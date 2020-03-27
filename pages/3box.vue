@@ -36,8 +36,7 @@ export default {
   	const Box = require('3box')
   	const profile = await Box.getProfile(this.ethereumAddress)
 
-  	console.log(profile.image[0]['contentUrl'])
-  	this.imageUrl = 'https://ipfs.infura.io/ipfs/QmQgkKiQRMpkoQV1Nz6XoEPtn4HpqtFVX73kGzruy2d2CF'
+  	this.imageUrl = 'https://ipfs.infura.io/ipfs/'+profile.image[0]['contentUrl']['/']
   	this.name = profile.name
   	this.website = profile.website
   },
