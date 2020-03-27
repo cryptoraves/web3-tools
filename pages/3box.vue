@@ -2,17 +2,18 @@
   <div class="container">
     <div>
       <h1 class="title">
-        3Box Tools
-      </h1>
-      <h2 class="subtitle">
         3Box Integrations
-      </h2>
+      </h1>
       <div>
-          <img
+      	<h2 class="subtitle">
+	        Profile Image With 3box Name as Title and Website as href:
+	    </h2>
+        <img
             :src="imageUrl"
             :title="name"
             @click="gowebsite()"
-          >
+            style="cursor: pointer;"
+        >
       </div>
     </div>
   </div>
