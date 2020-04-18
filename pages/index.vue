@@ -16,11 +16,11 @@
           3Box Tools
         </a>
         <a
-          href="https://github.com/nuxt/nuxt.js"
+          @click="goFactory()"
           target="_blank"
           class="button--grey"
         >
-          GitHub
+          Contract Factory
         </a>
       </div>
     </div>
@@ -28,10 +28,9 @@
 </template>
 
 <script>
-import Web3 from 'web3'
-import { ethers } from 'ethers'
-
+import MetamaskHandler from "./metamaskHandler"
 export default {
+  extends: MetamaskHandler,
   components: {},
   data() {
     return {
@@ -39,73 +38,14 @@ export default {
     }
   },
   async mounted() {
-    await this.initWeb3()
     this.ready = true
   },
   methods: {
     go3Box (ethereumAddress){
       this.$router.push({ name: '3box', query: { ethereumAddress: ethereumAddress } })
     },
-    async initWeb3() {
-      let web3js
-      if (window.ethereum) {
-        window.web3 = new Web3(ethereum)
-        web3js = new Web3(ethereum)
-        await ethereum.enable()
-      } else if (window.web3) {
-        window.web3 = new Web3(window.web3.currentProvider)
-        web3js = new Web3(window.web3.currentProvider)
-      } else {
-        // throw new Error('Please enable Metamask and refresh.')
-        this.showEnableMetaMask = true
-        return false
-      }
-      let networkId
-      try {
-        networkId = await web3js.eth.net.getId()
-      } catch(e) {
-        console.log(e)
-      }
-      if ([1, 4].includes(networkId)) {
-        if (networkId == 4) {
-          //mainnet check for live site
-          if (
-            window.location
-              .toString()
-              .includes('https://')
-          ) {
-            alert('Please switch Metamask to Main Ethereum Network')
-          }
-        }
-        if (networkId == 1) {
-          //mainnet check for live site
-          if (
-            !window.location
-              .toString()
-              .includes('https://') &&
-            !this.forceLive
-          ) {
-            alert('Please switch Metamask to Rinkeby Test Network')
-          }
-        }
-      } else {
-        this.showEnableMetaMask = true
-      }
-      if (web3js) {
-        this.web3js = web3js
-        this.ethereumProvider = new ethers.providers.Web3Provider(
-          web3js.currentProvider
-        )
-        this.ethereumAddress = (await this.ethereumProvider.listAccounts())[0]
-
-        window.ethereum.on('accountsChanged', function() {
-          const sleep = milliseconds => {
-            return new Promise(resolve => setTimeout(resolve, milliseconds))
-          }
-          sleep(1000)
-          location.reload()
-        })
-      }
+    goFactory (){
+      this.$router.push({ name: 'contractFactory'})
     }
   }
 }
