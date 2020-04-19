@@ -107,13 +107,14 @@ export default {
   components: {},
   data() {
     return {
-      contractAddress: '0x471FE61C929c03F534E32af51509DA308D911C3f',
+      contractFactoryAddress: '0x471FE61C929c03F534E32af51509DA308D911C3f',
       wallet: null,
       name: 'tokenA',
       symbol: 'TKA',
       totalSupply: '1000000000000000000000000000',
       decimals: 18,
       launchHash: null,
+      launchAddress: null,
       recipient: null,
       recipientAddress: null,
       amount: 100
@@ -138,7 +139,7 @@ export default {
       
 
       let token = new this.ethers.Contract(
-        this.contractAddress, 
+        this.contractFactoryAddress, 
         abi, 
         this.wallet
       )
@@ -149,10 +150,11 @@ export default {
         this.decimals,
         this.symbol 
       )
-      await tx.wait()
-
+      let val = await tx.wait()
+      
       this.launchHash = JSON.stringify(tx.hash).replace(/['"]+/g, '')
-      console.log(tx)
+      this.launchAddress = val.events[0].address
+
 
   	},
     async sendToken(){
@@ -161,8 +163,8 @@ export default {
         'function balanceOf(address who) external view returns (uint256)',
         'function transfer(address to, uint256 value) external returns (bool)'
       ]
-      console.log(this.wallet)
-      let token = new this.ethers.Contract('0x2cb985087b90959f1e7852401bdf1b89852dbc8b', abi, this.wallet)
+
+      let token = new this.ethers.Contract(this.launchAddress, abi, this.wallet)
 
       let amount1 = await token.balanceOf(this.wallet.address)
       let amount2 = await token.balanceOf(this.recipient.address)
