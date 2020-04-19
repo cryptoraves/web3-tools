@@ -72,10 +72,10 @@
           </div>
           <br>
           <form v-if="launchHash" name="send" action="" method="post">
-            <label for="recipient">
+            <label for="recipientAddress">
               Send to:
             </label>
-            <input v-model="recipient" />
+            <input v-model="recipientAddress" />
             <br>
             <label for="amount">
               Amount:
@@ -83,14 +83,13 @@
             <input v-model="amount" />
             <br><br>          
           </form>
-          <div
-            v-if="launchHash" 
+          <div 
             class="links">
             <a
               @click="sendToken()"
               class="button--green"
             >
-              Send {{this.amount}} of {{ this.symbol }} tokens to: {{ this.recipient }}
+              Send {{this.amount}} of {{ this.symbol }} tokens to: {{ this.recipientAddress}}
             </a>
           </div>
         </div>
@@ -116,6 +115,7 @@ export default {
       decimals: 18,
       launchHash: null,
       recipient: null,
+      recipientAddress: null,
       amount: 100
     }
   },
@@ -127,7 +127,9 @@ export default {
       //this.wallet = new this.ethers.Wallet.createRandom()
       this.wallet = new this.ethers.Wallet.fromMnemonic('wrist great knee profit inject clutch perfect purse faith lens vacuum world')
       this.wallet = this.wallet.connect(this.ethereumProvider)
-      console.log(this.wallet)
+
+      this.recipient = new this.ethers.Wallet.createRandom()
+      this.recipientAddress = this.recipient.address
     },
   	async launchToken(){
   		let abi = [
@@ -151,28 +153,27 @@ export default {
 
       this.launchHash = JSON.stringify(tx.hash).replace(/['"]+/g, '')
       console.log(tx)
+
   	},
     async sendToken(){
-      let recipient = new this.ethers.Wallet.createRandom()
-      this.recipient = recipient.address
+
       let abi = [
-        'function faucet() public',
         'function balanceOf(address who) external view returns (uint256)',
         'function transfer(address to, uint256 value) external returns (bool)'
       ]
-
-      let token = new ethers.Contract('0x2cb985087b90959f1e7852401bdf1b89852dbc8b', abi, this.wallet)
+      console.log(this.wallet)
+      let token = new this.ethers.Contract('0x2cb985087b90959f1e7852401bdf1b89852dbc8b', abi, this.wallet)
 
       let amount1 = await token.balanceOf(this.wallet.address)
-      let amount2 = await token.balanceOf(recipient.address)
+      let amount2 = await token.balanceOf(this.recipient.address)
       console.log('Balance #1: ', this.ethers.utils.formatEther(amount1))
       console.log('Balance #2: ', this.ethers.utils.formatEther(amount2))
 
-      tx = await token.transfer(wallet2.address, ethers.utils.parseEther(this.amount))
+      let tx = await token.transfer(this.recipient.address,this.ethers.utils.parseEther(this.amount.toString()))
       await tx.wait()
 
       amount1 = await token.balanceOf(this.wallet.address)
-      amount2 = await token.balanceOf(recipient.address)
+      amount2 = await token.balanceOf(this.recipient.address)
       console.log('Balance #1: ', this.ethers.utils.formatEther(amount1))
       console.log('Balance #2: ', this.ethers.utils.formatEther(amount2))
     },
