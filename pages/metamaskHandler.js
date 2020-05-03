@@ -64,7 +64,6 @@ export default {
           web3js.currentProvider
         )
         this.ethereumAddress = (await this.ethereumProvider.listAccounts())[0]
-
         window.ethereum.on('accountsChanged', function() {
           const sleep = milliseconds => {
             return new Promise(resolve => setTimeout(resolve, milliseconds))
