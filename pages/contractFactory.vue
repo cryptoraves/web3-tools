@@ -147,7 +147,7 @@ export default {
       //console.log(contract.deployTransaction.hash);
     },
   	async launchToken(){
-      
+
       let token = new this.ethers.Contract(
         this.contractFactoryAddress, 
         this.abi, 
@@ -204,7 +204,6 @@ export default {
   data() {
     return {
       contractFactoryAddress: null,
-      wallet: null,
       name: 'tokenA',
       symbol: 'TKA',
       totalSupply: '1000000000000000000000000000',
