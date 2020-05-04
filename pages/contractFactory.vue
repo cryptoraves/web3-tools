@@ -124,84 +124,48 @@ export default {
   extends: MetamaskHandler,
   components: {},
   async mounted() {
-    //localStorage.contractFactoryAddress = '0x471FE61C929c03F534E32af51509DA308D911C3f'
-    //let token = new ethers.Contract('0x471FE61C929c03F534E32af51509DA308D911C3f', abi, wallet1)
+    //localStorage.contractFactoryAddress = '0x471FE61C929c03F534E32af51509DA308D911C3f' original factory address
     if (localStorage.launchAddress) this.launchAddress = localStorage.launchAddress
     if (localStorage.launchHash) this.launchHash = localStorage.launchHash
-    if (localStorage.recipient) this.recipient = localStorage.recipient
     if (localStorage.recipientAddress) this.recipientAddress = localStorage.recipientAddress
     if (localStorage.contractFactoryAddress) this.contractFactoryAddress = localStorage.contractFactoryAddress
-      //0x471FE61C929c03F534E32af51509DA308D911C3f
   },
   methods: {
-
-    persist() {
-      localStorage.launchAddress = this.launchAddress
-      localStorage.launchHash = this.launchHash
-      localStorage.recipientAddress = this.recipientAddress
-      localStorage.contractFactoryAddress = this.contractFactoryAddress
-    },
     async initializeWallet(){
       //this.wallet = new this.ethers.Wallet.createRandom()
       //this.wallet = new this.ethers.Wallet.fromMnemonic('wrist great knee profit inject clutch perfect purse faith lens vacuum world')
       //this.wallet = this.wallet.connect(this.ethereumProvider)
-
-      
-      let recipient = new this.ethers.Wallet.createRandom()
-      this.recipientAddress = this.recipient.address
-
     },
-    resetLocalStorage(){
-      localStorage.clear()
-      location.reload()
+    async launchFactory(){
+
+      let factory = new this.ethers.ContractFactory(this.abi, this.bytecode, this.signer);
+      let contract = await factory.deploy();
+
+      this.contractFactoryAddress = localStorage.contractFactoryAddress = contract.address
+
+      await contract.deployed()
+      //console.log(contract.deployTransaction.hash);
     },
   	async launchToken(){
+      
+      let token = new this.ethers.Contract(
+        this.contractFactoryAddress, 
+        this.abi, 
+        this.signer
+      )
+      let tx = await token.createEIP20(
+        this.totalSupply,
+        this.name,
+        this.decimals,
+        this.symbol 
+      )
+      let val = await tx.wait()
+      
+      this.launchHash = localStorage.launchHash = JSON.stringify(tx.hash).replace(/['"]+/g, '')
+      this.launchAddress = localStorage.launchAddress = val.events[0].address
 
-      if (localStorage.launchAddress && localStorage.launchHash){
-        this.launchAddress = localStorage.launchAddress
-        this.launchHash = localStorage.launchHash
-      }else{
-
-    		let abi = [
-            'function createEIP20(uint256 _initialAmount, string _name, uint8 _decimals, string _symbol) public returns (address)'
-        ]
-        
-
-        let token = new this.ethers.Contract(
-          this.contractFactoryAddress, 
-          abi, 
-          this.signer
-        )
-        let tx = await token.createEIP20(
-          this.totalSupply,
-          this.name,
-          this.decimals,
-          this.symbol 
-        )
-        let val = await tx.wait()
-        
-        this.launchHash = JSON.stringify(tx.hash).replace(/['"]+/g, '')
-        this.launchAddress = val.events[0].address
-
-        localStorage.launchHash = this.launchHash
-        localStorage.launchAddress = this.launchAddress
-        /*this.$store.commit({
-          type: 'setLaunchInfo',
-          launchAddress: this.launchAddress,
-          launchHash: this.launchHash
-        })*/
-
-        let recipient = new this.ethers.Wallet.createRandom()
-        this.recipientAddress = recipient.address
-
-        localStorage.recipientAddress = this.recipientAddress
-        /*this.$store.commit({
-          type: 'setRecipientInfo',
-          recipient: this.recipient,
-          recipientAddress: this.recipientAddress
-        })*/
-      }
-
+      let recipient = new this.ethers.Wallet.createRandom()
+      this.recipientAddress = localStorage.recipientAddress = recipient.address
   	},
     async sendToken(){
 
@@ -225,29 +189,16 @@ export default {
       console.log('Balance #1: ', this.ethers.utils.formatEther(amount1))
       console.log('Balance #2: ', this.ethers.utils.formatEther(amount2))
     },
+    resetLocalStorage(){
+      localStorage.clear()
+      location.reload()
+    },
     goEtherscan(param){
       if (param.length == 42){
         window.open('https://rinkeby.etherscan.io/address/'+param)
       }else{
         window.open('https://rinkeby.etherscan.io/tx/'+param)
       }
-    },
-    async launchFactory(){
-
-      // Create an instance of a Contract Factory
-      let factory = new this.ethers.ContractFactory(this.abi, this.bytecode, this.signer);
-
-      let contract = await factory.deploy();
-
-      this.contractFactoryAddress = contract.address
-      localStorage.contractFactoryAddress = this.contractFactoryAddress
-
-      console.log(contract.address);
-      console.log(contract.deployTransaction.hash);
-      
-      // The contract is NOT deployed yet; we must wait until it is mined
-      await contract.deployed()
-
     }
   },
   data() {
