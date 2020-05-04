@@ -23,7 +23,7 @@
             v-else
           ><br>
             <a
-              target="_blank" 
+              target="_blank"
               @click="goEtherscan(contractFactoryAddress)">
               Contract Factory Address: {{ this.contractFactoryAddress }}
             </a>
@@ -379,6 +379,10 @@ export default {
   color: #526488;
   word-spacing: 5px;
   padding-bottom: 15px;
+}
+
+a {
+  color: blue;
 }
 
 .links {
