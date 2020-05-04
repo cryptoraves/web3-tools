@@ -15,6 +15,7 @@ export default {
     async initWeb3() {
       let web3js
       if (window.ethereum) {
+        ethereum.autoRefreshOnNetworkChange = false
         window.web3 = new Web3(ethereum)
         web3js = new Web3(ethereum)
         await ethereum.enable()
