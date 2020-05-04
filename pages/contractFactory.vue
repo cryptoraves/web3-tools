@@ -384,6 +384,12 @@ export default {
 a {
   color: blue;
 }
+a:hover {
+  cursor: pointer;
+  color: blue;
+  font-weight: bold;
+}
+
 
 .links {
   padding-top: 15px;
