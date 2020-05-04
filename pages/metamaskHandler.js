@@ -63,6 +63,7 @@ export default {
         this.ethereumProvider = new ethers.providers.Web3Provider(
           web3js.currentProvider
         )
+        this.signer = this.ethereumProvider.getSigner(0)
         this.ethereumAddress = (await this.ethereumProvider.listAccounts())[0]
         window.ethereum.on('accountsChanged', function() {
           const sleep = milliseconds => {
