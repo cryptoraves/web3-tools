@@ -16,11 +16,18 @@
           3Box Tools
         </a>
         <a
-          @click="goFactory()"
+          @click="goERC20Factory()"
           target="_blank"
           class="button--grey"
         >
-          Contract Factory
+          ERC20 Contract Factory
+        </a>
+        <a
+          @click="goERC721Factory()"
+          target="_blank"
+          class="button--grey"
+        >
+          ERC721 Contract Factory
         </a>
       </div>
     </div>
@@ -44,8 +51,11 @@ export default {
     go3Box (ethereumAddress){
       this.$router.push({ name: '3box', query: { ethereumAddress: ethereumAddress } })
     },
-    goFactory (){
-      this.$router.push({ name: 'contractFactory'})
+    goERC20Factory (){
+      this.$router.push({ name: 'ERC20ContractFactory'})
+    },
+    goERC721Factory (){
+      this.$router.push({ name: 'ERC721ContractFactory'})
     }
   }
 }
@@ -81,5 +91,11 @@ export default {
 
 .links {
   padding-top: 15px;
+}
+
+a:hover {
+  cursor: pointer;
+  color: blue;
+  font-weight: bold;
 }
 </style>
