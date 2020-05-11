@@ -27,7 +27,14 @@
           target="_blank"
           class="button--grey"
         >
-          ERC721 Contract Factory
+          ERC721 Contract
+        </a>
+        <a
+          @click="goERC1155Factory()"
+          target="_blank"
+          class="button--grey"
+        >
+          ERC1155 Contract
         </a>
       </div>
     </div>
@@ -56,6 +63,9 @@ export default {
     },
     goERC721Factory (){
       this.$router.push({ name: 'ERC721ContractFactory'})
+    },
+    goERC1155Factory (){
+      this.$router.push({ name: 'ERC1155Contract'})
     }
   }
 }
