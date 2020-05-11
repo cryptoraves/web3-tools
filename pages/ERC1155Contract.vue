@@ -186,9 +186,9 @@ export default {
         'function balanceOf(address from, uint256 tokenId) external view returns (uint256)',
         'function safeTransferFrom(address from, address to, uint256 tokenId, uint256 value, bytes data) public',
       ]
-      console.log('here')
+
       let token = new this.ethers.Contract(this.contractFactoryAddress, abi, this.signer)
-      console.log('here')
+
       let amount1 = await token.balanceOf(this.ethereumAddress, this.tokenId)
       let amount2 = await token.balanceOf(this.recipientAddress, this.tokenId)
       console.log('Balance #1: ', this.ethers.utils.formatUnits(amount1, this.decimals))
