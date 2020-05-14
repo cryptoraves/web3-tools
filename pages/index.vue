@@ -16,25 +16,32 @@
           3Box Tools
         </a>
         <a
-          @click="goERC20Factory()"
+          @click="gofeature('ERC20ContractFactory')"
           target="_blank"
           class="button--grey"
         >
           ERC20 Contract Factory
         </a>
         <a
-          @click="goERC721Factory()"
+          @click="gofeature('ERC721ContractFactory')"
           target="_blank"
           class="button--grey"
         >
           ERC721 Contract
         </a>
         <a
-          @click="goERC1155Factory()"
+          @click="gofeature('ERC1155Contract')"
           target="_blank"
           class="button--grey"
         >
           ERC1155 Contract
+        </a>
+        <a
+          @click="gofeature('DepositContract')"
+          target="_blank"
+          class="button--grey"
+        >
+          Multi-Deposit Contract
         </a>
       </div>
     </div>
@@ -58,14 +65,8 @@ export default {
     go3Box (ethereumAddress){
       this.$router.push({ name: '3box', query: { ethereumAddress: ethereumAddress } })
     },
-    goERC20Factory (){
-      this.$router.push({ name: 'ERC20ContractFactory'})
-    },
-    goERC721Factory (){
-      this.$router.push({ name: 'ERC721ContractFactory'})
-    },
-    goERC1155Factory (){
-      this.$router.push({ name: 'ERC1155Contract'})
+    gofeature (page){
+      this.$router.push({ name: page})
     }
   }
 }
