@@ -9,7 +9,7 @@ contract EIP20Factory {
     mapping(address => bool) public isEIP20; //verify without having to do a bytecode check.
     
     constructor() public {
-        //upon creation of the factory, deploy a EIP20 (parameters are meaningless) and store the bytecode provably.
+        //upon creation of the factory, deploy a EIP20 (parameters are meaningless) to get factory address.
         createEIP20(10000, "Verify Token", 3, "VTX");
     }
 
