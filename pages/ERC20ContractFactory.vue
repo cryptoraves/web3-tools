@@ -9,6 +9,12 @@
 	        Tinker with contract factory
 	     </h2>
        <div class="content">
+          <br>
+          <a
+            target="_blank" 
+            @click="goEtherscan(ethereumAddress)">
+            Wallet Address: {{ this.ethereumAddress }}
+          </a>
           <div
             v-if="!contractFactoryAddress && !showLoading" 
             class="links">
@@ -28,12 +34,7 @@
               Contract Factory Address: {{ this.contractFactoryAddress }}
             </a>
             <br>
-            <br>
-            <a
-              target="_blank" 
-              @click="goEtherscan(ethereumAddress)">
-              Wallet Address: {{ this.ethereumAddress }}
-            </a>
+            
           </div>
           <br>
           <form v-if="!launchHash && ethereumAddress && contractFactoryAddress && !showLoading" name="contact" action="" method="post">
@@ -146,8 +147,6 @@ export default {
     async launchFactory(){
 
       let factory = new this.ethers.ContractFactory(this.abi, this.bytecode, this.signer);
-
-      
       let contract = await factory.deploy();
 
       this.showLoading = true
@@ -159,12 +158,12 @@ export default {
     },
   	async launchToken(){
 
-      let token = new this.ethers.Contract(
+      let factory = new this.ethers.Contract(
         this.contractFactoryAddress, 
         this.abi, 
         this.signer
       )
-      let tx = await token.createEIP20(
+      let tx = await factory.createEIP20(
         this.totalSupply,
         this.name,
         this.decimals,
@@ -177,8 +176,10 @@ export default {
       this.launchHash = localStorage.launchHash = JSON.stringify(tx.hash).replace(/['"]+/g, '')
       this.launchAddress = localStorage.launchAddress = val.events[0].address
 
-      let recipient = new this.ethers.Wallet.createRandom()
-      this.recipientAddress = localStorage.recipientAddress = recipient.address
+      if (!this.recipientAddress){
+        let recipient = new this.ethers.Wallet.createRandom()
+        this.recipientAddress = localStorage.recipientAddress = recipient.address
+      }
   	},
     async sendToken(){
 

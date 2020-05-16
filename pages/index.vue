@@ -27,7 +27,7 @@
           target="_blank"
           class="button--grey"
         >
-          ERC721 Contract
+          ERC721 Contract Factory
         </a>
         <a
           @click="gofeature('ERC1155Contract')"
