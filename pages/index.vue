@@ -8,6 +8,7 @@
         Fundamental tools for interacting in web3
       </h2>
       <div class="links">
+        
         <a
           @click="go3Box(ethereumAddress)"
           target="_blank"
@@ -42,6 +43,13 @@
           class="button--grey"
         >
           Multi-Deposit Contract
+        </a>
+        <a
+          @click="gofeature('ManagerContract')"
+          target="_blank"
+          class="button--grey"
+        >
+          Manager Contract
         </a>
       </div>
     </div>

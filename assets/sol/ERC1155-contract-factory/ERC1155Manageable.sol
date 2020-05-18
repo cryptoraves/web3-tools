@@ -1,10 +1,11 @@
 pragma solidity ^0.6.0;
 
 import "https://github.com/OpenZeppelin/openzeppelin-contracts/contracts/token/ERC1155/ERC1155.sol";
+import "./WalletFull.sol";
 
 //can manage tokens for any Cryptoraves-native address
 
-contract ERC1155Manageable is ERC1155 {
+contract ERC1155Manageable is ERC1155{
     
     //the address of the contract launcher is _manager by default
     address private _manager;
@@ -28,7 +29,8 @@ contract ERC1155Manageable is ERC1155 {
         _mintBatch(_to, _ids, _values, _data);
     }
     
-    function addManagerToAccount(address account) public onlyManager {
-        
+    function launchL2Account() public onlyManager returns (address) {
+        WalletFull receiver = (new WalletFull(address(this)));
+        return address(receiver);
     }
 }
