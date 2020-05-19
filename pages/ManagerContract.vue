@@ -49,15 +49,24 @@
             @click="goEtherscan(launchedWalletAddress)">
             Launched Wallet Address: {{ this.launchedWalletAddress }}
           </a>
-          <br>
+          <!-- br>
           <br>
           <a 
             @click="launchWallet()"
             class="button--green"
           >
             Launch Another Wallet
-          </a>
+          </a -->
         </div>
+        <div
+          class="links">
+          <a
+            @click="dropMyCrypto()"
+            class="button--green"
+          >
+            Drop Crypto For Launched Wallet
+          </a>
+        </div>      
         <div
           v-if="showLoading"
         >
@@ -127,6 +136,35 @@ export default {
       tx = await factory.isApprovedForAll(this.launchedWalletAddress, this.managerContractAddress)
       this.showLoading = false
       console.log(tx)
+
+    },
+    async dropMyCrypto(){
+
+      let token = new this.ethers.Contract(
+        this.managerContractAddress, 
+        this.abi, 
+        this.signer
+      )
+
+      let amount = 1000000000
+      let decimals = 18
+      let tokenId = 0
+
+      let amt = this.ethers.utils.parseUnits(amount.toString(), parseInt(decimals))
+
+      let tx = await token.mint(
+        this.launchedWalletAddress,
+        tokenId,
+        amt.toString(),
+        this.ethers.utils.formatBytes32String('')
+      )
+
+      this.showLoading = true
+      let val = await tx.wait()
+      this.showLoading = false
+
+      let amount1 = await token.balanceOf(this.launchedWalletAddress, tokenId)
+      console.log('Balance for : ',this.launchedWalletAddress, this.ethers.utils.formatUnits(amount1, decimals))
 
     },
     resetLocalStorage(){
