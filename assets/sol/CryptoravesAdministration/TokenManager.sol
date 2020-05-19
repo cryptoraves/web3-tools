@@ -7,6 +7,8 @@ import "./WalletFull.sol";
 
 contract ERC1155Manageable is ERC1155{
     
+    mapping(address => bool) public wallets;
+    
     //the address of the contract launcher is _manager by default
     address private _manager;
     
@@ -17,8 +19,8 @@ contract ERC1155Manageable is ERC1155{
     }
 
     constructor() ERC1155() public {
-    	_manager = msg.sender;
-    	
+        _manager = msg.sender;
+        
     }
     
     function mint(address _to, uint256 _id, uint256 _value, bytes memory _data) public { 
@@ -31,6 +33,7 @@ contract ERC1155Manageable is ERC1155{
     
     function launchL2Account() public onlyManager returns (address) {
         WalletFull receiver = (new WalletFull(address(this)));
+        wallets[address(receiver)];
         return address(receiver);
     }
 }

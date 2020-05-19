@@ -49,7 +49,14 @@
             @click="goEtherscan(launchedWalletAddress)">
             Launched Wallet Address: {{ this.launchedWalletAddress }}
           </a>
-          
+          <br>
+          <br>
+          <a 
+            @click="launchWallet()"
+            class="button--green"
+          >
+            Launch Another Wallet
+          </a>
         </div>
         <div
           v-if="showLoading"
@@ -116,7 +123,8 @@ export default {
       this.launchedWalletAddress = localStorage.launchedWalletAddress = val.events[0].args['account']
 
       this.showLoading = true
-      tx = await factory.showCurrentWallet()
+      //Verifies that new wallet has approved the manager contract to perform transactions on its behalf
+      tx = await factory.isApprovedForAll(this.launchedWalletAddress, this.managerContractAddress)
       this.showLoading = false
       console.log(tx)
 
