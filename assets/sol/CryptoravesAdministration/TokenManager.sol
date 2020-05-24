@@ -33,11 +33,6 @@ contract TokenManager is ERC1155{
         
     }
     
-    function mint(address _to, uint256 _id, uint256 _value, bytes memory _data) public{ 
-        _mint(_to, _id, _value, _data);
-        
-    }
-    
     function getUserAccount(uint256 _userId) onlyManager public view returns(address) {
         
         return users[_userId].account;
@@ -111,9 +106,3 @@ contract TokenManager is ERC1155{
       }
     }
 }
-
-
-
-
-
-
