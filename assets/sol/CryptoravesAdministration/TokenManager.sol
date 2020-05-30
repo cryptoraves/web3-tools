@@ -2,9 +2,7 @@ pragma solidity ^0.6.0;
 
 import "./WalletFull.sol";
 
-
 //can manage tokens for any Cryptoraves-native address
-
 contract TokenManager is ERC1155{
     
     struct User {
@@ -27,6 +25,20 @@ contract TokenManager is ERC1155{
       require(msg.sender == _manager, 'Sender is not the manager.');
       _;
     }
+    
+    /**
+    * @notice Emits when a deposit is made.
+    */
+    event Deposit(address indexed _from, uint _value, address indexed _token);
+    /**
+    * @notice Emits when a withdrawal is made.
+    */
+    event Withdraw(address indexed _to, uint _value, address indexed _token);
+    /**
+    * @notice Emits when a Transfer is made.
+    */
+    event Transfer(address indexed _from, address indexed _to, uint _value, uint256 _token);
+
 
     constructor() ERC1155() public {
         _manager = msg.sender;
@@ -86,6 +98,7 @@ contract TokenManager is ERC1155{
     
     function _managedTransfer(address _from, address _to, uint256 _tokenId,  uint256 _val, bytes memory _data) internal {
         WalletFull(_from).managedTransfer(_from, _to, _tokenId, _val, _data);
+        emit Transfer(_from, _to, _val, _tokenId);
     }
     
     function _userAccountCheck(uint256 _platformUserId) internal returns (address) {
