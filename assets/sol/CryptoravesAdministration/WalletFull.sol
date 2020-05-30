@@ -24,7 +24,7 @@ abstract contract ERC1155Receiver is ERC165, IERC1155Receiver {
     constructor(address _ManagerAddress) public {
         //setManager 
         ERC1155ABI(_ManagerAddress).setApprovalForAll(_ManagerAddress, true);
-        _manager = _ManagerAddress;
+        _manager = _ManagerAddress; 
     }
 
     function onERC1155Received(address, address, uint256, uint256, bytes calldata) external override virtual returns (bytes4) {

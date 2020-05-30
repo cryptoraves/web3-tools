@@ -26,7 +26,7 @@ contract TokenManager is ERC1155{
       _;
     }
     
-    /**
+    /** 
     * @notice Emits when a deposit is made.
     */
     event Deposit(address indexed _from, uint _value, address indexed _token);
