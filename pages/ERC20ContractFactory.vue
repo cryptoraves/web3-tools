@@ -117,7 +117,7 @@
                 @click="burnToken()"
                 class="button--green"
               >
-                Brun {{this.amount}} {{ this.symbol }} tokens.
+                Burn {{this.amount}} {{ this.symbol }} tokens.
               </a>
             </div>      
           </form>
