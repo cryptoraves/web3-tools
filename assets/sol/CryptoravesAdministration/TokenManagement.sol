@@ -63,14 +63,12 @@ contract TokenManagement is ERC1155, ERC20Depositable, UserManagement {
         
         address _fromAddress = users[_fromPlatformId].account;
         address _toAddress = _userAccountCheck(_toPlatformId);
-        
         address _userAccount = getUserAccount(_platformId);
-        
         
         _managedTransfer(_fromAddress, _toAddress, _getManagedTokenIdByAddress(_userAccount), _val, _data);
     }
     
-    function DepositERC20(uint _amount, address _token) public payable returns (bool) {
+    function depositERC20(uint256 _amount, address _token) public payable returns (bool) {
         
         _depositERC20(_amount, _token);
         if(!managedTokenListByAddress[_token].isManagedToken) {
