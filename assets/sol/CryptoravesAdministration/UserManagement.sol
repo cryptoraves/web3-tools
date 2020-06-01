@@ -18,7 +18,7 @@ contract UserManagement {
     mapping(address => uint256) public userAccounts;
     
     
-    function _getUserAccount(uint256 _userId) internal view returns(address) {
+    function getUserAccount(uint256 _userId) public view returns(address) {
         
         return users[_userId].account;
     }

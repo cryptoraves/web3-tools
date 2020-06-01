@@ -64,7 +64,7 @@ contract TokenManagement is ERC1155, ERC20Depositable, UserManagement {
         address _fromAddress = users[_fromPlatformId].account;
         address _toAddress = _userAccountCheck(_toPlatformId);
         
-        address _userAccount = _getUserAccount(_platformId);
+        address _userAccount = getUserAccount(_platformId);
         
         
         _managedTransfer(_fromAddress, _toAddress, _getManagedTokenIdByAddress(_userAccount), _val, _data);
@@ -80,6 +80,10 @@ contract TokenManagement is ERC1155, ERC20Depositable, UserManagement {
         uint256 _tokenId = _getManagedTokenIdByAddress(_token);
         _mint(msg.sender, _tokenId, _amount, '');
         
+    }
+    
+    function getTokenIdFromPlatformId(uint256 _platformId) public view returns(uint256) {
+        _getManagedTokenIdByAddress(getUserAccount(_platformId));
     }
     
     function _addTokenToManagedTokenList(address _token) internal {
