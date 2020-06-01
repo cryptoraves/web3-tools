@@ -3,9 +3,9 @@ pragma solidity ^0.6.2;
 import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/math/SafeMath.sol"; //release-v3.0.0
 import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/Address.sol"; //release-v3.0.0
 
-contract ContentValidation {
-	
-	using SafeMath for uint256;
+contract ValidatorSystem {
+    
+    using SafeMath for uint256;
     using Address for address;
 
     /*
@@ -53,7 +53,7 @@ contract ContentValidation {
     */ 
     function validateCommand(
         uint256 twitterIdFrom,
-        uint256 fromImageUrl,
+        string memory fromImageUrl,
         string memory param1, 
         string memory param2, 
         string memory param3
@@ -63,6 +63,5 @@ contract ContentValidation {
         *  Also see if view functions can return a function type that can then be executed 
         *  from here if valid.
         */
-    }
-    
+    }    
 }
