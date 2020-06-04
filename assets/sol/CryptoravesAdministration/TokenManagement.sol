@@ -82,6 +82,17 @@ contract TokenManagement is ERC1155, ERC20Depositable, UserManagement {
         emit Transfer(address(this), msg.sender, _amount, _tokenId); 
     }
     
+    function withdrawERC20(uint256 _amount, address _token) public payable {
+        
+        _withdrawERC20(_amount, _token);
+        
+        uint256 _tokenId = _getManagedTokenIdByAddress(_token);
+        _burn(msg.sender, _tokenId, _amount);
+        
+        //must be last to execute for web3 processing
+        emit Transfer(msg.sender, address(this), _amount, _tokenId); 
+    }
+    
     function getTokenIdFromPlatformId(uint256 _platformId) public view returns(uint256) {
         _getManagedTokenIdByAddress(getUserAccount(_platformId));
     }
