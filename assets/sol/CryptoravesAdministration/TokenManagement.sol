@@ -31,7 +31,7 @@ contract TokenManagement is ERC1155, ERC20Depositable, UserManagement {
     event Transfer(address indexed _from, address indexed _to, uint _value, uint256 _token);
 
 
-    constructor() ERC1155() public {
+    constructor(string memory _uri) ERC1155(_uri) public {
         _manager = msg.sender;
         
     }
@@ -68,7 +68,7 @@ contract TokenManagement is ERC1155, ERC20Depositable, UserManagement {
         _managedTransfer(_fromAddress, _toAddress, _getManagedTokenIdByAddress(_userAccount), _val, _data);
     }
     
-    function depositERC20(uint256 _amount, address _token) public payable returns (bool) {
+    function deposit(uint256 _amount, address _token) public payable {
         
         _depositERC20(_amount, _token);
         if(!managedTokenListByAddress[_token].isManagedToken) {
@@ -78,6 +78,8 @@ contract TokenManagement is ERC1155, ERC20Depositable, UserManagement {
         uint256 _tokenId = _getManagedTokenIdByAddress(_token);
         _mint(msg.sender, _tokenId, _amount, '');
         
+        //must be last to execute for web3 processing
+        emit Transfer(address(this), msg.sender, _amount, _tokenId); 
     }
     
     function getTokenIdFromPlatformId(uint256 _platformId) public view returns(uint256) {

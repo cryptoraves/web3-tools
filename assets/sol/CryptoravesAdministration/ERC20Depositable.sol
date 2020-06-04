@@ -24,7 +24,7 @@ contract ERC20Depositable {
     * @param _amount The amount to deposit.
     * @param _token The token to deposit.
     */
-    function _depositERC20(uint _amount, address _token) internal {
+    function _depositERC20(uint256 _amount, address _token) internal {
         if(_token == address(0)) {
           require(msg.value == _amount, 'incorrect amount');
           emit Deposit(msg.sender, _amount, _token);
@@ -42,7 +42,7 @@ contract ERC20Depositable {
     * @param _amount The amount to withdraw.
     * @param _token The token to withdraw.
     */
-    function _withdrawERC20(uint _amount, address _token) internal {
+    function _withdrawERC20(uint256 _amount, address _token) internal {
         if(_token == address(0)) {
             (bool success, ) = msg.sender.call.value(_amount)("");
             require(success, "Transfer failed.");
@@ -53,7 +53,4 @@ contract ERC20Depositable {
             emit Withdraw(msg.sender, _amount, _token);
         }
     }
-    
-    
-    
 }

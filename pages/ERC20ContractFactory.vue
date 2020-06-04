@@ -75,7 +75,7 @@
             <a v-if="launchHash"
               target="_blank" 
               @click="goEtherscan(launchHash)">
-              New Contract Hash: {{ this.launchHash }}
+              New ERC20 Contract Address: {{ this.launchAddress }}
             </a>
             <br>
             <br>
@@ -255,7 +255,10 @@ export default {
       console.log('Balance #2: ', this.ethers.utils.formatEther(amount2))
     },
     resetLocalStorage(){
-      localStorage.clear()
+      localStorage.removeItem('ERC20launchAddress')
+      localStorage.removeItem('ERC20launchHash')
+      localStorage.removeItem('recipientAddress')
+      localStorage.removeItem('ERC20contractFactoryAddress')
       location.reload()
     },
     goEtherscan(param){
