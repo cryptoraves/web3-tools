@@ -3,9 +3,10 @@ pragma solidity ^0.6.0;
 import "./UserManagement.sol";
 import "./ERC20Depositable.sol";
 
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC721/IERC721Receiver.sol";
 
 //can manage tokens for any Cryptoraves-native address
-contract TokenManagement is ERC1155, ERC20Depositable, UserManagement {
+contract TokenManagement is ERC1155, ERC20Depositable, UserManagement, IERC721Receiver {
     
     //Token id list
     address[] public tokenListById;
@@ -92,6 +93,30 @@ contract TokenManagement is ERC1155, ERC20Depositable, UserManagement {
         //must be last to execute for web3 processing
         emit Transfer(msg.sender, address(this), _amount, _tokenId); 
     }
+    function depositERC721(uint256 _tokenId, address _token) public payable {
+        
+        _depositERC721(_tokenId, _token);
+        if(!managedTokenListByAddress[_token].isManagedToken) {
+            _addTokenToManagedTokenList(_token);
+        }
+        
+        uint256 _1155tokenId = _getManagedTokenIdByAddress(_token);
+        _mint(msg.sender, _1155tokenId, _tokenId, '');
+        
+        //must be last to execute for web3 processing
+        emit Transfer(address(this), msg.sender, _1155tokenId, _tokenId); 
+    }
+    
+    function withdrawERC721(uint256 _tokenId, address _token) public payable {
+        
+        _withdrawERC721(_tokenId, _token);
+        
+        uint256 _1155tokenId = _getManagedTokenIdByAddress(_token);
+        _burn(msg.sender, _1155tokenId, _tokenId);
+        
+        //must be last to execute for web3 processing
+        emit Transfer(msg.sender, address(this), _1155tokenId, _tokenId); 
+    }
     
     function getTokenIdFromPlatformId(uint256 _platformId) public view returns(uint256) {
         _getManagedTokenIdByAddress(getUserAccount(_platformId));
@@ -114,5 +139,9 @@ contract TokenManagement is ERC1155, ERC20Depositable, UserManagement {
     function _managedTransfer(address _from, address _to, uint256 _tokenId,  uint256 _val, bytes memory _data) internal {
         WalletFull(_from).managedTransfer(_from, _to, _tokenId, _val, _data);
         emit Transfer(_from, _to, _val, _tokenId);
+    }
+    
+    function onERC721Received(address, address, uint256, bytes memory) public virtual override returns (bytes4) {
+        return this.onERC721Received.selector;
     }
 }
