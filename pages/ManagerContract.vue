@@ -367,7 +367,7 @@ export default {
 
       this.showLoading = true
       let tx = await tokenManager.withdrawERC721(
-        localStorage.ERC721TokenId.toString(),
+        '1',
         localStorage.ERC721launchAddress
       )
       let val = await tx.wait()

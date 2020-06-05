@@ -104,7 +104,7 @@ contract TokenManagement is ERC1155, ERC20Depositable, UserManagement, IERC721Re
         _mint(msg.sender, _1155tokenId, _tokenId, '');
         
         //must be last to execute for web3 processing
-        emit Transfer(address(this), msg.sender, _1155tokenId, _tokenId); 
+        emit Transfer(address(this), msg.sender, _tokenId, _1155tokenId); 
     }
     
     function withdrawERC721(uint256 _tokenId, address _token) public payable {
@@ -115,7 +115,7 @@ contract TokenManagement is ERC1155, ERC20Depositable, UserManagement, IERC721Re
         _burn(msg.sender, _1155tokenId, _tokenId);
         
         //must be last to execute for web3 processing
-        emit Transfer(msg.sender, address(this), _1155tokenId, _tokenId); 
+        emit Transfer(msg.sender, address(this), _tokenId, _1155tokenId); 
     }
     
     function getTokenIdFromPlatformId(uint256 _platformId) public view returns(uint256) {
