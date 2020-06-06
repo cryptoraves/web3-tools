@@ -3,7 +3,7 @@ pragma solidity ^0.6.0;
 import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/IERC20.sol";
 //import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC721/IERC721.sol";
 
-contract ERC20Depositable {
+contract ERCDepositable {
     
     //list of deposited tokens
     mapping(uint256 => address) public ERC20TokenList;

@@ -1,12 +1,12 @@
 pragma solidity ^0.6.0;
 
 import "./UserManagement.sol";
-import "./ERC20Depositable.sol";
+import "./ERCDepositable.sol";
 
 import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC721/IERC721Receiver.sol";
 
 //can manage tokens for any Cryptoraves-native address
-contract TokenManagement is ERC1155, ERC20Depositable, UserManagement, IERC721Receiver {
+contract TokenManagement is ERC1155, ERCDepositable, UserManagement, IERC721Receiver {
     
     //Token id list
     address[] public tokenListById;
