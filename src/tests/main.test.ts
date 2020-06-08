@@ -11,4 +11,5 @@ spec.test('returns boolean', async (ctx) => {
   ctx.is(value, '100');
 });
 
+
 export default spec;

@@ -1,4 +1,4 @@
-pragma solidity ^0.6.2;
+pragma solidity ^0.6.0;
 
 import "https://github.com/OpenZeppelin/openzeppelin-contracts/contracts/token/ERC1155/ERC1155.sol";
 
@@ -44,3 +44,5 @@ interface ERC1155ABI {
     function setApprovalForAll(address operator, bool approved) external;
     function safeTransferFrom(address from, address to, uint256 id, uint256 value, bytes calldata data) external;
 }
+
+

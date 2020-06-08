@@ -1,6 +1,6 @@
 import "./ERC20Full.sol"; 
 
-pragma solidity ^0.6.2;
+pragma solidity ^0.6.0;
 
 
 contract EIP20Factory {
