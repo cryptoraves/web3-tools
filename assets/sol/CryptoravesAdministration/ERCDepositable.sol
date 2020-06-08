@@ -1,7 +1,6 @@
 pragma solidity ^0.6.0;
 
 import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/IERC20.sol";
-//import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC721/IERC721.sol";
 
 contract ERCDepositable {
     
@@ -57,7 +56,7 @@ contract ERCDepositable {
     }
     
     function _depositERC721(uint256 _tokenId, address _token) internal {
-        IERCuni token = IERCuni(_token); //trying ABI for ERC20 as IERC721.sol conflicts with IERC1155
+        IERCuni token = IERCuni(_token); //you can use ABI for ERC20 as IERC721.sol conflicts with IERC1155
         token.safeTransferFrom(msg.sender, address(this), _tokenId);
         emit Deposit(msg.sender, _tokenId, _token);
         
