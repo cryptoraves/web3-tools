@@ -1,7 +1,7 @@
 pragma solidity ^0.6.0;
+pragma experimental ABIEncoderV2;
 
-import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/math/SafeMath.sol"; //release-v3.0.0
-import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/Address.sol"; //release-v3.0.0
+import "./TokenManagement.sol";
 
 contract ValidatorSystem {
     
@@ -13,6 +13,8 @@ contract ValidatorSystem {
     */
     mapping(address => bool) private _validators;
     
+    //token manager contract address
+    address private _tokenManager;
     /*
     * Require msg.sender to be validator
     */
@@ -23,8 +25,14 @@ contract ValidatorSystem {
     }
     
     //owner can validate by default. Can later revoke self by unsetValidator()
-    constructor() public {
+    constructor(string memory _uri) public {
          _validators[msg.sender] = true;
+         
+         //launch token Manager
+         TokenManagement tokenManager = new TokenManagement(_uri);
+         
+         //set default token manager address
+         _tokenManager = address(tokenManager);
     }
     
     /*
@@ -44,24 +52,39 @@ contract ValidatorSystem {
     }
     
     /*
+    * Change token manager address
+    * @param newTokenManager is the address of new Token Manager
+    */
+    function changeTokenManager(address newTokenManager) public onlyValidator {
+        _tokenManager = newTokenManager;
+    }
+    
+    /*
     * check incoming parsed Tweet data for valid command
-    * @param twitterAddressFrom The Twitter ID of the Tweet author
-    * @param fromImgUrl The Twitter img of user
-    * @param param1 first possible param to ckeck
-    * @param param2 second possible param to ckeck
-    * @param param3 third possible param to ckeck
+    * @param _twitterIds [1] = twitterIdFrom, [2] = twitterIdTo, [3] = twitterIdThirdParty
+    * @param _twitterNames [1] = twitterHandleFrom, [2] = twitterHandleTo, [3] = thirdPartyName
+    * @param _fromImgUrl The Twitter img of initiating user
+    * @param _isLaunch launch indicator
+    * @param _value amount or id of token to transfer
+    * @param _data bytes value for ERC721 & 1155 txns
     */ 
     function validateCommand(
-        uint256 twitterIdFrom,
-        string memory fromImageUrl,
-        string memory param1, 
-        string memory param2, 
-        string memory param3
+        uint256[] memory _twitterIds,
+        string[] memory _twitterNames,
+        string memory _fromImageUrl,
+        bool _isLaunch, 
+        uint256 _value,
+        bytes memory _data
     ) public onlyValidator {
+        
+        TokenManagement tokenManager = TokenManagement(_tokenManager);
+        
+        tokenManager.initCommand(_twitterIds, _twitterNames, _fromImageUrl, _isLaunch, _value, _data);
         /*
         *  Consider using the Token Manager Contract to host view functions for validating.
         *  Also see if view functions can return a function type that can then be executed 
         *  from here if valid.
         */
-    }    
+    }
+    
 }

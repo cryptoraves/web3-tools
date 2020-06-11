@@ -4,35 +4,41 @@ import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contr
 
 contract ERCDepositable {
     
-    //list of deposited tokens
-    mapping(uint256 => address) public ERC20TokenList;
+    mapping(string => address) public tokenAddressesByTicker;
     
     /**
     * @notice Emits when a deposit is made.
     */
-    event Deposit(address indexed _from, uint _value, address indexed _token);
+    event Deposit(address indexed _from, uint256 _value, address indexed _token);
     /**
     * @notice Emits when a withdrawal is made.
     */
-    event Withdraw(address indexed _to, uint _value, address indexed _token);
+    event Withdraw(address indexed _to, uint256 _value, address indexed _token);
     /**
     * @notice Emits when a Transfer is made.
     */
+    
+    function _checkTickerAddress(string memory _ticker, address _token) internal {
+        if(tokenAddressesByTicker[_ticker] == address(0)){
+            tokenAddressesByTicker[_ticker] = _token;
+        }
+    }
     
     /**
     * @dev Allows a user to deposit ETH or an ERC20 into the contract.
            If _token is 0 address, deposit ETH.
     * @param _amount The amount to deposit.
-    * @param _token The token to deposit.
+    * @param _tokenAddr The token to deposit.
     */
-    function _depositERC20(uint256 _amount, address _token) internal {
-        if(_token == address(0)) {
+    function _depositERC20(uint256 _amount, address _tokenAddr) internal {
+        if(_tokenAddr == address(0)) {
           require(msg.value == _amount, 'incorrect amount');
-          emit Deposit(msg.sender, _amount, _token);
+          emit Deposit(msg.sender, _amount, _tokenAddr);
         } else {
-          IERC20 token = IERC20(_token);
+          IERCuni token = IERCuni(_tokenAddr);
           require(token.transferFrom(msg.sender, address(this), _amount), 'transfer failed');
-          emit Deposit(msg.sender, _amount, _token);
+          _checkTickerAddress(token.symbol(), _tokenAddr);
+          emit Deposit(msg.sender, _amount, _tokenAddr);
         }
     }
     
@@ -41,30 +47,31 @@ contract ERCDepositable {
            and msg.sender is the beneficiary.
            If _token is 0 address, withdraw ETH.
     * @param _amount The amount to withdraw.
-    * @param _token The token to withdraw.
+    * @param _tokenAddr The token to withdraw.
     */
-    function _withdrawERC20(uint256 _amount, address _token) internal {
-        if(_token == address(0)) {
+    function _withdrawERC20(uint256 _amount, address _tokenAddr) internal {
+        if(_tokenAddr == address(0)) {
             (bool success, ) = msg.sender.call.value(_amount)("");
             require(success, "Transfer failed.");
-            emit Withdraw(msg.sender, _amount, _token);
+            emit Withdraw(msg.sender, _amount, _tokenAddr);
         } else {
-            IERC20 token = IERC20(_token);
+            IERCuni token = IERCuni(_tokenAddr);
             require(token.transfer(msg.sender, _amount), 'transfer failed');
-            emit Withdraw(msg.sender, _amount, _token);
+            emit Withdraw(msg.sender, _amount, _tokenAddr);
         }
     }
     
-    function _depositERC721(uint256 _tokenId, address _token) internal {
-        IERCuni token = IERCuni(_token); //you can use ABI for ERC20 as IERC721.sol conflicts with IERC1155
+    function _depositERC721(uint256 _tokenId, address _tokenAddr) internal {
+        IERCuni token = IERCuni(_tokenAddr); //you can use ABI for ERC20 as IERC721.sol conflicts with IERC1155
         token.safeTransferFrom(msg.sender, address(this), _tokenId);
-        emit Deposit(msg.sender, _tokenId, _token);
+        _checkTickerAddress(token.symbol(), _tokenAddr);
+        emit Deposit(msg.sender, _tokenId, _tokenAddr);
         
     }
-    function _withdrawERC721(uint256 _tokenId, address _token) internal {
-        IERCuni token = IERCuni(_token);
+    function _withdrawERC721(uint256 _tokenId, address _tokenAddr) internal {
+        IERCuni token = IERCuni(_tokenAddr);
         token.safeTransferFrom(address(this), msg.sender, _tokenId);
-        emit Withdraw(msg.sender, _tokenId, _token);
+        emit Withdraw(msg.sender, _tokenId, _tokenAddr);
         
     }
 }
@@ -72,4 +79,5 @@ contract ERCDepositable {
 interface IERCuni is IERC20 {
     //adding erc721 function for minimilaization of inhereitances
     function safeTransferFrom(address from, address to, uint256 tokenId) external;
+    function symbol() external view returns(string memory);
 }

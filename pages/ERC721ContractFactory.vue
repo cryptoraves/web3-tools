@@ -259,7 +259,11 @@ export default {
       await this.checkBalance()
     },
     resetLocalStorage(){
-      localStorage.clear()
+      localStorage.removeItem('ERC721launchAddress')
+      localStorage.removeItem('ERC721launchHash')
+      localStorage.removeItem('ERC721TokenId')
+      localStorage.removeItem('ERC721contractFactoryAddress')
+      
       location.reload()
     },
     goEtherscan(param){
