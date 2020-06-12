@@ -52,6 +52,15 @@
           Manager Contract
         </a>
       </div>
+      <div class="links">
+        <a
+          @click="gofeature('ValidatorContract')"
+          target="_blank"
+          class="button--grey"
+        >
+          Validator Contract
+        </a>
+      </div>
     </div>
   </div>
 </template>

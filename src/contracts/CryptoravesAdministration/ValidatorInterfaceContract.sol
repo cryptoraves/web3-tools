@@ -15,6 +15,9 @@ contract ValidatorSystem {
     
     //token manager contract address
     address private _tokenManager;
+    
+    event NewTokenManager(address);
+    
     /*
     * Require msg.sender to be validator
     */
@@ -26,13 +29,17 @@ contract ValidatorSystem {
     
     //owner can validate by default. Can later revoke self by unsetValidator()
     constructor(string memory _uri) public {
+        
+        //set default validator
          _validators[msg.sender] = true;
          
          //launch token Manager
-         TokenManagement tokenManager = new TokenManagement(_uri);
+         TokenManagement _tknManager = new TokenManagement(_uri);
          
          //set default token manager address
-         _tokenManager = address(tokenManager);
+         _tokenManager = address(_tknManager);
+         
+         emit NewTokenManager(_tokenManager);
     }
     
     /*
@@ -49,6 +56,13 @@ contract ValidatorSystem {
     */
     function unsetValidator(address oldValidator) public onlyValidator {
         _validators[oldValidator] = false;
+    }
+    
+    /*
+    * Get token manager address
+    */
+    function getTokenManager() public view onlyValidator returns(address) {
+        return _tokenManager;
     }
     
     /*

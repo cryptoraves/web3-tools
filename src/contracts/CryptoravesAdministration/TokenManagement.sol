@@ -31,7 +31,8 @@ contract TokenManagement is ERC1155, ERCDepositable, UserManagement, IERC721Rece
     }
     
     event Transfer(address indexed _from, address indexed _to, uint256 _value, uint256 _token);
-
+    
+    event CryptoDropped(address user, uint256 tokenId);
 
     constructor(string memory _uri) ERC1155(_uri) public {
         _manager = msg.sender;
@@ -114,9 +115,13 @@ contract TokenManagement is ERC1155, ERCDepositable, UserManagement, IERC721Rece
         
         _addTokenToManagedTokenList(_userAddress);
         
-        _mint(_userAddress, _getManagedTokenIdByAddress(_userAddress), _standardMintAmount, '');
+        uint256 _tokenId = _getManagedTokenIdByAddress(_userAddress);
+        
+        _mint(_userAddress, _tokenId, _standardMintAmount, '');
         
         users[_platformUserId].dropped = true;
+        
+        emit CryptoDropped(_userAddress, _tokenId);
         
         return _userAddress;
     }
