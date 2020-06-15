@@ -175,22 +175,23 @@ contract TokenManagement is ERC1155, ERCDepositable, UserManagement, IERC721Rece
         //must be last to execute for web3 processing
         emit Transfer(msg.sender, address(this), _tokenId, _1155tokenId); 
     }
-    
-    function getTokenIdFromPlatformId(uint256 _platformId) public view returns(uint256) {
-        _getManagedTokenIdByAddress(getUserAccount(_platformId));
+  
+    function managedTokenCount() public view returns(uint) {
+        return tokenListById.length; 
     }
     
     function _addTokenToManagedTokenList(address _token) internal {
         tokenListById.push(_token);
-        managedTokenListByAddress[_token].managedTokenId = _getLatestManagedTokenId();
-        managedTokenListByAddress[_token].isManagedToken = true;
+        
+        ManagedToken memory _mngTkn;
+        
+        _mngTkn.managedTokenId = tokenListById.length - 1;
+        _mngTkn.isManagedToken = true;
+        
+        managedTokenListByAddress[_token] = _mngTkn;
     }
     
-    function _getLatestManagedTokenId() internal view returns(uint256) {
-        return tokenListById.length - 1;
-    }
-    
-    function _getManagedTokenIdByAddress(address _tokenOriginAddr) internal view returns(uint256) {
+    function _getManagedTokenIdByAddress(address _tokenOriginAddr) public view returns(uint256) {
         return managedTokenListByAddress[_tokenOriginAddr].managedTokenId;
     }
     

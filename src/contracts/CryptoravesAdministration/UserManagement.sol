@@ -21,7 +21,10 @@ contract UserManagement {
     //for looking up user from account address
     mapping(address => uint256) public userAccounts;
     
-    
+    function getUserId(address _account) public view returns(uint256) {
+        
+        return userAccounts[_account];
+    }
     function getUserAccount(uint256 _userId) public view returns(address) {
         
         return users[_userId].account;
@@ -39,6 +42,7 @@ contract UserManagement {
         user.twitterHandle = _twitterHandleFrom;
         user.isManaged = true;
         user.isUser = true;
+        
         users[_userId] = user;
         
         userAccounts[address(receiver)] = _userId;
