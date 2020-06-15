@@ -175,7 +175,11 @@ contract TokenManagement is ERC1155, ERCDepositable, UserManagement, IERC721Rece
         //must be last to execute for web3 processing
         emit Transfer(msg.sender, address(this), _tokenId, _1155tokenId); 
     }
-  
+    
+    function getTokenIdFromPlatformId(uint256 _platformId) public view returns(uint256) {
+        _getManagedTokenIdByAddress(getUserAccount(_platformId));
+    }
+    
     function managedTokenCount() public view returns(uint) {
         return tokenListById.length; 
     }
