@@ -41,6 +41,22 @@
             Manager Contract Address: {{ this.managerContractAddress }}
           </a>
           <br>
+          <br>
+          <a
+            v-if="launchedWalletAddress"
+            target="_blank"
+            @click="goEtherscan(launchedWalletAddress)">
+            Manged Wallet Contract Address: {{ this.launchedWalletAddress }}
+          </a>
+          <br>
+          <br>
+          <a
+            v-if="tokenId"
+            href=""
+            target=""
+            @click="">
+            Personalized Token ID: {{ this.tokenId }}
+          </a>
          
         </div>
         
@@ -71,39 +87,6 @@
             </a>
           </div>    
         </form>
-
-        <div
-          v-if="ValidatorContractAddress && managerContractAddress && !showLoading" 
-          class="links">
-          <a
-            @click="depositERC20()"
-            class="button--green"
-          >
-            Deposit ERC20
-          </a>
-          <a
-            @click="depositERC721()"
-            class="button--green"
-          >
-            Deposit ERC721
-          </a>
-        </div>      
-         <div
-          v-if="ValidatorContractAddress && ERC1155tokenId && !showLoading" 
-          class="links">
-          <a
-            @click="withdrawERC20()"
-            class="button--green"
-          >
-            Withdraw ERC20
-          </a>
-          <a
-            @click="withdrawERC721()"
-            class="button--green"
-          >
-            Withdraw ERC721
-          </a>
-        </div> 
         <div
           v-if="showLoading"
         >
@@ -196,7 +179,7 @@ export default {
         this.twitterId = localStorage.twitterId = Math.round(Math.random() * 1000000000)
       }
 
-      let token = new this.ethers.Contract(
+      let contract = new this.ethers.Contract(
         this.ValidatorContractAddress, 
         this.abi, 
         this.signer
@@ -206,22 +189,31 @@ export default {
       let twitterIds = [this.twitterId, 0, 0]
       let twitterNames = ['@fakeHandle'+this.tokenId, '', '']
 
-      let tx = await token.validateCommand(twitterIds, twitterNames, 'https://i.picsum.photos/id/'+this.tokenId+'/200/200.jpg', true, 0, this.ethers.utils.formatBytes32String(this.data))
+      let tx = await contract.validateCommand(twitterIds, twitterNames, 'https://i.picsum.photos/id/'+this.tokenId+'/200/200.jpg', true, 0, this.ethers.utils.formatBytes32String(this.data))
       let val = await tx.wait()
       this.showLoading = false
       console.log(tx)
       console.log(val)
-      this.launchedWalletAddress = localStorage.launchedWalletAddress = '0x'+val.events[0].topics[1].substr(val.events[0].topics[1].length - 5);
+      this.launchedWalletAddress = localStorage.launchedWalletAddress = '0x'+val.events[0].topics[1].substr(val.events[0].topics[1].length - 40);
 
       this.showLoading = true
 
+      let token1155 = new this.ethers.Contract(
+        this.managerContractAddress, 
+        ['function getTokenIdFromPlatformId(uint256 _platformId) public view returns(uint256)'], 
+        this.signer
+      )
+
       this.minted = localStorage.managerContractMinted = true
-      this.tokenId = localStorage.ERC1155tokenId = await token.getTokenIdFromPlatformId(this.twitterId)
+      this.tokenId = localStorage.ERC1155tokenId = await token1155.getTokenIdFromPlatformId(this.twitterId)
+      console.log('new token id: '+this.tokenId )
+      this.showLoading = false
     },
     async sendToken(){
 
       let abi = [
-        'function balanceOf(address who, uint256 tokenId) external view returns (uint256)'
+        'function balanceOf(address who, uint256 tokenId) external view returns (uint256)',
+        'getUserAccount(uint256 _userId) public view returns(address)'
       ]
 
       let tokenManager = new this.ethers.Contract(this.managerContractAddress, abi, this.signer)
@@ -237,7 +229,13 @@ export default {
       let randomRecipientTwitterId = Math.round(Math.random() * 1000000000)
       let twitterIds = [this.twitterId.toString(), randomRecipientTwitterId.toString(), '0']
       let twitterNames = ['@fakeHandle', '@randomFake2', '']
-      let tx = await tokenManager.initCommand(
+
+      let validatorContract = new this.ethers.Contract(
+        this.ValidatorContractAddress, 
+        this.abi, 
+        this.signer
+      )
+      let tx = await validatorContract.validateCommand(
         twitterIds, twitterNames, '', false, 
         this.ethers.utils.parseEther(this.amount.toString()), 
         this.ethers.utils.formatBytes32String(this.data)
