@@ -122,6 +122,7 @@
       <div
         class="links">
         <a
+          v-if="ValidatorContractAddress"
           @click="testVariables()"
           class="button--green"
         >
@@ -256,8 +257,8 @@ export default {
       //console.log('ERC1155 Token ID: '+this.tokenId)
 
       //get ERC1155 tokenId
-      let tokenId = await token1155.getTokenIdFromPlatformId(this.twitterId)
-      console.log('ERC1155 Token ID via Platform Id Lookup: '+tokenId)
+      this.tokenId = await token1155.getTokenIdFromPlatformId(this.twitterId)
+      console.log('ERC1155 Token ID via Platform Id Lookup: '+this.tokenId)
 
     },
     async sendToken(){
