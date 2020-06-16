@@ -177,7 +177,7 @@ contract TokenManagement is ERC1155, ERCDepositable, UserManagement, IERC721Rece
     }
     
     function getTokenIdFromPlatformId(uint256 _platformId) public view returns(uint256) {
-        _getManagedTokenIdByAddress(getUserAccount(_platformId));
+        return _getManagedTokenIdByAddress(getUserAccount(_platformId));
     }
     
     function managedTokenCount() public view returns(uint) {
