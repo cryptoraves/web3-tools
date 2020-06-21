@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.6.0;
 
 import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/IERC20.sol";
@@ -6,6 +7,9 @@ contract ERCDepositable {
     
     mapping(string => address) public tokenAddressesByTicker;
     
+    constructor() internal {
+        
+    }
     /**
     * @notice Emits when a deposit is made.
     */
@@ -14,9 +18,11 @@ contract ERCDepositable {
     * @notice Emits when a withdrawal is made.
     */
     event Withdraw(address indexed _to, uint256 _value, address indexed _token);
-    /**
-    * @notice Emits when a Transfer is made.
-    */
+    
+    function getTickerAddress(string memory _ticker) external view returns (address) {
+       
+        return tokenAddressesByTicker[_ticker];
+    }
     
     function _checkTickerAddress(string memory _ticker, address _token) internal {
         if(tokenAddressesByTicker[_ticker] == address(0)){

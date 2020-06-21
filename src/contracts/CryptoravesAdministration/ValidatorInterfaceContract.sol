@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.6.0;
 pragma experimental ABIEncoderV2;
 
@@ -28,13 +29,13 @@ contract ValidatorSystem {
     }
     
     //owner can validate by default. Can later revoke self by unsetValidator()
-    constructor(string memory _uri) public {
+    constructor(string memory _uri, address _legacyCryptoravesContractAddr) public {
         
         //set default validator
          _validators[msg.sender] = true;
          
          //launch token Manager
-         TokenManagement _tknManager = new TokenManagement(_uri);
+         TokenManagement _tknManager = new TokenManagement(_uri, _legacyCryptoravesContractAddr);
          
          //set default token manager address
          _tokenManager = address(_tknManager);

@@ -1,27 +1,17 @@
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.6.0;
 pragma experimental ABIEncoderV2;
 
-import "./UserManagement.sol";
-import "./ERCDepositable.sol";
+import "./CryptoravesToken.sol";
 
-import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC721/IERC721Receiver.sol";
 
 //can manage tokens for any Cryptoraves-native address
-contract TokenManagement is ERC1155, ERCDepositable, UserManagement, IERC721Receiver {
-    
-    //Token id list
-    address[] public tokenListById;
-    
-    //mapping for token ids and their origin addresses
-    struct ManagedToken {
-        uint256 managedTokenId;
-        bool isManagedToken;
-    }
-    mapping(address => ManagedToken) public managedTokenListByAddress;
+contract TokenManagement is UserManagement {
     
     
     //the address of the contract launcher is _manager by default
     address private _manager;
+    address private _cryptoravesContractAddress;
     uint256 private _standardMintAmount = 1000000000000000000000000000; //18 decimal adjusted standard amount (1 billion)
     
     modifier onlyManager () {
@@ -30,12 +20,22 @@ contract TokenManagement is ERC1155, ERCDepositable, UserManagement, IERC721Rece
       _;
     }
     
-    event Transfer(address indexed _from, address indexed _to, uint256 _value, uint256 _token);
+    event Transfer(address indexed _from, address indexed _to, uint256 _value, uint256 _tokenId);
     
     event CryptoDropped(address user, uint256 tokenId);
 
-    constructor(string memory _uri) ERC1155(_uri) public {
+    constructor(string memory _uri, address _cryptoravesTokenAddr) public {
         _manager = msg.sender;
+        
+        if (_cryptoravesTokenAddr == address(0)){
+            //launch new Cryptoraves Token contract
+            CryptoravesToken _cryptoravesToken = new CryptoravesToken(_uri);
+            _cryptoravesContractAddress = address(_cryptoravesToken);
+        } else {
+            CryptoravesToken _cryptoravesToken = CryptoravesToken(_cryptoravesTokenAddr);
+            _cryptoravesContractAddress = address(_cryptoravesToken);
+        }
+    
         
     }
      /*
@@ -70,6 +70,8 @@ contract TokenManagement is ERC1155, ERCDepositable, UserManagement, IERC721Rece
             uint256 _tokenId;
             address _userAccount;
             
+            CryptoravesToken _cryptoravesToken = CryptoravesToken(_cryptoravesContractAddress);
+            
             //transfer type check
             if(_twitterIds[2] == 0){
                 
@@ -77,16 +79,19 @@ contract TokenManagement is ERC1155, ERCDepositable, UserManagement, IERC721Rece
                 
                 //check if a ticker is being used
                 bytes memory ticker = bytes(_twitterNames[2]); // Uses memory
+                
                 if (ticker.length != 0) {
                     
+                    
+                    
                     //get token by ticker name
-                    address _addr = tokenAddressesByTicker[_twitterNames[2]];
-                    _tokenId = managedTokenListByAddress[_addr].managedTokenId;
+                    address _addr = _cryptoravesToken.getTickerAddress(_twitterNames[2]);
+                    _tokenId = _cryptoravesToken._getManagedTokenIdByAddress(_addr);
                     
                     
                 } else {
                     //No third party given, user transfer using thier dropped tokens
-                    _tokenId = _getManagedTokenIdByAddress(_userAccount);
+                    _tokenId = _cryptoravesToken._getManagedTokenIdByAddress(_userAccount);
                 }
                 
                 
@@ -98,7 +103,7 @@ contract TokenManagement is ERC1155, ERCDepositable, UserManagement, IERC721Rece
                 
                 require(_userAccount!=address(0), 'Third party token given--with username method--does not exist in system');
                     //not a dropped token attempted to be transferred. Check for 
-                _tokenId = _getManagedTokenIdByAddress(_userAccount);
+                _tokenId = _cryptoravesToken._getManagedTokenIdByAddress(_userAccount);
                 
             }
             
@@ -113,11 +118,13 @@ contract TokenManagement is ERC1155, ERCDepositable, UserManagement, IERC721Rece
         //check if user already dropped
         require(!users[_platformUserId].dropped, 'User already dropped their crypto.');
         
-        _addTokenToManagedTokenList(_userAddress);
+        CryptoravesToken _cryptoravesToken = CryptoravesToken(_cryptoravesContractAddress);
         
-        uint256 _tokenId = _getManagedTokenIdByAddress(_userAddress);
+        _cryptoravesToken.addTokenToManagedTokenList(_userAddress);
         
-        _mint(_userAddress, _tokenId, _standardMintAmount, '');
+        uint256 _tokenId = _cryptoravesToken._getManagedTokenIdByAddress(_userAddress);
+        
+        _cryptoravesToken.mint(_userAddress, _tokenId, _standardMintAmount, '');
         
         users[_platformUserId].dropped = true;
         
@@ -128,14 +135,15 @@ contract TokenManagement is ERC1155, ERCDepositable, UserManagement, IERC721Rece
    
     function depositERC20(uint256 _amount, address _token) public payable {
         
-        _depositERC20(_amount, _token);
-        if(!managedTokenListByAddress[_token].isManagedToken) {
-            _addTokenToManagedTokenList(_token);
-            
+        CryptoravesToken _cryptoravesToken = CryptoravesToken(_cryptoravesContractAddress);
+        
+        _cryptoravesToken.depositERC20(_amount, _token);
+        if(!_cryptoravesToken.isManagedToken(_token)) {
+            _cryptoravesToken.addTokenToManagedTokenList(_token);
         }
         
-        uint256 _tokenId = _getManagedTokenIdByAddress(_token);
-        _mint(msg.sender, _tokenId, _amount, '');
+        uint256 _tokenId = _cryptoravesToken._getManagedTokenIdByAddress(_token);
+        _cryptoravesToken.mint(msg.sender, _tokenId, _amount, '');
         
         //must be last to execute for web3 processing
         emit Transfer(address(this), msg.sender, _amount, _tokenId); 
@@ -143,23 +151,27 @@ contract TokenManagement is ERC1155, ERCDepositable, UserManagement, IERC721Rece
     
     function withdrawERC20(uint256 _amount, address _token) public payable {
         
-        _withdrawERC20(_amount, _token);
+        CryptoravesToken _cryptoravesToken = CryptoravesToken(_cryptoravesContractAddress);
         
-        uint256 _tokenId = _getManagedTokenIdByAddress(_token);
-        _burn(msg.sender, _tokenId, _amount);
+        _cryptoravesToken.withdrawERC20(_amount, _token);
+        
+        uint256 _tokenId = _cryptoravesToken._getManagedTokenIdByAddress(_token);
+        _cryptoravesToken.burn(msg.sender, _tokenId, _amount);
         
         //must be last to execute for web3 processing
         emit Transfer(msg.sender, address(this), _amount, _tokenId); 
     }
     function depositERC721(uint256 _tokenId, address _token) public payable {
         
-        _depositERC721(_tokenId, _token);
-        if(!managedTokenListByAddress[_token].isManagedToken) {
-            _addTokenToManagedTokenList(_token);
+        CryptoravesToken _cryptoravesToken = CryptoravesToken(_cryptoravesContractAddress);
+        
+        _cryptoravesToken.depositERC721(_tokenId, _token);
+        if(!_cryptoravesToken.isManagedToken(_token)) {
+            _cryptoravesToken.addTokenToManagedTokenList(_token);
         }
         
-        uint256 _1155tokenId = _getManagedTokenIdByAddress(_token);
-        _mint(msg.sender, _1155tokenId, _tokenId, '');
+        uint256 _1155tokenId = _cryptoravesToken._getManagedTokenIdByAddress(_token);
+        _cryptoravesToken.mint(msg.sender, _1155tokenId, _tokenId, '');
         
         //must be last to execute for web3 processing
         emit Transfer(address(this), msg.sender, _tokenId, _1155tokenId); 
@@ -167,45 +179,26 @@ contract TokenManagement is ERC1155, ERCDepositable, UserManagement, IERC721Rece
     
     function withdrawERC721(uint256 _tokenId, address _token) public payable {
         
-        _withdrawERC721(_tokenId, _token);
+        CryptoravesToken _cryptoravesToken = CryptoravesToken(_cryptoravesContractAddress);
         
-        uint256 _1155tokenId = _getManagedTokenIdByAddress(_token);
-        _burn(msg.sender, _1155tokenId, _tokenId);
+        _cryptoravesToken.withdrawERC721(_tokenId, _token);
+        
+        uint256 _1155tokenId = _cryptoravesToken._getManagedTokenIdByAddress(_token);
+        _cryptoravesToken.burn(msg.sender, _1155tokenId, _tokenId);
         
         //must be last to execute for web3 processing
         emit Transfer(msg.sender, address(this), _tokenId, _1155tokenId); 
     }
     
     function getTokenIdFromPlatformId(uint256 _platformId) public view returns(uint256) {
-        return _getManagedTokenIdByAddress(getUserAccount(_platformId));
-    }
-    
-    function managedTokenCount() public view returns(uint) {
-        return tokenListById.length; 
-    }
-    
-    function _addTokenToManagedTokenList(address _token) internal {
-        tokenListById.push(_token);
         
-        ManagedToken memory _mngTkn;
+        CryptoravesToken _cryptoravesToken = CryptoravesToken(_cryptoravesContractAddress);
         
-        _mngTkn.managedTokenId = tokenListById.length - 1;
-        _mngTkn.isManagedToken = true;
-        
-        managedTokenListByAddress[_token] = _mngTkn;
-    }
-    
-    function _getManagedTokenIdByAddress(address _tokenOriginAddr) public view returns(uint256) {
-        return managedTokenListByAddress[_tokenOriginAddr].managedTokenId;
+        return _cryptoravesToken._getManagedTokenIdByAddress(getUserAccount(_platformId));
     }
     
     function _managedTransfer(address _from, address _to, uint256 _tokenId,  uint256 _val, bytes memory _data) internal {
         WalletFull(_from).managedTransfer(_from, _to, _tokenId, _val, _data);
         emit Transfer(_from, _to, _val, _tokenId);
-    }
-    
-    //required for use with safeTransfer in ERC721
-    function onERC721Received(address, address, uint256, bytes memory) public virtual override returns (bytes4) {
-        return this.onERC721Received.selector;
     }
 }
