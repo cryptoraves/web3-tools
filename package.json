@@ -18,13 +18,13 @@
     "compiler": {
       "build": "./build",
       "match": [
-        "./src/contracts/**/*.sol"
+        "./src/**/*.sol"
       ]
     },
     "flattener": {
       "build": "./build",
       "match": [
-        "./src/contracts/**/*.sol"
+        "./src/**/*.sol"
       ],
       "severities": [
         "error",
