@@ -1,3 +1,4 @@
+//SPDX-License-Identifier: MIT
 import "./ERC721Full.sol";
 
 pragma solidity ^0.6.0;

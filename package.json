@@ -9,6 +9,7 @@
     "build": "nuxt build",
     "start": "nuxt start",
     "generate": "nuxt generate",
+    "solhint": "solhint src/**/*.sol",
     "compile": "specron compile",
     "sandbox": "specron sandbox",
     "prepare": "specron compile",
@@ -44,13 +45,16 @@
   "dependencies": {
     "3box": "^1.17.1",
     "@specron/cli": "latest",
+    "@specron/flattener": "latest",
     "@specron/spec": "latest",
+    "@types/node": "13.7.0",
     "assemblyscript": "^0.10.0",
     "ethers": "^4.0.46",
     "nuxt": "^2.12.1",
     "solc": "^0.6.10",
+    "solhint": "2.3.0",
     "ts-node": "8.6.2",
-    "typescript": "3.6.3",
+    "typescript": "3.7.5",
     "web3": "^1.2.6"
   }
 }

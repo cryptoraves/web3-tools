@@ -1,6 +1,7 @@
+//SPDX-License-Identifier: MIT
 pragma solidity ^0.6.0;
 
-import "https://github.com/OpenZeppelin/openzeppelin-contracts/contracts/token/ERC1155/ERC1155.sol";
+import "/home/cartosys/www/openzeppelin-contracts/contracts/token/ERC1155/ERC1155.sol";
 
 contract ERC1155Full is ERC1155 {
     

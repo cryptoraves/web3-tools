@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: MIT
+
 pragma solidity ^0.6.10;
 
 import "./UserManagement.sol";
 import "./ERCDepositable.sol";
 
-import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC721/IERC721Receiver.sol";
+import "/home/cartosys/www/openzeppelin-contracts/contracts/token/ERC721/IERC721Receiver.sol";
 
 contract CryptoravesToken is ERC1155Burnable, ERCDepositable, IERC721Receiver {
     
