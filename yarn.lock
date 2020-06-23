@@ -13513,7 +13513,7 @@ pull-utf8-decoder@^1.0.2:
   resolved "https://registry.yarnpkg.com/pull-utf8-decoder/-/pull-utf8-decoder-1.0.2.tgz#a7afa2384d1e6415a5d602054126cc8de3bcbce7"
   integrity sha1-p6+iOE0eZBWl1gIFQSbMjeO8vOc=
 
-"pull-ws@github:hugomrdias/pull-ws#fix/bundle-size":
+pull-ws@hugomrdias/pull-ws#fix/bundle-size:
   version "3.3.1"
   resolved "https://codeload.github.com/hugomrdias/pull-ws/tar.gz/8e2ce0bb3b1cd6804828316e937fff8e0bef6225"
   dependencies:
@@ -14666,10 +14666,10 @@ sol-merger@2.0.1:
     solidity-parser-antlr "^0.4.11"
     strip-json-comments "^3.0.1"
 
-solc@0.6.1:
-  version "0.6.1"
-  resolved "https://registry.yarnpkg.com/solc/-/solc-0.6.1.tgz#9a5080dd4106e37a87f84e6b355d4478e1ea5832"
-  integrity sha512-iKqNYps2p++x8L9sBg7JeAJb7EmW8VJ/2asAzwlLYcUhj86AzuWLe94UTSQHv1SSCCj/x6lya8twvXkZtlTbIQ==
+solc@^0.6.0:
+  version "0.6.10"
+  resolved "https://registry.yarnpkg.com/solc/-/solc-0.6.10.tgz#6e45b4f7013c7098fc1e31f7d86ce949e8c49e18"
+  integrity sha512-+oHwIvNjg3bxXvL9yua/Z4ZFEdkCkgRSh7aIGGb+mf/gzoA8PRKiKGYDsjMaj0CJLH1BTBOUpNFeYhhnUFfjRg==
   dependencies:
     command-exists "^1.2.8"
     commander "3.0.2"
