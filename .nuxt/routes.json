@@ -1,0 +1,65 @@
+[
+  {
+    "name": "3box",
+    "path": "/3box",
+    "component": "/home/cartosys/www/web3-tools/pages/3box.vue",
+    "chunkName": "pages/3box",
+    "_name": "_37e75a8b"
+  },
+  {
+    "name": "DepositContract",
+    "path": "/DepositContract",
+    "component": "/home/cartosys/www/web3-tools/pages/DepositContract.vue",
+    "chunkName": "pages/DepositContract",
+    "_name": "_1a4bc62d"
+  },
+  {
+    "name": "ERC1155Contract",
+    "path": "/ERC1155Contract",
+    "component": "/home/cartosys/www/web3-tools/pages/ERC1155Contract.vue",
+    "chunkName": "pages/ERC1155Contract",
+    "_name": "_77d4aab6"
+  },
+  {
+    "name": "ERC20ContractFactory",
+    "path": "/ERC20ContractFactory",
+    "component": "/home/cartosys/www/web3-tools/pages/ERC20ContractFactory.vue",
+    "chunkName": "pages/ERC20ContractFactory",
+    "_name": "_d988f652"
+  },
+  {
+    "name": "ERC721ContractFactory",
+    "path": "/ERC721ContractFactory",
+    "component": "/home/cartosys/www/web3-tools/pages/ERC721ContractFactory.vue",
+    "chunkName": "pages/ERC721ContractFactory",
+    "_name": "_39a74875"
+  },
+  {
+    "name": "ManagerContract",
+    "path": "/ManagerContract",
+    "component": "/home/cartosys/www/web3-tools/pages/ManagerContract.vue",
+    "chunkName": "pages/ManagerContract",
+    "_name": "_9e24be88"
+  },
+  {
+    "name": "metamaskHandler",
+    "path": "/metamaskHandler",
+    "component": "/home/cartosys/www/web3-tools/pages/metamaskHandler.js",
+    "chunkName": "pages/metamaskHandler",
+    "_name": "_327d0539"
+  },
+  {
+    "name": "ValidatorContract",
+    "path": "/ValidatorContract",
+    "component": "/home/cartosys/www/web3-tools/pages/ValidatorContract.vue",
+    "chunkName": "pages/ValidatorContract",
+    "_name": "_7facefa1"
+  },
+  {
+    "name": "index",
+    "path": "/",
+    "component": "/home/cartosys/www/web3-tools/pages/index.vue",
+    "chunkName": "pages/index",
+    "_name": "_f0ba1ae2"
+  }
+]
