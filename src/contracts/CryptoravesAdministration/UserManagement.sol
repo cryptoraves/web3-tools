@@ -1,8 +1,7 @@
-//SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.6.0;
 
-pragma solidity ^0.6.10;
-
-import "./WalletFull.sol";
+import "/home/cartosys/www/web3-tools/src/contracts/CryptoravesAdministration/WalletFull.sol";
 
 contract UserManagement {
     struct User {

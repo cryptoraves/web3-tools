@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "fundamental tools for interacting in web3",
   "author": "cartosys",
-  "private": true,
   "scripts": {
     "dev": "nuxt",
     "build": "nuxt build",
@@ -13,7 +12,7 @@
     "compile": "specron compile",
     "sandbox": "specron sandbox",
     "prepare": "specron compile",
-    "test": "specron compile && specron test"
+    "test": "specron test"
   },
   "specron": {
     "compiler": {

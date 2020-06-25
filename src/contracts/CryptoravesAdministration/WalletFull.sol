@@ -14,8 +14,8 @@ abstract contract ERC1155Receiver is ERC165, IERC1155Receiver {
 }
 
 
-
- contract WalletFull is ERC1155Receiver {
+// SPDX-License-Identifier: MIT
+contract WalletFull is ERC1155Receiver {
 
     address private _manager;
     
@@ -43,7 +43,7 @@ abstract contract ERC1155Receiver is ERC165, IERC1155Receiver {
         ERC1155ABI(_manager).safeTransferFrom(_from, _to, _id, _val, _data);
     }
 }
-
+// SPDX-License-Identifier: MIT
 interface ERC1155ABI {
     function setApprovalForAll(address operator, bool approved) external;
     function safeTransferFrom(address from, address to, uint256 id, uint256 value, bytes calldata data) external;
