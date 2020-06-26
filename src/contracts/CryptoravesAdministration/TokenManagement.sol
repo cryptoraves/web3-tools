@@ -35,9 +35,11 @@ contract TokenManagement is UserManagement {
             CryptoravesToken _cryptoravesToken = CryptoravesToken(_cryptoravesTokenAddr);
             _cryptoravesContractAddress = address(_cryptoravesToken);
         }
-    
-        
     }
+    
+    function getCryptoravesTokenAddress() public view returns(address){
+        return _cryptoravesContractAddress;
+    } 
      /*
     * check incoming parsed Tweet data for valid command
     * @param _twitterIds [0] = twitterIdFrom, [1] = twitterIdTo, [2] = twitterIdThirdParty
@@ -64,8 +66,8 @@ contract TokenManagement is UserManagement {
             require(_isUser(_twitterIds[0]), 'Initiating Twitter user is not a Cryptoraves user');
             
             //get addresses
-            address _fromAddress = _userAccountCheck(_twitterIds[0], _twitterNames[0], _fromImageUrl);
-            address _toAddress = _userAccountCheck(_twitterIds[1], _twitterNames[1], '');
+            address _fromAddress = userAccountCheck(_twitterIds[0], _twitterNames[0], _fromImageUrl);
+            address _toAddress = userAccountCheck(_twitterIds[1], _twitterNames[1], '');
             
             uint256 _tokenId;
             address _userAccount;
@@ -113,7 +115,7 @@ contract TokenManagement is UserManagement {
     
     function initCryptoDrop(uint256 _platformUserId, string memory _twitterHandleFrom, string memory _imageUrl) onlyManager public returns(address) {
         //init account
-        address _userAddress = _userAccountCheck(_platformUserId,_twitterHandleFrom,_imageUrl);
+        address _userAddress = userAccountCheck(_platformUserId,_twitterHandleFrom,_imageUrl);
         
         //check if user already dropped
         require(!users[_platformUserId].dropped, 'User already dropped their crypto.');

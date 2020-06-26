@@ -30,9 +30,7 @@ export default spec;
 spec.beforeEach(async (ctx) => {
 	const accounts = await ctx.web3.eth.getAccounts();
 	ctx.set('owner', accounts[0]);
-	ctx.set('bob', accounts[1]);
-	ctx.set('jane', accounts[2]);
-	ctx.set('sara', accounts[3]);
+	
 	ctx.set('zeroAddress', '0x0000000000000000000000000000000000000000');
 
 	ctx.set('id1', '123');
@@ -44,6 +42,7 @@ spec.beforeEach(async (ctx) => {
 });
 
 spec.beforeEach(async (ctx) => {
+	
 	const zeroAddress = ctx.get('zeroAddress');
 	const uri1 = ctx.get('uri1');
 
@@ -53,7 +52,6 @@ spec.beforeEach(async (ctx) => {
 		args: [ uri1, zeroAddress ],
 	});
 	ctx.set('validatorContract', validatorContract);
-
 	/* const cryptoravesContract = await ctx.deploy({ 
 		src: './build/CryptoravesAdministration/CryptoravesToken.json',
 		contract: 'CryptoravesToken',
@@ -64,7 +62,20 @@ spec.beforeEach(async (ctx) => {
   	
 
 });
-spec.test('check manager address', async (ctx) => {
+spec.test('Launch validator contract & get manager contract address', async (ctx) => {
+	
+	const validatorContract = ctx.get('validatorContract');
+
+	const tokenManager = await validatorContract.instance.methods.getTokenManager().call();
+
+	//also check isValidator() function 
+	const isValidator = await validatorContract.instance.methods.isValidator().call();
+
+	ctx.is(ctx.web3.utils.isAddress(tokenManager) && isValidator, true)
+
+});
+
+spec.test('Drop a crypto for Bob & check his balance', async (ctx) => {
 
  	const validatorContract = ctx.get('validatorContract');
 
@@ -83,45 +94,23 @@ spec.test('check manager address', async (ctx) => {
  	const uri = ctx.get('uri1')
  	const isLaunch = true;
 
- 	const owner = ctx.get('owner');
+ 	const validator = ctx.get('owner');
+ console.log(validator)
+ 	//drop crypto here
+ 	await validatorContract.instance.methods.validateCommand(
+ 		twitterIds, twitterUserNames, '', true, 0, 0
+ 	).send({ from: validator });
+console.log('here')	
+ 	//now check balance
+ 	let cryptoravesContract = ctx.get('cryptoravesContract')
 
- 	//await nftoken.instance.methods.mint(bob, id1).send({ from: owner });
-	//const value = await cryptoravesContract.instance.methods.mint(owner, '1', '1000000000', 0).send({ from: owner });
-	//const value = await cryptoravesContract.instance.methods.isManagedToken(ctx.get('bob')).call();
+ 	const cryptoravesTokenId = cryptoravesContract.instance.methods.getTokenIdFromPlatformId(twitterIds[0])
+ 	console.log(cryptoravesTokenId)
 
-	const tokenManager = await validatorContract.instance.methods.getTokenManager().call();
-	
-	console.log(tokenManager)
-	ctx.is(ctx.web3.utils.isAddress(tokenManager), true)
+ 	const accountAddress = cryptoravesContract.instance.methods.getUserAccount(twitterIds[0])
+ 	console.log(accountAddress)
 
+ 	const balance = cryptoravesContract.instance.methods.balanceOf(accountAddress[0])
+ 	console.log(balance)
+	ctx.is(balance, 1000000000);
 });
-/*
-spec.test('is bob\'s token managed', async (ctx) => {
-
- 	const cryptoravesContract = ctx.get('cryptoravesContract');
-
- 	let twitterIds = [
- 		ctx.get('id1'),
- 		ctx.get('id2'),
- 		ctx.get('id3')
- 	];
-
- 	let twitterUserNames = [
- 		'@bob',
- 		'@jane',
- 		'@sara'
- 	]
-
- 	const uri = ctx.get('uri1')
- 	const isLaunch = true;
-
- 	const owner = ctx.get('owner');
-
- 	//await nftoken.instance.methods.mint(bob, id1).send({ from: owner });
-	const value = await cryptoravesContract.instance.methods.mint(owner, '1', '1000000000', 0).send({ from: owner });
-	//const value = await cryptoravesContract.instance.methods.isManagedToken(ctx.get('bob')).call();
-	console.log(value);
-	ctx.is(value, false);
-});
-
-*/

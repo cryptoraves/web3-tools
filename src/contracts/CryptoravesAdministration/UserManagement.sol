@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.6.0;
 
-import "/home/cartosys/www/web3-tools/src/contracts/CryptoravesAdministration/WalletFull.sol";
+import "./WalletFull.sol";
 
 contract UserManagement {
     struct User {
@@ -22,6 +22,17 @@ contract UserManagement {
     //for looking up user from account address
     mapping(address => uint256) public userAccounts;
     
+    address private _userManager;
+    
+    modifier onlyUserManager () {
+      // can we pull from a Chainlink mapping?
+      require(msg.sender == _userManager, 'Sender is not the user manager.');
+      _;
+    }
+    
+    constructor() public {
+        _userManager = msg.sender;
+    }
     function getUserId(address _account) public view returns(uint256) {
         
         return userAccounts[_account];
@@ -31,7 +42,7 @@ contract UserManagement {
         return users[_userId].account;
     }
     
-    function _launchL2Account(uint256 _userId, string memory _twitterHandleFrom, string memory _imageUrl) internal returns (address) {
+    function launchL2Account(uint256 _userId, string memory _twitterHandleFrom, string memory _imageUrl) public onlyUserManager returns (address) {
         //launch a managed wallet
         WalletFull receiver = new WalletFull(address(this));
         
@@ -53,7 +64,7 @@ contract UserManagement {
         return address(receiver);
     }
     
-    function _userAccountCheck(uint256 _platformUserId, string memory _twitterHandle, string memory _imageUrl) internal returns (address) {
+    function userAccountCheck(uint256 _platformUserId, string memory _twitterHandle, string memory _imageUrl) public onlyUserManager returns (address) {
         //create a new user
         if (_isUser(_platformUserId)){
             //check if handle has changed
@@ -70,7 +81,7 @@ contract UserManagement {
             }
             return users[_platformUserId].account;
         } else {
-            return _launchL2Account(_platformUserId, _twitterHandle, _imageUrl);
+            return launchL2Account(_platformUserId, _twitterHandle, _imageUrl);
         }
     }
     

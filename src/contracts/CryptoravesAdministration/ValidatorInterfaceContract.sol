@@ -67,6 +67,13 @@ contract ValidatorSystem {
     }
     
     /*
+    * Get token manager address
+    */
+    function isValidator() public view onlyValidator returns(bool) {
+        return _validators[msg.sender];
+    }
+    
+    /*
     * Change token manager address
     * @param newTokenManager is the address of new Token Manager
     */
