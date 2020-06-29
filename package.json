@@ -7,38 +7,7 @@
     "dev": "nuxt",
     "build": "nuxt build",
     "start": "nuxt start",
-    "generate": "nuxt generate",
-    "solhint": "solhint src/**/*.sol",
-    "compile": "specron compile",
-    "sandbox": "specron sandbox",
-    "prepare": "specron compile",
-    "test": "specron test"
-  },
-  "specron": {
-    "compiler": {
-      "build": "./build",
-      "match": [
-        "./src/**/*.sol"
-      ]
-    },
-    "flattener": {
-      "build": "./build",
-      "match": [
-        "./src/**/*.sol"
-      ],
-      "severities": [
-        "error",
-        "warning"
-      ]
-    },
-    "test": {
-      "match": [
-        "./src/**/*.test.*"
-      ]
-    },
-    "require": [
-      "ts-node/register"
-    ]
+    "generate": "nuxt generate"
   },
   "license": "MIT",
   "dependencies": {

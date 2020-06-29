@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.6.10;
+pragma solidity 0.6.10;
 
 import "./UserManagement.sol";
 import "./ERCDepositable.sol";
@@ -19,6 +19,15 @@ contract CryptoravesToken is ERC1155Burnable, ERCDepositable, IERC721Receiver {
         bool isManagedToken;
     }
     mapping(address => ManagedToken) public managedTokenListByAddress;
+    
+    /**
+    * @notice Emits when a deposit is made.
+    */
+    event Deposit(address indexed _from, uint256 _value, address indexed _token, uint256 indexed cryptoravesTokenId);
+    /**
+    * @notice Emits when a withdrawal is made.
+    */
+    event Withdraw(address indexed _to, uint256 _value, address indexed _token, uint256 indexed cryptoravesTokenId);
     
     constructor(string memory _uri) ERC1155(_uri) public {
         _managementContract = msg.sender;
@@ -48,44 +57,59 @@ contract CryptoravesToken is ERC1155Burnable, ERCDepositable, IERC721Receiver {
         _mintBatch(account, ids, amounts, data);
     }
     
-    function depositERC20(uint256 _amount, address _token) public payable onlyManagement {
+    function depositERC20(uint256 _amount, address _token) public payable returns(uint256){
         
         _depositERC20(_amount, _token);
         if(!managedTokenListByAddress[_token].isManagedToken) {
             addTokenToManagedTokenList(_token);
-            
         }
         
-        uint256 _tokenId = _getManagedTokenIdByAddress(_token);
-        mint(msg.sender, _tokenId, _amount, '');
+        uint256 _1155tokenId = getManagedTokenIdByAddress(_token);
+        _mint(msg.sender, _1155tokenId, _amount, '');
+        
+        emit Deposit(msg.sender, _amount, _token, _1155tokenId);
+        
+        return _1155tokenId;
 
     }
     
-    function withdrawERC20(uint256 _amount, address _token) public payable onlyManagement {
+    function withdrawERC20(uint256 _amount, address _token) public payable returns(uint256){
 
         _withdrawERC20(_amount, _token);
         
-        uint256 _tokenId = _getManagedTokenIdByAddress(_token);
-        _burn(msg.sender, _tokenId, _amount);
+        uint256 _1155tokenId = getManagedTokenIdByAddress(_token);
+        _burn(msg.sender, _1155tokenId, _amount);
+        
+        Withdraw(msg.sender, _amount, _token, _1155tokenId);
+        
+        return _1155tokenId;
 
     }
-    function depositERC721(uint256 _tokenId, address _token) public payable onlyManagement {
+    function depositERC721(uint256 _tokenId, address _token) public payable returns(uint256){
         
        _depositERC721(_tokenId, _token);
         if(!managedTokenListByAddress[_token].isManagedToken) {
             addTokenToManagedTokenList(_token);
         }
         
-        uint256 _1155tokenId = _getManagedTokenIdByAddress(_token);
+        uint256 _1155tokenId = getManagedTokenIdByAddress(_token);
        _mint(msg.sender, _1155tokenId, _tokenId, '');
+       
+       emit Deposit(msg.sender, _tokenId, _token, _1155tokenId);
+       
+       return _1155tokenId;
         
     }
     
-    function withdrawERC721(uint256 _tokenId, address _token) public payable onlyManagement {
+    function withdrawERC721(uint256 _tokenId, address _token) public payable returns(uint256){
         _withdrawERC721(_tokenId, _token);
         
-        uint256 _1155tokenId = _getManagedTokenIdByAddress(_token);
+        uint256 _1155tokenId = getManagedTokenIdByAddress(_token);
         _burn(msg.sender, _1155tokenId, _tokenId);
+        
+        Withdraw(msg.sender, _tokenId, _token, _1155tokenId);
+        
+        return _1155tokenId;
         
     }
     
@@ -93,11 +117,11 @@ contract CryptoravesToken is ERC1155Burnable, ERCDepositable, IERC721Receiver {
         return managedTokenListByAddress[_token].isManagedToken;
     }
 
-    function _getManagedTokenIdByAddress(address _tokenOriginAddr) public view returns(uint256) {
+    function getManagedTokenIdByAddress(address _tokenOriginAddr) public view returns(uint256) {
         return managedTokenListByAddress[_tokenOriginAddr].managedTokenId;
     }
     
-    function addTokenToManagedTokenList(address _token) public onlyManagement {
+    function addTokenToManagedTokenList(address _token) public {
         tokenListById.push(_token);
         
         ManagedToken memory _mngTkn;

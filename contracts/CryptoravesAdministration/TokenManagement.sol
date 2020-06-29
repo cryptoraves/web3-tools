@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.6.10;
+pragma solidity 0.6.10;
 pragma experimental ABIEncoderV2;
 
 import "./CryptoravesToken.sol";
@@ -88,12 +88,12 @@ contract TokenManagement is UserManagement {
                     
                     //get token by ticker name
                     address _addr = _cryptoravesToken.getTickerAddress(_twitterNames[2]);
-                    _tokenId = _cryptoravesToken._getManagedTokenIdByAddress(_addr);
+                    _tokenId = _cryptoravesToken.getManagedTokenIdByAddress(_addr);
                     
                     
                 } else {
                     //No third party given, user transfer using thier dropped tokens
-                    _tokenId = _cryptoravesToken._getManagedTokenIdByAddress(_userAccount);
+                    _tokenId = _cryptoravesToken.getManagedTokenIdByAddress(_userAccount);
                 }
                 
                 
@@ -105,7 +105,7 @@ contract TokenManagement is UserManagement {
                 
                 require(_userAccount!=address(0), 'Third party token given--with username method--does not exist in system');
                     //not a dropped token attempted to be transferred. Check for 
-                _tokenId = _cryptoravesToken._getManagedTokenIdByAddress(_userAccount);
+                _tokenId = _cryptoravesToken.getManagedTokenIdByAddress(_userAccount);
                 
             }
             
@@ -124,7 +124,7 @@ contract TokenManagement is UserManagement {
         
         _cryptoravesToken.addTokenToManagedTokenList(_userAddress);
         
-        uint256 _tokenId = _cryptoravesToken._getManagedTokenIdByAddress(_userAddress);
+        uint256 _tokenId = _cryptoravesToken.getManagedTokenIdByAddress(_userAddress);
         
         _cryptoravesToken.mint(_userAddress, _tokenId, _standardMintAmount, '');
         
@@ -134,69 +134,12 @@ contract TokenManagement is UserManagement {
         
         return _userAddress;
     }
-   
-    function depositERC20(uint256 _amount, address _token) public payable {
-        
-        CryptoravesToken _cryptoravesToken = CryptoravesToken(_cryptoravesContractAddress);
-        
-        _cryptoravesToken.depositERC20(_amount, _token);
-        if(!_cryptoravesToken.isManagedToken(_token)) {
-            _cryptoravesToken.addTokenToManagedTokenList(_token);
-        }
-        
-        uint256 _tokenId = _cryptoravesToken._getManagedTokenIdByAddress(_token);
-        _cryptoravesToken.mint(msg.sender, _tokenId, _amount, '');
-        
-        //must be last to execute for web3 processing
-        emit Transfer(address(this), msg.sender, _amount, _tokenId); 
-    }
-    
-    function withdrawERC20(uint256 _amount, address _token) public payable {
-        
-        CryptoravesToken _cryptoravesToken = CryptoravesToken(_cryptoravesContractAddress);
-        
-        _cryptoravesToken.withdrawERC20(_amount, _token);
-        
-        uint256 _tokenId = _cryptoravesToken._getManagedTokenIdByAddress(_token);
-        _cryptoravesToken.burn(msg.sender, _tokenId, _amount);
-        
-        //must be last to execute for web3 processing
-        emit Transfer(msg.sender, address(this), _amount, _tokenId); 
-    }
-    function depositERC721(uint256 _tokenId, address _token) public payable {
-        
-        CryptoravesToken _cryptoravesToken = CryptoravesToken(_cryptoravesContractAddress);
-        
-        _cryptoravesToken.depositERC721(_tokenId, _token);
-        if(!_cryptoravesToken.isManagedToken(_token)) {
-            _cryptoravesToken.addTokenToManagedTokenList(_token);
-        }
-        
-        uint256 _1155tokenId = _cryptoravesToken._getManagedTokenIdByAddress(_token);
-        _cryptoravesToken.mint(msg.sender, _1155tokenId, _tokenId, '');
-        
-        //must be last to execute for web3 processing
-        emit Transfer(address(this), msg.sender, _tokenId, _1155tokenId); 
-    }
-    
-    function withdrawERC721(uint256 _tokenId, address _token) public payable {
-        
-        CryptoravesToken _cryptoravesToken = CryptoravesToken(_cryptoravesContractAddress);
-        
-        _cryptoravesToken.withdrawERC721(_tokenId, _token);
-        
-        uint256 _1155tokenId = _cryptoravesToken._getManagedTokenIdByAddress(_token);
-        _cryptoravesToken.burn(msg.sender, _1155tokenId, _tokenId);
-        
-        //must be last to execute for web3 processing
-        emit Transfer(msg.sender, address(this), _tokenId, _1155tokenId); 
-    }
-    
+
     function getTokenIdFromPlatformId(uint256 _platformId) public view returns(uint256) {
         
         CryptoravesToken _cryptoravesToken = CryptoravesToken(_cryptoravesContractAddress);
         
-        return _cryptoravesToken._getManagedTokenIdByAddress(getUserAccount(_platformId));
+        return _cryptoravesToken.getManagedTokenIdByAddress(getUserAccount(_platformId));
     }
     
     function _managedTransfer(address _from, address _to, uint256 _tokenId,  uint256 _val, bytes memory _data) internal {

@@ -1,7 +1,7 @@
 //SPDX-License-Identifier: MIT
 import "./ERC20Full.sol"; 
 
-pragma solidity ^0.6.0;
+pragma solidity 0.6.10;
 
 
 contract EIP20Factory {
