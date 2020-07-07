@@ -4,7 +4,7 @@ pragma experimental ABIEncoderV2;
 
 import "./TokenManagement.sol";
 
-contract ValidatorSystem {
+contract ValidatorInterfaceContract {
     
     using SafeMath for uint256;
     using Address for address;
@@ -78,7 +78,10 @@ contract ValidatorSystem {
     * @param newTokenManager is the address of new Token Manager
     */
     function changeTokenManager(address newTokenManager) public onlyValidator {
+        
+        require(_tokenManager != newTokenManager);
         _tokenManager = newTokenManager;
+        emit NewTokenManager(_tokenManager);
     }
     
     /*
