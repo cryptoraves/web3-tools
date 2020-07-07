@@ -78,7 +78,10 @@ contract ValidatorInterfaceContract {
     * @param newTokenManager is the address of new Token Manager
     */
     function changeTokenManager(address newTokenManager) public onlyValidator {
+        
+        require(_tokenManager != newTokenManager);
         _tokenManager = newTokenManager;
+        emit NewTokenManager(_tokenManager);
     }
     
     /*
