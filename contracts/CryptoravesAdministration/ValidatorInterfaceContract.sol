@@ -4,7 +4,7 @@ pragma experimental ABIEncoderV2;
 
 import "./TokenManagement.sol";
 
-contract ValidatorSystem {
+contract ValidatorInterfaceContract {
     
     using SafeMath for uint256;
     using Address for address;
