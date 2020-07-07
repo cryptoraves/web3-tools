@@ -480,7 +480,6 @@ export default {
     "type": "function"
   }
 ]
-
     }
   }
 }
