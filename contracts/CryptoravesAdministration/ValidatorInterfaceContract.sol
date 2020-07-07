@@ -17,7 +17,7 @@ contract ValidatorInterfaceContract {
     //token manager contract address
     address private _tokenManager;
     
-    event NewTokenManager(address);
+    event NewTokenManager(address indexed _managementAddr);
     
     /*
     * Require msg.sender to be validator
