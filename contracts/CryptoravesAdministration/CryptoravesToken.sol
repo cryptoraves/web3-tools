@@ -4,7 +4,7 @@ pragma solidity 0.6.10;
 import "./UserManagement.sol";
 import "./ERCDepositable.sol";
 
-import "/home/cartosys/www/openzeppelin-contracts/contracts/token/ERC721/IERC721Receiver.sol";
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC721/IERC721Receiver.sol";
 
 contract CryptoravesToken is ERC1155Burnable, ERCDepositable, IERC721Receiver {
     
@@ -28,7 +28,6 @@ contract CryptoravesToken is ERC1155Burnable, ERCDepositable, IERC721Receiver {
     * @notice Emits when a withdrawal is made.
     */
     event Withdraw(address indexed _to, uint256 _value, address indexed _token, uint256 indexed cryptoravesTokenId);
-
     event Deploy(address indexed _managementAddress, address indexed _contractAddress);
     
     constructor(string memory _uri) ERC1155(_uri) public {

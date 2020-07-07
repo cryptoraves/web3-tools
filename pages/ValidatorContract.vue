@@ -174,13 +174,12 @@ export default {
 
       //URI goes in here in place of ''
       let contract = await factory.deploy('https://i.picsum.photos/id/99/200/200.jpg', '0x0000000000000000000000000000000000000000');
-
       this.showLoading = true
       let tx = await contract.deployed()
       this.showLoading = false
-      
+    
       this.ValidatorContractAddress = localStorage.ValidatorContractAddress = contract.address
-      
+
       this.managerContractAddress = localStorage.managerContractAddress = await contract.getTokenManager()
       this.minted = localStorage.managerContractMinted = false
     },
@@ -228,6 +227,14 @@ export default {
 
       console.log('Twitter ID: '+this.twitterId.toString())
 
+      let contract = new this.ethers.Contract(
+        this.ValidatorContractAddress, 
+        this.abi, 
+        this.signer
+      )
+
+      console.log('token Manager Address',await contract.getTokenManager())
+/*
       let token1155 = new this.ethers.Contract(
         this.managerContractAddress, 
         [
@@ -261,8 +268,8 @@ export default {
       //console.log('ERC1155 Token ID: '+this.tokenId)
 
       //get ERC1155 tokenId
-      this.tokenId = await token1155.getTokenIdFromPlatformId(this.twitterId)
-      console.log('ERC1155 Token ID via Platform Id Lookup: '+this.tokenId)
+      //this.tokenId = await token1155.getTokenIdFromPlatformId(this.twitterId)
+      //console.log('ERC1155 Token ID via Platform Id Lookup: '+this.tokenId)
 
     },
     async sendToken(){
@@ -473,6 +480,7 @@ export default {
       "type": "function"
     }
   ]
+
     }
   }
 }
