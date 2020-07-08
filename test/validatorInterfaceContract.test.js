@@ -5,10 +5,9 @@ contract("ValidatorInterfaceContract", async accounts => {
   it("should verify token manager address is valid", async () => {
     let instance = await ValidatorInterfaceContract.deployed()
     let tokenManagerAddr = await instance.getTokenManager.call()
-    assert.notEqual(tokenManagerAddr, '0x0000000000000000000000000000000000000000', 'token manager is zero address. That is bad.')
-    assert.lengthOf(
+    assert.equal(
       tokenManagerAddr,
-      42,
+      accounts[0],
       "Token Manager Address not valid: "+tokenManagerAddr
     );
   });
