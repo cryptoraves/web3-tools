@@ -5,9 +5,11 @@ contract("ValidatorInterfaceContract", async accounts => {
   it("should verify token manager address is valid", async () => {
     let instance = await ValidatorInterfaceContract.deployed()
     let tokenManagerAddr = await instance.getTokenManager.call()
-    assert.equal(
+    
+    assert.notEqual('0x0000000000000000000000000000000000000000', tokenManagerAddr, "Token Manager Address is zero address")
+    assert.lengthOf(
       tokenManagerAddr,
-      accounts[0],
+      42,
       "Token Manager Address not valid: "+tokenManagerAddr
     );
   });
@@ -29,15 +31,6 @@ contract("ValidatorInterfaceContract", async accounts => {
       "isValidator failed with main address as msg.sender"
     );
   });
-  it("should set a new validator and check it", async () => {
-    let instance = await ValidatorInterfaceContract.deployed()
-    let res = await instance.setValidator(accounts[1]) 
-    let isValidator = await instance.isValidator.call({ from: accounts[1] })
-    assert.isOk(
-      isValidator,
-      "isValidator failed with accounts[1] as msg.sender"
-    );
-  });
   it("should revert since sender is not validator", async () => {
     let instance = await ValidatorInterfaceContract.deployed()
     let isValidator
@@ -48,6 +41,15 @@ contract("ValidatorInterfaceContract", async accounts => {
     	//reverts as predicted
     	assert.isOk(true)
     }
+  });
+  it("should set a new validator and check it", async () => {
+    let instance = await ValidatorInterfaceContract.deployed()
+    let res = await instance.setValidator(accounts[1]) 
+    let isValidator = await instance.isValidator.call({ from: accounts[1] })
+    assert.isOk(
+      isValidator,
+      "isValidator failed with accounts[1] as msg.sender"
+    );
   });
   it("should UNSET a new validator and check it", async () => {
     let instance = await ValidatorInterfaceContract.deployed()
