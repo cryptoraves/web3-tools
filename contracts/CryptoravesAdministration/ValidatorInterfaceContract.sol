@@ -18,6 +18,8 @@ contract ValidatorInterfaceContract {
     address private _tokenManager;
     
     event NewTokenManager(address indexed _managementAddr);
+    event NewValidator(address indexed _newValidatorAddr);
+    event RemovedValidator(address indexed _oldValidatorAddr);
     
     /*
     * Require msg.sender to be validator
@@ -44,19 +46,28 @@ contract ValidatorInterfaceContract {
     }
     
     /*
-    * Add a validator to the list
-    * @param newValidator The address of the new validator
+    * Get token manager address
     */
-    function setValidator(address newValidator) public onlyValidator {
-        _validators[newValidator] = true;
+    function isValidator() public view onlyValidator returns(bool) {
+        return _validators[msg.sender];
+    }
+    
+    /*
+    * Add a validator to the list
+    * @param _newValidator The address of the new validator
+    */
+    function setValidator(address _newValidator) public onlyValidator {
+        _validators[_newValidator] = true;
+        emit NewValidator(_newValidator);
     }
     
     /*
     * de-authorize a validator
     * @param oldValidator The address of the validator to remove access
     */
-    function unsetValidator(address oldValidator) public onlyValidator {
-        _validators[oldValidator] = false;
+    function unsetValidator(address _oldValidator) public onlyValidator {
+        _validators[_oldValidator] = false;
+        emit RemovedValidator(_oldValidator);
     }
     
     /*
@@ -65,14 +76,7 @@ contract ValidatorInterfaceContract {
     function getTokenManager() public view onlyValidator returns(address) {
         return _tokenManager;
     }
-    
-    /*
-    * Get token manager address
-    */
-    function isValidator() public view onlyValidator returns(bool) {
-        return _validators[msg.sender];
-    }
-    
+
     /*
     * Change token manager address
     * @param newTokenManager is the address of new Token Manager
