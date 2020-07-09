@@ -1,4 +1,5 @@
 const ValidatorInterfaceContract = artifacts.require("ValidatorInterfaceContract")
+const ethers = require('ethers')
 
 contract("ValidatorInterfaceContract", async accounts => {
   
@@ -67,16 +68,17 @@ contract("ValidatorInterfaceContract", async accounts => {
   });
   it("Drop crypto", async () => {
     let instance = await ValidatorInterfaceContract.deployed()
-	var bytes = new Uint32Array('');
+	var bytes = ethers.utils.formatBytes32String('')
+	console.log(bytes)
     let res = await instance.validateCommand(
-    	['38845343252',0,0],
-    	['@tokenbae12', '', ''],
+    	[38845343252,0,0],
+    	['@fakeHandle', '', ''],
     	'https://i.picsum.photos/id/1/200/200.jpg',
     	true,
     	0,
     	bytes
     )
-
+    console.log(res)
     assert.isOk(true);
   });
 
