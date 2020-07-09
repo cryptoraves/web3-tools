@@ -60,7 +60,7 @@ contract TokenManagement is UserManagement {
         
         //launch criteria
         if(_isLaunch){
-            initCryptoDrop(_twitterIds[0], _twitterNames[0], _fromImageUrl);
+            _initCryptoDrop(_twitterIds[0], _twitterNames[0], _fromImageUrl);
         }else{
             
             require(_isUser(_twitterIds[0]), 'Initiating Twitter user is not a Cryptoraves user');
@@ -113,7 +113,7 @@ contract TokenManagement is UserManagement {
         }
     }
     
-    function initCryptoDrop(uint256 _platformUserId, string memory _twitterHandleFrom, string memory _imageUrl) onlyManager public returns(address) {
+    function _initCryptoDrop(uint256 _platformUserId, string memory _twitterHandleFrom, string memory _imageUrl) internal returns(address) {
         //init account
         address _userAddress = userAccountCheck(_platformUserId,_twitterHandleFrom,_imageUrl);
         

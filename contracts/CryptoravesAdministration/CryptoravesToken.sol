@@ -28,17 +28,18 @@ contract CryptoravesToken is ERC1155Burnable, ERCDepositable, IERC721Receiver {
     * @notice Emits when a withdrawal is made.
     */
     event Withdraw(address indexed _to, uint256 _value, address indexed _token, uint256 indexed cryptoravesTokenId);
-    event Deploy(address indexed _managementAddress, address indexed _contractAddress);
     
-    constructor(string memory _uri) ERC1155(_uri) public {
-        _managementContract = msg.sender;
-        emit Deploy(msg.sender, address(this));
-    }
+    event Deploy(address indexed _managementAddress, address indexed _contractAddress);
     
     modifier onlyManagement () {
       // can we pull from a Chainlink mapping?
       require(msg.sender == _managementContract, 'Sender is not the manager contract.');
       _;
+    }
+
+    constructor(string memory _uri) ERC1155(_uri) public {
+        _managementContract = msg.sender;
+        emit Deploy(msg.sender, address(this));
     }
     
     function mint(address account, uint256 id, uint256 amount, bytes memory data) public virtual onlyManagement {
