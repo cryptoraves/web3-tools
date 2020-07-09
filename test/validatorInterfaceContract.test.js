@@ -1,8 +1,58 @@
 const ValidatorInterfaceContract = artifacts.require("ValidatorInterfaceContract")
-const ethers = require('ethers')
 
+
+const truffleAssert = require('truffle-assertions');
+const ethers = require('ethers')
 contract("ValidatorInterfaceContract", async accounts => {
   
+  it("Drop crypto", async () => {
+    let instance = await ValidatorInterfaceContract.deployed()
+	var bytes = ethers.utils.formatBytes32String('')
+    let res = await instance.validateCommand(
+    	[38845343252,0,0],
+    	['@fakeHandle', '', ''],
+    	'https://i.picsum.photos/id/1/200/200.jpg',
+    	true,
+    	0,
+    	bytes
+    )
+    assert.isOk(res);
+  });
+  it("Transfer dropped crypto", async () => {
+    let instance = await ValidatorInterfaceContract.deployed()
+	var bytes = ethers.utils.formatBytes32String('')
+    let res = await instance.validateCommand(
+    	[38845343252,434443434,0],
+    	['@fakeHandle', '@rando1', ''],
+    	'https://i.picsum.photos/id/1/200/200.jpg',
+    	false,
+    	200,
+    	bytes
+    )
+    assert.isOk(res.receipt['status']);
+  });
+  it("Transfer 3rd party crypto", async () => {
+    let instance = await ValidatorInterfaceContract.deployed()
+	var bytes = ethers.utils.formatBytes32String('')
+    let res = await instance.validateCommand(
+    	[434443434,55667788,0],
+    	['@rando1', '@rando2', ''],
+    	'https://i.picsum.photos/id/2/200/200.jpg',
+    	false,
+    	50,
+    	bytes
+    )
+    assert.isOk(res.receipt['status']);
+    res = await instance.validateCommand(
+    	[434443434,38845343252,0],
+    	['@rando1', '@rando2', ''],
+    	'https://i.picsum.photos/id/2/200/200.jpg',
+    	false,
+    	50,
+    	bytes
+    )
+    assert.isOk(res.receipt['status']);
+  });
   it("verify token manager address is valid", async () => {
     let instance = await ValidatorInterfaceContract.deployed()
     let tokenManagerAddr = await instance.getTokenManager.call()
@@ -65,21 +115,6 @@ contract("ValidatorInterfaceContract", async accounts => {
     	//reverts as predicted
     	assert.isOk(true)
     }
-  });
-  it("Drop crypto", async () => {
-    let instance = await ValidatorInterfaceContract.deployed()
-	var bytes = ethers.utils.formatBytes32String('')
-	console.log(bytes)
-    let res = await instance.validateCommand(
-    	[38845343252,0,0],
-    	['@fakeHandle', '', ''],
-    	'https://i.picsum.photos/id/1/200/200.jpg',
-    	true,
-    	0,
-    	bytes
-    )
-    console.log(res)
-    assert.isOk(true);
   });
 
 });
