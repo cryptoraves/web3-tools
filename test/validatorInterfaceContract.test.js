@@ -1,7 +1,5 @@
 const ValidatorInterfaceContract = artifacts.require("ValidatorInterfaceContract")
 
-
-const truffleAssert = require('truffle-assertions');
 const ethers = require('ethers')
 contract("ValidatorInterfaceContract", async accounts => {
   
