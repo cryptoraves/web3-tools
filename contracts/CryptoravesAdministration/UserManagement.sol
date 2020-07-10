@@ -3,7 +3,7 @@ pragma solidity 0.6.10;
 
 import "./WalletFull.sol";
 
-contract UserManagement {
+contract UserManagement is AdministrationContract {
     struct User {
         address account;
         string twitterHandle;
@@ -22,16 +22,10 @@ contract UserManagement {
     //for looking up user from account address
     mapping(address => uint256) public userAccounts;
     
-    address private _userManager;
-    
-    modifier onlyUserManager () {
-      // can we pull from a Chainlink mapping?
-      require(msg.sender == _userManager, 'Sender is not the user manager.');
-      _;
-    }
-    
     constructor() public {
-        _userManager = msg.sender;
+        //default managers include parent contract and ValidatorInterfaceContract Owner
+        _administrators[msg.sender] = true;
+        _administrators[tx.origin] = true;
     }
     function getUserId(address _account) public view returns(uint256) {
         
@@ -42,9 +36,9 @@ contract UserManagement {
         return users[_userId].account;
     }
     
-    function launchL2Account(uint256 _userId, string memory _twitterHandleFrom, string memory _imageUrl) public onlyUserManager returns (address) {
+    function launchL2Account(uint256 _userId, string memory _twitterHandleFrom, string memory _imageUrl) public onlyAdmin returns (address) {
         //launch a managed wallet
-        WalletFull receiver = new WalletFull(address(this));
+        WalletFull receiver = new WalletFull(msg.sender);
         
          //create a new user
         User memory user;
@@ -64,9 +58,9 @@ contract UserManagement {
         return address(receiver);
     }
     
-    function userAccountCheck(uint256 _platformUserId, string memory _twitterHandle, string memory _imageUrl) public onlyUserManager returns (address) {
+    function userAccountCheck(uint256 _platformUserId, string memory _twitterHandle, string memory _imageUrl) public onlyAdmin returns (address) {
         //create a new user
-        if (_isUser(_platformUserId)){
+        if (isUser(_platformUserId)){
             //check if handle has changed
             if(!_stringsMatch(_twitterHandle, users[_platformUserId].twitterHandle)){
                 //update user handle if no match
@@ -85,13 +79,26 @@ contract UserManagement {
         }
     }
     
-    function _isUser (uint256 _userId) internal view returns(bool) {
+    function isUser (uint256 _userId) public view onlyAdmin returns(bool) {
       // can we pull from a Chainlink mapping?
       if (users[_userId].isUser) {
           return true;
       } else {
           return false;
       }
+    }
+    
+    function dropState (uint256 _platformUserId) public view onlyAdmin returns(bool) {
+      // can we pull from a Chainlink mapping?
+      if (users[_platformUserId].dropped) {
+          return true;
+      } else {
+          return false;
+      }
+    }
+    
+    function setDropState(uint256 _platformUserId) public onlyAdmin returns (address) {
+        users[_platformUserId].dropped = true;
     }
     
     function _stringsMatch (string memory a, string memory b) internal pure returns (bool) {

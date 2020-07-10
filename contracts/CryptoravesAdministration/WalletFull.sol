@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.6.10;
 
-import "/home/cartosys/www/openzeppelin-contracts/contracts/token/ERC1155/ERC1155Burnable.sol";
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC1155/ERC1155Burnable.sol";
+import "./AdministrationContract.sol";
 
 abstract contract ERC1155Receiver is ERC165, IERC1155Receiver {
     constructor() public {
@@ -16,15 +17,9 @@ interface ITokenManager {
     function getCryptoravesTokenAddress() external view returns(address);
 }
 
-contract WalletFull is ERC1155Receiver {
+contract WalletFull is ERC1155Receiver, AdministrationContract {
 
     address private _walletManager;
-    
-    modifier onlyWalletManager () {
-      // can we pull from a Chainlink mapping?
-      require(msg.sender == _walletManager, 'Sender is not the manager.');
-      _;
-    }
 
     constructor(address _managerAddress) public {
         
@@ -32,6 +27,8 @@ contract WalletFull is ERC1155Receiver {
         //setManager 
         IERC1155(_cryptoravesTokenAddress).setApprovalForAll(_managerAddress, true);
         _walletManager = _managerAddress;
+        _administrators[_managerAddress] = true;
+        _administrators[msg.sender] = true;
     }
 
     function onERC1155Received(address, address, uint256, uint256, bytes calldata) external override virtual returns (bytes4) {
@@ -42,7 +39,7 @@ contract WalletFull is ERC1155Receiver {
         return this.onERC1155BatchReceived.selector;
     }
     
-    function managedTransfer(address _from, address _to, uint256 _id,  uint256 _val, bytes memory _data) public onlyWalletManager {
+    function managedTransfer(address _from, address _to, uint256 _id,  uint256 _val, bytes memory _data) public onlyAdmin {
         
         address _cryptoravesTokenAddress = ITokenManager(_walletManager).getCryptoravesTokenAddress();
         

@@ -4,40 +4,25 @@ pragma experimental ABIEncoderV2;
 
 import "./TokenManagement.sol";
 
-contract ValidatorInterfaceContract {
+
+contract ValidatorInterfaceContract is AdministrationContract {
     
     using SafeMath for uint256;
     using Address for address;
 
-    /*
-    * Legit list of validator addresses 
-    */
-    mapping(address => bool) private _validators;
-    
     //token manager contract address
     address private _tokenManager;
     
     event NewTokenManager(address indexed _managementAddr);
-    event NewValidator(address indexed _newValidatorAddr);
-    event RemovedValidator(address indexed _oldValidatorAddr);
-    
-    /*
-    * Require msg.sender to be validator
-    */
-    modifier onlyValidator () {
-      // can we pull from a Chainlink mapping?
-      require(_validators[msg.sender], 'Sender is not a validator.');
-      _;
-    }
     
     //owner can validate by default. Can later revoke self by unsetValidator()
-    constructor(string memory _uri, address _legacyCryptoravesContractAddr) public {
+    constructor(string memory _uri, address _legacyCryptoravesContractAddr, address _legacyUserManagementAddr) public {
         
         //set default validator
-         _validators[msg.sender] = true;
+         _administrators[msg.sender] = true;
          
          //launch token Manager
-         TokenManagement _tknManager = new TokenManagement(_uri, _legacyCryptoravesContractAddr);
+         TokenManagement _tknManager = new TokenManagement(_uri, _legacyCryptoravesContractAddr, _legacyUserManagementAddr);
          
          //set default token manager address
          _tokenManager = address(_tknManager);
@@ -45,35 +30,11 @@ contract ValidatorInterfaceContract {
          emit NewTokenManager(_tokenManager);
     }
     
-    /*
-    * Get token manager address
-    */
-    function isValidator() public view onlyValidator returns(bool) {
-        return _validators[msg.sender];
-    }
-    
-    /*
-    * Add a validator to the list
-    * @param _newValidator The address of the new validator
-    */
-    function setValidator(address _newValidator) public onlyValidator {
-        _validators[_newValidator] = true;
-        emit NewValidator(_newValidator);
-    }
-    
-    /*
-    * de-authorize a validator
-    * @param oldValidator The address of the validator to remove access
-    */
-    function unsetValidator(address _oldValidator) public onlyValidator {
-        _validators[_oldValidator] = false;
-        emit RemovedValidator(_oldValidator);
-    }
     
     /*
     * Get token manager address
     */
-    function getTokenManager() public view onlyValidator returns(address) {
+    function getTokenManager() public view onlyAdmin returns(address) {
         return _tokenManager;
     }
 
@@ -81,7 +42,7 @@ contract ValidatorInterfaceContract {
     * Change token manager address
     * @param newTokenManager is the address of new Token Manager
     */
-    function changeTokenManager(address newTokenManager) public onlyValidator {
+    function changeTokenManager(address newTokenManager) public onlyAdmin {
         
         require(_tokenManager != newTokenManager);
         _tokenManager = newTokenManager;
@@ -104,7 +65,7 @@ contract ValidatorInterfaceContract {
         bool _isLaunch, 
         uint256 _value,
         bytes memory _data
-    ) public onlyValidator {
+    ) public onlyAdmin {
         
         TokenManagement tokenManager = TokenManagement(_tokenManager);
         
