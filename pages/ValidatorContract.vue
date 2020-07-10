@@ -262,7 +262,7 @@ export default {
       )
       console.log('DropState of user: ', await userManagerContract.dropState(this.twitterId))
       console.log('Is Administrator: ', await userManagerContract.isAdministrator())
-      console.log('userAccountCheck: ', await userManagerContract.launchL2Account(0, '@fakeHandle1', 'http://none.com'))
+      
       /*
       //get cryptoraves user Id from address
       let address = await token1155.getUserId(this.launchedWalletAddress)
