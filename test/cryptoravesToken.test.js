@@ -5,6 +5,6 @@ contract("CryptoravesToken", async accounts => {
     let instance = await CryptoravesToken.deployed()
     //let balance = await instance.getBalance.call(accounts[0]);
     //assert.equal(balance.valueOf(), 10000);
-    console.log(instance)
+    //console.log(instance)
   })
 })  

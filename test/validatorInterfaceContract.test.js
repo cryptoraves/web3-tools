@@ -72,42 +72,42 @@ contract("ValidatorInterfaceContract", async accounts => {
       "changeTokenManager failed with accounts[1] as input"
     );
   });
-  it("verify sender is validator", async () => {
+  it("verify sender is admin", async () => {
     let instance = await ValidatorInterfaceContract.deployed()
-    let isValidator = await instance.isValidator.call()
+    let isValidator = await instance.isAdministrator.call()
     assert.isOk(
       isValidator,
       "isValidator failed with main address as msg.sender"
     );
   });
-  it("revert since sender is not validator", async () => {
+  it("revert since sender is not admin", async () => {
     let instance = await ValidatorInterfaceContract.deployed()
     let isValidator
     try{
-    	isValidator = await instance.isValidator.call({from: accounts[2]})
-    	assert.isOk(!isValidator, "isValidator failing. revert")
+    	isValidator = await instance.isAdministrator.call({from: accounts[2]})
+    	assert.isOk(!isValidator, "isAdmin failing. revert")
     }catch(e){
     	//reverts as predicted
     	assert.isOk(true)
     }
   });
-  it("set a new validator and check it", async () => {
+  it("set a new administrator and check it", async () => {
     let instance = await ValidatorInterfaceContract.deployed()
-    let res = await instance.setValidator(accounts[1]) 
-    let isValidator = await instance.isValidator.call({ from: accounts[1] })
+    let res = await instance.setAdministrator(accounts[1]) 
+    let isValidator = await instance.isAdministrator.call({ from: accounts[1] })
     assert.isOk(
       isValidator,
       "isValidator failed with accounts[1] as msg.sender"
     );
   });
-  it("should UNSET a new validator and check it", async () => {
+  it("should UNSET a new administrator and check it", async () => {
     let instance = await ValidatorInterfaceContract.deployed()
-    let res = await instance.setValidator(accounts[1]) 
+    let res = await instance.setAdministrator(accounts[1]) 
     assert.isOk(res)
-    res = await instance.unsetValidator(accounts[1]) 
+    res = await instance.unsetAdministrator(accounts[1]) 
     
     try{
-    	isValidator = await instance.isValidator.call({ from: accounts[1] })
+    	isValidator = await instance.isAdministrator.call({ from: accounts[1] })
     	assert.isOk(!isValidator, "unsetValidator failing. Should revert")
     }catch(e){
     	//reverts as predicted

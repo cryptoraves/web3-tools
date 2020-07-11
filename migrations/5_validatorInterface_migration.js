@@ -6,11 +6,12 @@ const originAddr = '0x0000000000000000000000000000000000000000'
 module.exports = function (deployer) {
   
   deployer.then(async () => {
-    await deployer.deploy(ValidatorInterfaceContract, imgUrl, originAddr)
+  	
+    await deployer.deploy(ValidatorInterfaceContract, imgUrl, originAddr, originAddr)
     const instance = await ValidatorInterfaceContract.deployed()
         
     console.log('\n*************************************************************************\n')
-    console.log('ValidatorInterfaceContract Contract Address: '+instance.address)
+    console.log('ValidatorInterfaceContract Address: '+instance.address)
     console.log('\n*************************************************************************\n')
   })
 }
