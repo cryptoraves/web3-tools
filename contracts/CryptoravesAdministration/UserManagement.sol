@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.6.10;
+pragma experimental ABIEncoderV2;
 
 import "./WalletFull.sol";
 
@@ -39,6 +40,9 @@ contract UserManagement is AdministrationContract {
         return users[_userId].account;
     }
 
+    function getTokenManagerAddr() public view returns(address) {
+        return _tknMgmt;
+    }
     function changeTokenManagerAddr(address _newAddr) public onlyAdmin{
         _tknMgmt = _newAddr;
     }
@@ -87,12 +91,15 @@ contract UserManagement is AdministrationContract {
     }
     
     function isUser (uint256 _userId) public view onlyAdmin returns(bool) {
-      // can we pull from a Chainlink mapping?
       if (users[_userId].isUser) {
           return true;
       } else {
           return false;
       }
+    }
+
+    function getUser (uint256 _userId) public view onlyAdmin returns(User memory) {
+      return users[_userId];
     }
     
     function dropState (uint256 _platformUserId) public view onlyAdmin returns(bool) {
