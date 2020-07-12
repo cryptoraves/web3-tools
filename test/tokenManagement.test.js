@@ -3,17 +3,6 @@ const TokenManagement = artifacts.require("TokenManagement");
 const ethers = require('ethers')
 
 contract("TokenManagement", async accounts => {
-  it("verify cryptoraves token address is valid", async () => {
-    let instance = await TokenManagement.deployed()
-    let tokenContractAddr = await instance.getCryptoravesTokenAddress.call()
-    
-    assert.notEqual('0x0000000000000000000000000000000000000000', tokenContractAddr, "Token Manager Address is zero address")
-    assert.lengthOf(
-      tokenContractAddr,
-      42,
-      "Token cryptoraves token Address not valid: "+tokenContractAddr
-    )
-  })
   it("Drop crypto with initCommand", async () => {
     let instance = await TokenManagement.deployed()
 	var bytes = ethers.utils.formatBytes32String('testing crypto drop')
@@ -36,6 +25,41 @@ contract("TokenManagement", async accounts => {
     )
     assert.isOk(res.receipt['status'])
   })
+  it("Transfer dropped crypto via initCommand", async () => {
+    let instance = await TokenManagement.deployed()
+  var bytes = ethers.utils.formatBytes32String('')
+    let res = await instance.initCommand(
+      [1029384756,434443434,0],
+      ['@fakeHandle', '@rando1', ''],
+      'https://i.picsum.photos/id/1/200/200.jpg',
+      false,
+      200,
+      bytes
+    )
+    assert.isOk(res.receipt['status']);
+  });
+  it("Transfer 3rd party crypto via initCommand", async () => {
+    let instance = await TokenManagement.deployed()
+  var bytes = ethers.utils.formatBytes32String('')
+    let res = await instance.initCommand(
+      [434443434,55667788,0],
+      ['@rando1', '@rando2', ''],
+      'https://i.picsum.photos/id/2/200/200.jpg',
+      false,
+      50,
+      bytes
+    )
+    assert.isOk(res.receipt['status']);
+    res = await instance.initCommand(
+      [434443434,1029384756,0],
+      ['@rando1', '@rando2', ''],
+      'https://i.picsum.photos/id/2/200/200.jpg',
+      false,
+      50,
+      bytes
+    )
+    assert.isOk(res.receipt['status']);
+  });
   it("get token from twitter id", async () => {
     let instance = await TokenManagement.deployed()
     let tokenId = await instance.getTokenIdFromPlatformId.call(1029388888)
@@ -50,12 +74,57 @@ contract("TokenManagement", async accounts => {
   	/*
 	* Begin UserManager Portion
 	*/
-  it("get token from twitter id", async () => {
+  it("twitter id not registered. Should revert.", async () => {
     let instance = await TokenManagement.deployed()
-    let tokenId = await instance.getTokenIdFromPlatformId.call(18)
-    assert.isNumber(
-      tokenId.toNumber(),
-      "Token ID not valid: "+tokenId.toNumber()
+    let tokenId
+    try{
+      tokenId = await instance.getTokenIdFromPlatformId.call(18)
+      assert.isOk(!tokenId, "Test failed. Should revert due to non-existant platform ID")
+    }catch(e){
+      //reverts as predicted
+      assert.isOk(true)
+    }
+  })
+  it("verify cryptoraves token address is valid", async () => {
+    let instance = await TokenManagement.deployed()
+    let tokenContractAddr = await instance.getCryptoravesTokenAddress.call()
+    
+    assert.notEqual('0x0000000000000000000000000000000000000000', tokenContractAddr, "Token Manager Address is zero address")
+    assert.lengthOf(
+      tokenContractAddr,
+      42,
+      "Token cryptoraves token Address not valid: "+tokenContractAddr
     )
-  })	
+  })
+  it("set a new cryptoraves token address and check it", async () => {
+    let instance = await TokenManagement.deployed()
+    let res = await instance.changeCryptoravesTokenAddress(accounts[4]) 
+    let cryptoravesTokenAddress = await instance.getCryptoravesTokenAddress.call()
+    assert.equal(
+      cryptoravesTokenAddress,
+      accounts[4],
+      "changeCryptoravesTokenAddress failed with accounts[1] as input"
+    )
+  })
+  it("verify userManagement contract address is valid", async () => {
+    let instance = await TokenManagement.deployed()
+    let tokenContractAddr = await instance.getUserManagementAddress.call()
+    
+    assert.notEqual('0x0000000000000000000000000000000000000000', tokenContractAddr, "User Manager Address is zero address")
+    assert.lengthOf(
+      tokenContractAddr,
+      42,
+      "User management contract Address not valid: "+tokenContractAddr
+    )
+  })
+  it("set a new userManagement address and check it", async () => {
+    let instance = await TokenManagement.deployed()
+    let res = await instance.changeUserManagementAddress(accounts[4]) 
+    let userMgmtTokenAddress = await instance.getUserManagementAddress.call()
+    assert.equal(
+      userMgmtTokenAddress,
+      accounts[4],
+      "changeUserManagementAddress failed with accounts[1] as input"
+    )
+  })
 })  

@@ -15,6 +15,8 @@ contract TokenManagement is AdministrationContract {
     event Transfer(address indexed _from, address indexed _to, uint256 _value, uint256 _tokenId);
     
     event CryptoDropped(address user, uint256 tokenId);
+    event CryptoravesTokenAddressChange(address _newContractAddr);
+    event UserManagementAddressChange(address _newContractAddr);
 
     constructor(string memory _uri, address _cryptoravesTokenAddr, address _userManagementAddr) public {
         
@@ -44,9 +46,19 @@ contract TokenManagement is AdministrationContract {
     function getCryptoravesTokenAddress() public view returns(address){
         return _cryptoravesContractAddress;
     } 
+
+    function changeCryptoravesTokenAddress(address _newAddr) public onlyAdmin {
+        _cryptoravesContractAddress = _newAddr;
+        emit CryptoravesTokenAddressChange(_newAddr);
+    } 
     
     function getUserManagementAddress() public view returns(address){
         return _userManagementContractAddress;
+    } 
+
+    function changeUserManagementAddress(address _newAddr) public onlyAdmin {
+        _userManagementContractAddress = _newAddr;
+        emit UserManagementAddressChange(_newAddr); 
     } 
     
      /*
@@ -154,8 +166,12 @@ contract TokenManagement is AdministrationContract {
         UserManagement _userManagement = UserManagement(_userManagementContractAddress);
         CryptoravesToken _cryptoravesToken = CryptoravesToken(_cryptoravesContractAddress);
         
+        address _userAccount = _userManagement.getUserAccount(_platformId);
+
+        require(_userAccount != address(0), 'User account does not exist');
+
         return _cryptoravesToken.getManagedTokenIdByAddress(
-            _userManagement.getUserAccount(_platformId)
+            _userAccount
         );
     }
     

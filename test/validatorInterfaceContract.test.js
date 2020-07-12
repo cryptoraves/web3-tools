@@ -80,7 +80,7 @@ contract("ValidatorInterfaceContract", async accounts => {
       "isValidator failed with main address as msg.sender"
     );
   });
-  it("revert since sender is not admin", async () => {
+  it("revert since different sender is not admin", async () => {
     let instance = await ValidatorInterfaceContract.deployed()
     let isValidator
     try{
