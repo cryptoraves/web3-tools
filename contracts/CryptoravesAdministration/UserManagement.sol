@@ -14,6 +14,8 @@ contract UserManagement is AdministrationContract {
         uint256 tokenId;
     }
     
+    address private _tknMgmt;
+
     event NewUser(uint256 _userId, address _address, string imageUrl);
     
     //maps platform user id to User object
@@ -25,6 +27,7 @@ contract UserManagement is AdministrationContract {
     constructor() public {
         //default managers include parent contract and ValidatorInterfaceContract Owner
         _administrators[msg.sender] = true;
+        _tknMgmt = msg.sender;
         _administrators[tx.origin] = true;
     }
     function getUserId(address _account) public view returns(uint256) {
@@ -35,10 +38,14 @@ contract UserManagement is AdministrationContract {
         
         return users[_userId].account;
     }
+
+    function changeTokenManagerAddr(address _newAddr) public onlyAdmin{
+        _tknMgmt = _newAddr;
+    }
     
     function launchL2Account(uint256 _userId, string memory _twitterHandleFrom, string memory _imageUrl) public onlyAdmin returns (address) {
         //launch a managed wallet
-        WalletFull receiver = new WalletFull(msg.sender);
+        WalletFull receiver = new WalletFull(_tknMgmt);
         
          //create a new user
         User memory user;
