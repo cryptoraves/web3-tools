@@ -83,6 +83,7 @@ contract UserManagement is AdministrationContract {
                 //update user handle if no match
                 users[_platformUserId].twitterHandle = _twitterHandle;
                 userIDs[_twitterHandle] = _platformUserId;
+                emit HandleChange(_platformUserId, _twitterHandle);
             }
             //check if imageUrl has changed
             if(!_stringsMatch(_imageUrl, users[_platformUserId].imageUrl)){
