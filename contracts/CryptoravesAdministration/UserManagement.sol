@@ -18,6 +18,8 @@ contract UserManagement is AdministrationContract {
     address private _tknMgmt;
 
     event NewUser(uint256 _userId, address _address, string imageUrl);
+
+    event HandleChange(uint256 _userId, string _handle);
     
     //maps platform user id to User object
     mapping(uint256 => User) public users;
