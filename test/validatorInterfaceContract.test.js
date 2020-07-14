@@ -1,12 +1,13 @@
 const ValidatorInterfaceContract = artifacts.require("ValidatorInterfaceContract")
 
-const TokenManagement = artifacts.require("TokenManagement");
 const ethers = require('ethers')
 
+const TokenManagement = artifacts.require("TokenManagement");
 let secondTokenManagerAddr = ''
 
 contract("ValidatorInterfaceContract", async accounts => {
   
+  //for iterateing through second token contract assignment
   for (var i = 0; i < 2; i++) {  
     
 
