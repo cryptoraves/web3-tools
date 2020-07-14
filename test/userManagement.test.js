@@ -38,6 +38,17 @@ contract("UserManagement", async accounts => {
 			'getUserId or getUserAccount failed'
 		)
 	})
+	it('check getUserId from Handle', async () => {
+		let instance = await UserManagement.deployed()
+		let userId = await instance.getUserIdByPlatformHandle(fakeTwitterHandle)
+		let account = await instance.getUser(userId)
+
+		assert.equal(
+			account.twitterHandle,
+			fakeTwitterHandle,
+			'getUserId from twitter handle failed'
+		)
+	})
 	it("verify cryptoraves token address is valid", async () => {
 		let instance = await UserManagement.deployed()
 		let tokenManagerAddr = await instance.getTokenManagerAddr.call()

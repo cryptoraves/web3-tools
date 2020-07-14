@@ -24,6 +24,9 @@ contract UserManagement is AdministrationContract {
     
     //for looking up user from account address
     mapping(address => uint256) public userAccounts;
+
+    //for looking up platform ID from handle
+    mapping(string => uint256) public userIDs;
     
     constructor() public {
         //default managers include parent contract and ValidatorInterfaceContract Owner
@@ -63,6 +66,7 @@ contract UserManagement is AdministrationContract {
         users[_userId] = user;
         
         userAccounts[address(receiver)] = _userId;
+        userIDs[_twitterHandleFrom] = _userId;
         
         emit NewUser(_userId, address(receiver), _imageUrl);
         
@@ -76,6 +80,7 @@ contract UserManagement is AdministrationContract {
             if(!_stringsMatch(_twitterHandle, users[_platformUserId].twitterHandle)){
                 //update user handle if no match
                 users[_platformUserId].twitterHandle = _twitterHandle;
+                userIDs[_twitterHandle] = _platformUserId;
             }
             //check if imageUrl has changed
             if(!_stringsMatch(_imageUrl, users[_platformUserId].imageUrl)){
@@ -100,6 +105,10 @@ contract UserManagement is AdministrationContract {
 
     function getUser (uint256 _userId) public view onlyAdmin returns(User memory) {
       return users[_userId];
+    }
+
+    function getUserIdByPlatformHandle (string memory _platformHandle) public view onlyAdmin returns(uint256) {
+      return userIDs[_platformHandle];
     }
     
     function dropState (uint256 _platformUserId) public view onlyAdmin returns(bool) {
