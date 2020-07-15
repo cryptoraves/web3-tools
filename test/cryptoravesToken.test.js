@@ -6,6 +6,43 @@ const ERC721Full = artifacts.require('ERC721Full')
 const ethers = require('ethers')
 
 contract("CryptoravesToken", async accounts => {
+  it("Mint 1 billion to admin", async () => {
+  	let instance = await CryptoravesToken.deployed()
+  	let tokenId1155 = 12345
+  	let amount = ethers.utils.parseUnits('1000000000',18).toString()
+  	await instance.mint(
+  		accounts[0], 
+  		tokenId1155, 
+  		amount,
+  		ethers.utils.formatBytes32String('test')
+  	)
+  	let balance = await instance.balanceOf(accounts[0], tokenId1155)
+  	assert.equal(
+    	balance.toString(),
+    	amount,
+    	'ERC1155 mint failed'
+    )
+  })
+  it("batch mint multiple to accounts[1]", async () => {
+  	let instance = await CryptoravesToken.deployed()
+  	let amount = ethers.utils.parseUnits('1000000000',18).toString()
+  	let ids = [11111,22222,33333,44444,55555]
+  	let amounts = [1000,2000,3000,4000,5000]
+  	await instance.mintBatch(
+  		accounts[0],
+  		ids, 
+  		amounts,
+  		ethers.utils.formatBytes32String('batch test')
+  	)
+  	for (var i = 0; i < 5; i++) {
+  		let balance = await instance.balanceOf(accounts[0], ids[i])
+  		assert.equal(
+	    	balance.toString(),
+	    	amounts[i],
+	    	'ERC1155 mint failed'
+	    )
+ 	}
+  })
   it("deposits ERC20", async () => {
   	let instance = await CryptoravesToken.deployed()
     let erc20Instance = await ERC20Full.deployed()	
@@ -77,5 +114,55 @@ contract("CryptoravesToken", async accounts => {
     	balance2.toString(),
     	'ERC721 balance does not match after deposit'
     )
+  })
+  it("checks if both ERC20/721 token addresses are managed by contract", async () => {
+  	let instance = await CryptoravesToken.deployed()
+  	let erc721Instance = await ERC721Full.deployed()
+  	let erc20Instance = await ERC20Full.deployed()
+
+  	assert.isOk(await instance.isManagedToken(erc721Instance.address))
+  	assert.isOk(await instance.isManagedToken(erc20Instance.address))
+  })
+  it("get managed token id by address", async () => {
+  	let instance = await CryptoravesToken.deployed()
+  	let erc721Instance = await ERC721Full.deployed()
+  	let erc20Instance = await ERC20Full.deployed()
+
+  	let id20 = await instance.getManagedTokenIdByAddress(erc20Instance.address)
+  	let id721 = await instance.getManagedTokenIdByAddress(erc721Instance.address)
+
+  	assert.equal(
+  		id20.toString(),
+  		0,
+  		"ERC20 token id lookup failed"
+  	)
+  	assert.equal(
+  		id721.toString(),
+  		1,
+  		"ERC721 token id lookup failed"
+  	)
+  })
+  it("add managed token to list", async () => {
+  	let instance = await CryptoravesToken.deployed()
+  	await instance.addTokenToManagedTokenList(accounts[7])
+  	let id7 = await instance.getManagedTokenIdByAddress(accounts[7])
+  	let count = await instance.getTokenListCount()
+  	assert.equal(
+  		id7.toNumber(),
+  		count.toNumber() - 1,
+  		"Managed token addition failed"
+  	)
+  })
+  it("token list length ok", async () => {
+  	let instance = await CryptoravesToken.deployed()
+  	let count = await instance.getTokenListCount()
+  	assert.isNumber(
+  		count.toNumber(),
+  		"Managed token count failed isNumber test"
+  	)
+  	assert.isOk(
+  		count.toNumber(),
+  		"Managed token count failed > 0 test"
+  	)
   })
 })  

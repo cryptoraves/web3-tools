@@ -118,7 +118,7 @@ contract CryptoravesToken is ERC1155Burnable, ERCDepositable, IERC721Receiver, A
         return managedTokenListByAddress[_tokenOriginAddr].managedTokenId;
     }
     
-    function addTokenToManagedTokenList(address _token) public {
+    function addTokenToManagedTokenList(address _token) public onlyAdmin {
         tokenListById.push(_token);
         
         ManagedToken memory _mngTkn;
@@ -127,6 +127,10 @@ contract CryptoravesToken is ERC1155Burnable, ERCDepositable, IERC721Receiver, A
         _mngTkn.isManagedToken = true;
         
         managedTokenListByAddress[_token] = _mngTkn;
+    }
+
+    function getTokenListCount() public view returns(uint count) {
+        return tokenListById.length;
     }
     
     //required for use with safeTransfer in ERC721
