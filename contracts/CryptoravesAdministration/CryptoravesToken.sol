@@ -90,7 +90,7 @@ contract CryptoravesToken is ERC1155Burnable, ERCDepositable, IERC721Receiver, A
         }
         
         uint256 _1155tokenId = getManagedTokenIdByAddress(_token);
-       _mint(msg.sender, _1155tokenId, _tokenId, '');
+       _mint(msg.sender, _1155tokenId, 1, '');
        
        emit Deposit(msg.sender, _tokenId, _token, _1155tokenId);
        
@@ -102,7 +102,7 @@ contract CryptoravesToken is ERC1155Burnable, ERCDepositable, IERC721Receiver, A
         _withdrawERC721(_tokenId, _token);
         
         uint256 _1155tokenId = getManagedTokenIdByAddress(_token);
-        _burn(msg.sender, _1155tokenId, _tokenId);
+        _burn(msg.sender, _1155tokenId, 1);
         
         Withdraw(msg.sender, _tokenId, _token, _1155tokenId);
         

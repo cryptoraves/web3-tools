@@ -359,31 +359,30 @@ export default {
       
       console.log('ERC721 Amount before deposit: '+amount1)
 
-      let tokenManager = new this.ethers.Contract(
-        this.managerContractAddress, 
-        this.abi, 
+      let cryptoravesToken = new this.ethers.Contract(
+        this.cryptoravesTokenContractAddress, 
+        this.cryptoravesTokenAbi, 
         this.signer
       )
       this.showLoading = true
 
-      let appr = await token.approve(this.managerContractAddress, amount1 - 1);
+      let appr = await token.approve(this.cryptoravesTokenContractAddress, amount1 - 1);
       await appr.wait()
 
-      let tx = await tokenManager.depositERC721(
+      let tx = await cryptoravesToken.depositERC721(
         amount1 - 1,
         localStorage.ERC721launchAddress
       )
       let val = await tx.wait()
+
       this.showLoading = false
-      console.log(val)
+
       amount1 = await token.balanceOf(this.ethereumAddress)
       console.log('ERC721 Amount After deposit: '+amount1)
 
       localStorage.ERC721TokenId--
 
-      this.ERC1155tokenId = localStorage.ERC1155tokenId = val.events[val.events.length - 1].args[3].toString()
-
-      let cryptoravesToken = new this.ethers.Contract(this.cryptoravesTokenContractAddress, this.cryptoravesTokenAbi, this.signer)
+      this.ERC1155tokenId = localStorage.ERC1155tokenId = await cryptoravesToken.getManagedTokenIdByAddress(localStorage.ERC721launchAddress)
 
       amount1 = await cryptoravesToken.balanceOf(this.ethereumAddress, this.ERC1155tokenId)
       console.log('ERC1155 Wrapped tokens held: '+amount1)
