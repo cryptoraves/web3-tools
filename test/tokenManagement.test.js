@@ -115,7 +115,7 @@ contract("TokenManagement", async accounts => {
         await cTkn.setAdministrator(instance.address)
         secondCryptoravesTokenAddr = cTkn.address
       }else{
-        secondCryptoravesTokenAddr = accounts[4]
+        secondCryptoravesTokenAddr = ethers.Wallet.createRandom().address
       }
 
       let res = await instance.changeCryptoravesTokenAddress(secondCryptoravesTokenAddr) 
