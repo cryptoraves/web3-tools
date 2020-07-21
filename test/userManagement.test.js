@@ -1,5 +1,7 @@
 const UserManagement = artifacts.require("UserManagement");
 
+const ethers = require('ethers')
+
 const TokenManagement = artifacts.require("TokenManagement");
 let userAccount
 let fakeTwitterId = 1230456987
