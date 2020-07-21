@@ -91,7 +91,7 @@ contract("UserManagement", async accounts => {
     let instance = await UserManagement.deployed()
     let isValidator
     try{
-      isValidator = await instance.isAdministrator.call({from: accounts[2]})
+      isValidator = await instance.isAdministrator.call({from: ethers.Wallet.createRandom().address})
       assert.isOk(!isValidator, "isAdmin failing. revert")
     }catch(e){
       //reverts as predicted
@@ -100,21 +100,27 @@ contract("UserManagement", async accounts => {
   });
   it("set a new administrator and check it", async () => {
     let instance = await UserManagement.deployed()
-    let res = await instance.setAdministrator(accounts[1]) 
-    let isValidator = await instance.isAdministrator.call({ from: accounts[1] })
+
+    let wallet = ethers.Wallet.createRandom()
+
+    let res = await instance.setAdministrator(wallet.address) 
+    let isValidator = await instance.isAdministrator.call({ from: wallet.address })
     assert.isOk(
       isValidator,
-      "isValidator failed with accounts[1] as msg.sender"
+      "isValidator failed with random wallet.address as msg.sender"
     );
   });
   it("should UNSET a new administrator and check it", async () => {
     let instance = await UserManagement.deployed()
-    let res = await instance.setAdministrator(accounts[1]) 
+
+    let wallet = ethers.Wallet.createRandom()
+    
+    let res = await instance.setAdministrator(wallet.address) 
     assert.isOk(res)
-    res = await instance.unsetAdministrator(accounts[1]) 
+    res = await instance.unsetAdministrator(wallet.address) 
     
     try{
-      isValidator = await instance.isAdministrator.call({ from: accounts[1] })
+      isValidator = await instance.isAdministrator.call({ from: wallet.address })
       assert.isOk(!isValidator, "unsetValidator failing. Should revert")
     }catch(e){
       //reverts as predicted
