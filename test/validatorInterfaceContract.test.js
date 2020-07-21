@@ -117,7 +117,7 @@ contract("ValidatorInterfaceContract", async accounts => {
       let wallet = ethers.Wallet.createRandom()
 
       let res = await instance.setAdministrator(wallet.address) 
-      let isValidator = await instance.isAdministrator.call({ from: wallet.address] })
+      let isValidator = await instance.isAdministrator.call({ from: wallet.address })
       assert.isOk(
         isValidator,
         "isValidator failed with random wallet.address as msg.sender"
