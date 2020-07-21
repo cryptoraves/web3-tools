@@ -6,3 +6,4 @@ build
 .nuxt/
 .secret
 .infuraKey
+.prvkey
