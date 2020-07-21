@@ -75,6 +75,7 @@ module.exports = {
         provider: () => new HDWalletProvider(privateKey, 'https://dev-testnet-v1-1.skalelabs.com'),
         gasPrice: 0,
         network_id: "*",
+        timeout: 100000,
         ChainID: 346750 
       },
     // Useful for private networks
