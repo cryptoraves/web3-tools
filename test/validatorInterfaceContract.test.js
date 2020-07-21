@@ -80,7 +80,7 @@ contract("ValidatorInterfaceContract", async accounts => {
         await tknMgmt.setAdministrator(instance.address)
         secondTokenManagerAddr = tknMgmt.address
       }else{
-        secondTokenManagerAddr = accounts[1]
+        secondTokenManagerAddr = ethers.Wallet.createRandom().address
       }
 
       let res = await instance.changeTokenManager(secondTokenManagerAddr) 
@@ -88,7 +88,7 @@ contract("ValidatorInterfaceContract", async accounts => {
       assert.equal(
         tokenManagerAddr,
         secondTokenManagerAddr,
-        "changeTokenManager failed with accounts[1] as input"
+        "changeTokenManager failed with random wallet.address as input"
       );
     });
   }
@@ -104,7 +104,7 @@ contract("ValidatorInterfaceContract", async accounts => {
       let instance = await ValidatorInterfaceContract.deployed()
       let isValidator
       try{
-      	isValidator = await instance.isAdministrator.call({from: accounts[2]})
+      	isValidator = await instance.isAdministrator.call({from: ethers.Wallet.createRandom().address})
       	assert.isOk(!isValidator, "isAdmin failing. revert")
       }catch(e){
       	//reverts as predicted
@@ -113,21 +113,27 @@ contract("ValidatorInterfaceContract", async accounts => {
     });
     it("set a new administrator and check it", async () => {
       let instance = await ValidatorInterfaceContract.deployed()
-      let res = await instance.setAdministrator(accounts[1]) 
-      let isValidator = await instance.isAdministrator.call({ from: accounts[1] })
+
+      let wallet = ethers.Wallet.createRandom()
+
+      let res = await instance.setAdministrator(wallet.address) 
+      let isValidator = await instance.isAdministrator.call({ from: wallet.address] })
       assert.isOk(
         isValidator,
-        "isValidator failed with accounts[1] as msg.sender"
+        "isValidator failed with random wallet.address as msg.sender"
       );
     });
     it("should UNSET a new administrator and check it", async () => {
       let instance = await ValidatorInterfaceContract.deployed()
-      let res = await instance.setAdministrator(accounts[1]) 
+
+      let wallet = ethers.Wallet.createRandom()
+
+      let res = await instance.setAdministrator(wallet.address) 
       assert.isOk(res)
-      res = await instance.unsetAdministrator(accounts[1]) 
+      res = await instance.unsetAdministrator(wallet.address) 
       
       try{
-      	isValidator = await instance.isAdministrator.call({ from: accounts[1] })
+      	isValidator = await instance.isAdministrator.call({ from: wallet.address })
       	assert.isOk(!isValidator, "unsetValidator failing. Should revert")
       }catch(e){
       	//reverts as predicted
