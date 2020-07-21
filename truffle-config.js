@@ -18,7 +18,9 @@
  *
  */
 
-//const HDWalletProvider = require('@truffle/hdwallet-provider');
+const HDWalletProvider = require('@truffle/hdwallet-provider');
+const fs = require('fs');
+const privateKey = fs.readFileSync(".prvkey").toString().trim();
 //const fs = require('fs');
 //const mnemonic = fs.readFileSync(".secret").toString().trim();
 //const infuraKey = fs.readFileSync(".infuraKey").toString().trim();
@@ -69,6 +71,11 @@ module.exports = {
        skipDryRun: true     // Skip dry run before migrations? (default: false for public nets )
      },
 
+      skaleTest: {
+        provider: () => new HDWalletProvider(privateKey, 'https://dev-testnet-v1-0.skalelabs.com'),
+        gasPrice: 0,
+        network_id: "*"
+      },
     // Useful for private networks
     // private: {
       // provider: () => new HDWalletProvider(mnemonic, `https://network.io`),
