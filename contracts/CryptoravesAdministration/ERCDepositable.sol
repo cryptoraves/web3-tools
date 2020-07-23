@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.6.10;
 
-import "/home/cartosys/www/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/IERC20.sol";
 
 contract ERCDepositable {
     
@@ -48,7 +48,8 @@ contract ERCDepositable {
     */
     function _withdrawERC20(uint256 _amount, address _tokenAddr) internal {
         if(_tokenAddr == address(0)) {
-            require(msg.sender.balance >= msg.value, "Transfer failed.");
+            (bool success, ) = msg.sender.call.value(_amount)("");
+            require(success, "Transfer failed.");
         } else {
             IERCuni token = IERCuni(_tokenAddr);
             require(token.transfer(msg.sender, _amount), 'transfer failed');
