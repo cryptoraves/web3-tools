@@ -79,17 +79,21 @@ contract("CryptoravesToken", async accounts => {
     	'ETH amount does not match 1155 balance after deposit'
     )
 
-	/*console.log('initial bal: ', initialEthBalance)
+    const txInfo = await web3.eth.getTransaction(res.tx); 
+	const gasCost = txInfo.gasPrice * res.receipt.gasUsed
+    
+    /*console.log(res)
+	console.log('initial bal: ', initialEthBalance)
 	console.log('final bal: ', finalEthBalance)
 	console.log('final bal + deposit amt: ', (finalEthBalance * 1) + (formatttedWeiAmt * 1) )
 	console.log('Gas used in gwei: ', gasUsed)
 	console.log('Gas used in wei: ', gasUsed * 20000000000)
 	console.log('final bal + deposit amt + gas used x 2: ', (finalEthBalance * 1) + (formatttedWeiAmt * 1) + (gasUsed * 20000000000))
 	*/
-	let totalFinalBalance = (finalEthBalance * 1) + (formatttedWeiAmt * 1) + (gasUsed * 20000000000)
+	let totalFinalBalance = (finalEthBalance * 1) + (formatttedWeiAmt * 1) + gasCost
 	assert.equal(
-		initialEthBalance,
-		totalFinalBalance,
+		Number.parseFloat(initialEthBalance.toString()).toPrecision(14),
+    	Number.parseFloat(totalFinalBalance.toString()).toPrecision(14),
 		'initial ETH balance doesn\'t match final ETH balance + gas spent'
 	)
 
@@ -106,24 +110,25 @@ contract("CryptoravesToken", async accounts => {
     	formatttedWeiAmt, 
     	zeroAddr
     )
-    let gasUsed = res.receipt.cumulativeGasUsed
+    const txInfo = await web3.eth.getTransaction(res.tx); 
+	const gasCost = txInfo.gasPrice * res.receipt.gasUsed
     
     let tokenId1155 = await instance.getManagedTokenIdByAddress(zeroAddr)
     let balance = await instance.balanceOf(accounts[0], tokenId1155)
     
     let finalEthBalance = await web3.eth.getBalance(accounts[0]);
 	
-    let totalFinalBalance = (initialEthBalance * 1) + (formatttedWeiAmt * 1) - (gasUsed * 20000000000)
-	console.log('initial bal: ', initialEthBalance)
+    let totalFinalBalance = (initialEthBalance * 1) + (formatttedWeiAmt * 1) - gasCost
+	/*console.log('initial bal: ', initialEthBalance)
 	console.log('final bal: ', finalEthBalance)
-	/*console.log('init bal + withdrawal amt: ', (initialEthBalance * 1) + (formatttedWeiAmt * 1) )
-	console.log('Gas used in gwei: ', gasUsed)
-	console.log('Gas used in wei: ', gasUsed * 20000000000)
-	console.log('init bal + withdrawal amt + gas used x 2: ', (initialEthBalance * 1) + (formatttedWeiAmt * 1) - (gasUsed * 20000000000))
+	console.log('init bal + withdrawal amt: ', (initialEthBalance * 1) + (formatttedWeiAmt * 1) )
+	console.log('Gas used in gwei: ', gasCost)
+	console.log('Gas used in wei: ', gasCost)
+	console.log('init bal + withdrawal amt + gas used x 2: ', (initialEthBalance * 1) + (formatttedWeiAmt * 1) - gasCost)
 	*/
     assert.equal(
-    	finalEthBalance.toString(),
-    	totalFinalBalance.toString(),
+    	Number.parseFloat(finalEthBalance.toString()).toPrecision(14),
+    	Number.parseFloat(totalFinalBalance.toString()).toPrecision(14),
     	'ETH balance does not match after withdrawal'
     )
   })
