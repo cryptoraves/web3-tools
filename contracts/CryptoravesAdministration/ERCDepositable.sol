@@ -48,7 +48,7 @@ contract ERCDepositable {
     */
     function _withdrawERC20(uint256 _amount, address _tokenAddr) internal {
         if(_tokenAddr == address(0)) {
-            (bool success, ) = msg.sender.call.value(_amount)("");
+            (bool success, ) = msg.sender.call{value: _amount}("");
             require(success, "Transfer failed.");
         } else {
             IERCuni token = IERCuni(_tokenAddr);
