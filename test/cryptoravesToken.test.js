@@ -5,10 +5,14 @@ const ERC721Full = artifacts.require('ERC721Full')
 
 const ethers = require('ethers')
 
+let tokenId1155 = 12345
+let ids = [11111,22222,33333,44444,55555]
+let amounts = [1000,2000,3000,4000,5000]
+
 contract("CryptoravesToken", async accounts => {
   it("Mint 1 billion to admin", async () => {
   	let instance = await CryptoravesToken.deployed()
-  	let tokenId1155 = 12345
+  	
   	let amount = ethers.utils.parseUnits('1000000000',18).toString()
   	await instance.mint(
   		accounts[0], 
@@ -26,8 +30,7 @@ contract("CryptoravesToken", async accounts => {
   it("batch mint multiple to accounts[1]", async () => {
   	let instance = await CryptoravesToken.deployed()
   	let amount = ethers.utils.parseUnits('1000000000',18).toString()
-  	let ids = [11111,22222,33333,44444,55555]
-  	let amounts = [1000,2000,3000,4000,5000]
+  	
   	await instance.mintBatch(
   		accounts[0],
   		ids, 
@@ -254,5 +257,54 @@ contract("CryptoravesToken", async accounts => {
   		count.toNumber(),
   		"Managed token count failed > 0 test"
   	)
+  })
+  it("get held token ids", async () => {
+  	let instance = await CryptoravesToken.deployed()
+  	let heldIds = await instance.getHeldTokenIds(accounts[0])
+  	
+  	assert.isAbove(heldIds.length, 0, 'No held token ids returned.')
+
+  	for(i=0; i < heldIds.length; i++){
+  		switch(i){
+  			case 0:	assert.equal(tokenId1155, heldIds[i], 'tokenId11555 does not match'); break;
+	  		case 1:	assert.equal(ids[i-1], heldIds[i], 'batchmint id1 does not match'); break;
+	  		case 2:	assert.equal(ids[i-1], heldIds[i], 'batchmint id2 does not match'); break;
+	  		case 3:	assert.equal(ids[i-1], heldIds[i], 'batchmint id3 does not match'); break;
+	  		case 4:	assert.equal(ids[i-1], heldIds[i], 'batchmint id4 does not match'); break;
+	  		case 5:	assert.equal(ids[i-1], heldIds[i], 'batchmint id5 does not match'); break;
+	  		case 6:	assert.equal(0, heldIds[i], 'erc721  id does not match'); break;
+	  		case 7:	assert.equal(1, heldIds[i], 'minted fungible does not match'); break;
+	  		case 8:	assert.equal(2, heldIds[i], 'idB does not match'); break;
+  		}
+  	}
+  })
+  it("get held token balances", async () => {
+  	let instance = await CryptoravesToken.deployed()
+  	let balances = await instance.getHeldTokenBalances(accounts[0])
+  	assert.isAbove(balances.length, 0, 'No held token ids returned.')
+
+  	for(i=0; i < balances.length; i++){
+  		switch(i){
+  			case 0:	assert.equal(
+	  				ethers.utils.parseUnits('1000000000',18).toString(), 
+	  				balances[i].toString(), 
+	  				'tokenId11555 does not match'
+  				)
+  			break;
+	  		case 1:	assert.equal(amounts[i-1], balances[i], 'batchmint balance1 does not match'); break;
+	  		case 2:	assert.equal(amounts[i-1], balances[i], 'batchmint balance2 does not match'); break;
+	  		case 3:	assert.equal(amounts[i-1], balances[i], 'batchmint balance3 does not match'); break;
+	  		case 4:	assert.equal(amounts[i-1], balances[i], 'batchmint balance4 does not match'); break;
+	  		case 5:	assert.equal(amounts[i-1], balances[i], 'batchmint balance5 does not match'); break;
+	  		case 6:	assert.equal(0, balances[i], 'erc721  balance does not match'); break;
+	  		case 7:	assert.equal(
+		  			ethers.utils.parseUnits('900000000',18).toString(), 
+		  			balances[i], 
+		  			'minted fungible balance does not match'
+	  			) 
+	  		break;
+	  		case 8:	assert.equal(0, balances[i], 'balanceB does not match'); break;
+  		}
+  	}
   })
 })  
