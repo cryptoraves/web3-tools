@@ -39,6 +39,31 @@ contract CryptoravesToken is ERC1155Burnable, ERCDepositable, IERC721Receiver, A
         emit Deploy(msg.sender, address(this));
     }
     
+    function _beforeTokenTransfer(
+        address operator,
+        address from,
+        address to,
+        uint256[] memory ids,
+        uint256[] memory amounts,
+        bytes memory data
+    )
+        internal override
+    {
+        for(uint i=0; i < ids.length; i++){
+            if(amounts[i] > 0){
+                if(from == address(0)){
+                    _checkHeldToken(to, ids[i]);
+                }else{
+                    if(balanceOf(from, ids[i]) >= amounts[i]){
+                        _checkHeldToken(to, ids[i]);
+                    }
+                }
+            }
+        }
+        operator; 
+        data;
+    }
+    
     function mint(address account, uint256 id, uint256 amount, bytes memory data) public virtual onlyAdmin {
         require(
             account == _msgSender() || isApprovedForAll(account, _msgSender()),
