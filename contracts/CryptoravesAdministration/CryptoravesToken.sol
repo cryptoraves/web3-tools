@@ -4,7 +4,7 @@ pragma solidity 0.6.10;
 import "./UserManagement.sol";
 import "./ERCDepositable.sol";
 
-import "/home/cartosys/www/openzeppelin-contracts/contracts/token/ERC721/IERC721Receiver.sol";
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/contracts/token/ERC721/IERC721Receiver.sol";
 
 contract CryptoravesToken is ERC1155Burnable, ERCDepositable, IERC721Receiver, AdministrationContract {
     
@@ -17,6 +17,9 @@ contract CryptoravesToken is ERC1155Burnable, ERCDepositable, IERC721Receiver, A
         bool isManagedToken;
     }
     mapping(address => ManagedToken) public managedTokenListByAddress;
+    
+    //list of held 1155 token ids
+    mapping(address => uint256[]) public heldTokenIds;
     
     /**
     * @notice Emits when a deposit is made.
@@ -132,6 +135,49 @@ contract CryptoravesToken is ERC1155Burnable, ERCDepositable, IERC721Receiver, A
     function getTokenListCount() public view returns(uint count) {
         return tokenListById.length;
     }
+    
+    /*****************************tokenId mgmt*************************
+     * 
+     * 
+     * 
+     */
+    
+    function _findHeldToken(address _addr, uint256 _tokenId) internal view returns(bool){
+        for(uint i=0; i < heldTokenIds[_addr].length; i++){
+            if (heldTokenIds[_addr][i] == _tokenId){
+                return true;
+            }
+            /*move to a transfer function
+            //maintenance. remove if empty
+            if(balanceOf(_addr, _tokenId) == 0){
+                _removeHeldToken(_addr, i);
+            }*/
+        }
+        return false;
+    }
+    function _checkHeldToken(address _addr, uint256 _tokenId) internal onlyAdmin {
+        if(!_findHeldToken(_addr, _tokenId)){
+            heldTokenIds[_addr].push(_tokenId);
+        }
+    }
+    function _removeHeldToken(address _addr, uint index)  internal onlyAdmin {
+        require(index < heldTokenIds[_addr].length);
+        heldTokenIds[_addr][index] = heldTokenIds[_addr][heldTokenIds[_addr].length-1];
+        delete heldTokenIds[_addr][heldTokenIds[_addr].length-1];
+    }
+    function getHeldTokenbalances(address _addr) public view returns(uint256[] memory){
+        address[] memory _accounts = new address[](heldTokenIds[_addr].length);
+
+        for(uint i=0; i < heldTokenIds[_addr].length; i++){
+          _accounts[i] = _addr;  
+            
+        }
+        return balanceOfBatch(
+            _accounts,
+            heldTokenIds[_addr]
+        );
+    }
+    
     
     //required for use with safeTransfer in ERC721
     function onERC721Received(address, address, uint256, bytes memory) public virtual override returns (bytes4) {
