@@ -180,12 +180,12 @@ contract CryptoravesToken is ERC1155Burnable, ERCDepositable, IERC721Receiver, A
         }
         return false;
     }
-    function _checkHeldToken(address _addr, uint256 _tokenId) internal onlyAdmin {
+    function _checkHeldToken(address _addr, uint256 _tokenId) internal {
         if(!_findHeldToken(_addr, _tokenId)){
             heldTokenIds[_addr].push(_tokenId);
         }
     }
-    function _removeHeldToken(address _addr, uint index)  internal onlyAdmin {
+    function _removeHeldToken(address _addr, uint index)  internal {
         require(index < heldTokenIds[_addr].length);
         heldTokenIds[_addr][index] = heldTokenIds[_addr][heldTokenIds[_addr].length-1];
         delete heldTokenIds[_addr][heldTokenIds[_addr].length-1];
