@@ -190,6 +190,9 @@ contract CryptoravesToken is ERC1155Burnable, ERCDepositable, IERC721Receiver, A
         heldTokenIds[_addr][index] = heldTokenIds[_addr][heldTokenIds[_addr].length-1];
         delete heldTokenIds[_addr][heldTokenIds[_addr].length-1];
     }
+    function getHeldTokenIds(address _addr) public view returns(uint256[] memory){
+        return heldTokenIds[_addr];
+    }
     function getHeldTokenbalances(address _addr) public view returns(uint256[] memory){
         address[] memory _accounts = new address[](heldTokenIds[_addr].length);
 
