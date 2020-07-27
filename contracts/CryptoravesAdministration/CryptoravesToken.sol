@@ -77,7 +77,7 @@ contract CryptoravesToken is ERC1155Burnable, ERCDepositable, IERC721Receiver, A
         addTokenToManagedTokenList(account, 1155);
     }
 
-    /*
+    
     function mintBatch(address account, uint256[] memory ids, uint256[] memory amounts, bytes memory data) public virtual onlyAdmin {
         require(
             account == _msgSender() || isApprovedForAll(account, _msgSender()),
@@ -85,7 +85,7 @@ contract CryptoravesToken is ERC1155Burnable, ERCDepositable, IERC721Receiver, A
         );
 
         _mintBatch(account, ids, amounts, data);
-    }*/
+    }
     
     function depositERC20(uint256 _amount, address _token) public payable returns(uint256){
         
