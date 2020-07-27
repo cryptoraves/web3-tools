@@ -148,8 +148,6 @@ contract TokenManagement is AdministrationContract {
         
         CryptoravesToken _cryptoravesToken = CryptoravesToken(_cryptoravesContractAddress);
         
-        _cryptoravesToken.addTokenToManagedTokenList(_userAddress, 1155);
-        
         uint256 _tokenId = _cryptoravesToken.getManagedTokenIdByAddress(_userAddress);
         
         _cryptoravesToken.mint(_userAddress, _tokenId, _standardMintAmount, '');
