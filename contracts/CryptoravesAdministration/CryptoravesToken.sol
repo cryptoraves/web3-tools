@@ -15,6 +15,7 @@ contract CryptoravesToken is ERC1155Burnable, ERCDepositable, IERC721Receiver, A
     struct ManagedToken {
         uint256 managedTokenId;
         bool isManagedToken;
+        uint ercType;
     }
     mapping(address => ManagedToken) public managedTokenListByAddress;
     
@@ -86,7 +87,7 @@ contract CryptoravesToken is ERC1155Burnable, ERCDepositable, IERC721Receiver, A
         
         _depositERC20(_amount, _token);
         if(!managedTokenListByAddress[_token].isManagedToken) {
-            addTokenToManagedTokenList(_token);
+            addTokenToManagedTokenList(_token, 20);
         }
         
         uint256 _1155tokenId = getManagedTokenIdByAddress(_token);
@@ -114,7 +115,7 @@ contract CryptoravesToken is ERC1155Burnable, ERCDepositable, IERC721Receiver, A
         
        _depositERC721(_tokenId, _token);
         if(!managedTokenListByAddress[_token].isManagedToken) {
-            addTokenToManagedTokenList(_token);
+            addTokenToManagedTokenList(_token, 721);
         }
         
         uint256 _1155tokenId = getManagedTokenIdByAddress(_token);
@@ -146,13 +147,14 @@ contract CryptoravesToken is ERC1155Burnable, ERCDepositable, IERC721Receiver, A
         return managedTokenListByAddress[_tokenOriginAddr].managedTokenId;
     }
     
-    function addTokenToManagedTokenList(address _token) public onlyAdmin {
+    function addTokenToManagedTokenList(address _token, uint ercType) public onlyAdmin {
         tokenListById.push(_token);
         
         ManagedToken memory _mngTkn;
         
         _mngTkn.managedTokenId = tokenListById.length - 1;
         _mngTkn.isManagedToken = true;
+        _mngTkn.ercType = ercType;
         
         managedTokenListByAddress[_token] = _mngTkn;
     }
