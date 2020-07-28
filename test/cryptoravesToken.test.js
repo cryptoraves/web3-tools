@@ -19,8 +19,8 @@ contract("CryptoravesToken", async accounts => {
   		amount,
   		ethers.utils.formatBytes32String('test')
   	)
-    primary_tokenId1155 = instance.getManagedTokenIdByAddress(accounts[0])
-console.log(primary_tokenId1155)
+    primary_tokenId1155 = await instance.getManagedTokenIdByAddress(accounts[0])
+
   	let balance = await instance.balanceOf(accounts[0], primary_tokenId1155)
   	assert.equal(
     	balance.toString(),
