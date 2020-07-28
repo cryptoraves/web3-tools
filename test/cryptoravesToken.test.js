@@ -5,7 +5,7 @@ const ERC721Full = artifacts.require('ERC721Full')
 
 const ethers = require('ethers')
 
-let tokenId1155 = 12345
+let primary_tokenId1155 = 12345
 let ids = [11111,22222,33333,44444,55555]
 let amounts = [1000,2000,3000,4000,5000]
 
@@ -19,8 +19,8 @@ contract("CryptoravesToken", async accounts => {
   		amount,
   		ethers.utils.formatBytes32String('test')
   	)
-    tokenId1155 = instance.getManagedTokenIdByAddress(accounts[0])
-  	let balance = await instance.balanceOf(accounts[0], tokenId1155)
+    primary_tokenId1155 = instance.getManagedTokenIdByAddress(accounts[0])
+  	let balance = await instance.balanceOf(accounts[0], primary_tokenId1155)
   	assert.equal(
     	balance.toString(),
     	amount,
@@ -266,7 +266,7 @@ contract("CryptoravesToken", async accounts => {
 
   	for(i=0; i < heldIds.length; i++){
   		switch(i){
-  			case 0:	assert.equal(tokenId1155, heldIds[i], 'tokenId11555 does not match'); break;
+  			case 0:	assert.equal(primary_tokenId1155, heldIds[i], 'primary_tokenId1155 does not match'); break;
 	  		case 1:	assert.equal(ids[i-1], heldIds[i], 'batchmint id1 does not match'); break;
 	  		case 2:	assert.equal(ids[i-1], heldIds[i], 'batchmint id2 does not match'); break;
 	  		case 3:	assert.equal(ids[i-1], heldIds[i], 'batchmint id3 does not match'); break;
