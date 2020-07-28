@@ -225,12 +225,12 @@ contract("CryptoravesToken", async accounts => {
 
   	assert.equal(
   		id20.toString(),
-  		1,
+  		2,
   		"ERC20 token id lookup failed"
   	)
   	assert.equal(
   		id721.toString(),
-  		2,
+  		3,
   		"ERC721 token id lookup failed"
   	)
   })
@@ -272,9 +272,9 @@ contract("CryptoravesToken", async accounts => {
 	  		case 3:	assert.equal(ids[i-1], heldIds[i], 'batchmint id3 does not match'); break;
 	  		case 4:	assert.equal(ids[i-1], heldIds[i], 'batchmint id4 does not match'); break;
 	  		case 5:	assert.equal(ids[i-1], heldIds[i], 'batchmint id5 does not match'); break;
-	  		case 6:	assert.equal(0, heldIds[i], 'erc721  id does not match'); break;
-	  		case 7:	assert.equal(1, heldIds[i], 'minted fungible does not match'); break;
-	  		case 8:	assert.equal(2, heldIds[i], 'idB does not match'); break;
+	  		case 6:	assert.equal(1, heldIds[i], 'erc721  id does not match'); break;
+	  		case 7:	assert.equal(2, heldIds[i], 'minted fungible does not match'); break;
+	  		case 8:	assert.equal(3, heldIds[i], 'idB does not match'); break;
   		}
   	}
   })
