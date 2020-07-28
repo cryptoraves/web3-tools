@@ -236,13 +236,11 @@ contract("CryptoravesToken", async accounts => {
   })
   it("add managed token to list", async () => {
   	let instance = await CryptoravesToken.deployed()
-    let wallet = ethers.Wallet.createRandom()
-  	await instance.addTokenToManagedTokenList(wallet.address, 1155)
-  	let id7 = await instance.getManagedTokenIdByAddress(wallet.address)
-  	let count = await instance.getTokenListCount()
+    //let wallet = ethers.Wallet.createRandom()
+  	let id7 = await instance.getManagedTokenIdByAddress(account[0])
   	assert.equal(
   		id7.toNumber(),
-  		count.toNumber() - 1,
+  		primary_tokenId1155,
   		"Managed token addition failed"
   	)
   })
