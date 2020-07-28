@@ -264,10 +264,8 @@ contract("CryptoravesToken", async accounts => {
   	assert.isAbove(heldIds.length, 0, 'No held token ids returned.')
 
   	for(i=0; i < heldIds.length; i++){
-      console.log(primary_tokenId1155.toString())
-      console.log(heldIds[i].toString())
   		switch(i){
-  			case 0:	assert.equal(primary_tokenId1155, heldIds[i], 'primary_tokenId1155 does not match'); break;
+  			case 0:	assert.equal(primary_tokenId1155.toString(), heldIds[i].toString(), 'primary_tokenId1155 does not match'); break;
 	  		case 1:	assert.equal(ids[i-1], heldIds[i], 'batchmint id1 does not match'); break;
 	  		case 2:	assert.equal(ids[i-1], heldIds[i], 'batchmint id2 does not match'); break;
 	  		case 3:	assert.equal(ids[i-1], heldIds[i], 'batchmint id3 does not match'); break;
