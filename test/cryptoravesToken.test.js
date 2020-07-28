@@ -20,6 +20,7 @@ contract("CryptoravesToken", async accounts => {
   		ethers.utils.formatBytes32String('test')
   	)
     primary_tokenId1155 = instance.getManagedTokenIdByAddress(accounts[0])
+console.log(primary_tokenId1155)
   	let balance = await instance.balanceOf(accounts[0], primary_tokenId1155)
   	assert.equal(
     	balance.toString(),
@@ -237,7 +238,7 @@ contract("CryptoravesToken", async accounts => {
   it("add managed token to list", async () => {
   	let instance = await CryptoravesToken.deployed()
     //let wallet = ethers.Wallet.createRandom()
-  	let id7 = await instance.getManagedTokenIdByAddress(account[0])
+  	let id7 = await instance.getManagedTokenIdByAddress(accounts[0])
   	assert.equal(
   		id7.toNumber(),
   		primary_tokenId1155,
