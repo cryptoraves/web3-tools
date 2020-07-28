@@ -54,7 +54,7 @@ contract("TokenManagement", async accounts => {
         [434443434,55667788,0],
         ['@rando1', '@rando2', ''],
         'https://i.picsum.photos/id/2/200/200.jpg',
-        'transfer',,
+        'transfer',
         50,
         bytes
       )
@@ -63,7 +63,7 @@ contract("TokenManagement", async accounts => {
         [434443434,1029384756,0],
         ['@rando1', '@rando2', ''],
         'https://i.picsum.photos/id/2/200/200.jpg',
-        'transfer',,
+        'transfer',
         50,
         bytes
       )
