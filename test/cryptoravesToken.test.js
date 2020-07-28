@@ -15,11 +15,11 @@ contract("CryptoravesToken", async accounts => {
   	
   	let amount = ethers.utils.parseUnits('1000000000',18).toString()
   	await instance.mint(
-  		accounts[0], 
-  		tokenId1155, 
+  		accounts[0],
   		amount,
   		ethers.utils.formatBytes32String('test')
   	)
+    tokenId1155 = instance.getManagedTokenIdByAddress(accounts[0])
   	let balance = await instance.balanceOf(accounts[0], tokenId1155)
   	assert.equal(
     	balance.toString(),
