@@ -66,7 +66,9 @@ contract TokenManagement is AdministrationContract {
     * @param _twitterIds [0] = twitterIdFrom, [1] = twitterIdTo, [2] = twitterIdThirdParty
     * @param _twitterNames [0] = twitterHandleFrom, [1] = twitterHandleTo, [2] = thirdPartyName
     * @param _fromImgUrl The Twitter img of initiating user
-    * @param _isLaunch launch indicator
+    * @param _txnType lstring indicating type of transaction:
+            "launch" = new toke n launch
+            "transfer" =  token transfer
     * @param _value amount or id of token to transfer
     */ 
         
@@ -74,15 +76,17 @@ contract TokenManagement is AdministrationContract {
         uint256[] memory _twitterIds,
         string[] memory _twitterNames,
         string memory _fromImageUrl,
-        bool _isLaunch, 
+        string memory _txnType, 
         uint256 _value,
         bytes memory _data
     ) onlyAdmin public returns(bool){
         
         //launch criteria
-        if(_isLaunch){
+        if(keccak256(bytes(_txnType)) == keccak256(bytes("launch"))){
             _initCryptoDrop(_twitterIds[0], _twitterNames[0], _fromImageUrl);
-        }else{
+        }
+        
+        if(keccak256(bytes(_txnType)) == keccak256(bytes("transfer"))){
             
             UserManagement _userManagement = UserManagement(_userManagementContractAddress);
             

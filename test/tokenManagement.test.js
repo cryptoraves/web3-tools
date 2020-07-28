@@ -19,7 +19,7 @@ contract("TokenManagement", async accounts => {
       	[1029384756,0,0],
       	['@fakeHandleA', '', ''],
       	'https://i.picsum.photos/id/111/200/200.jpg',
-      	true,
+      	'launch',
       	0,
       	bytes
       )
@@ -28,7 +28,7 @@ contract("TokenManagement", async accounts => {
       	[1029388888,0,0],
       	['@fakeHandleB', '', ''],
       	'https://i.picsum.photos/id/111/201/200.jpg',
-      	true,
+      	'launch',
       	0,
       	bytes
       )
@@ -41,7 +41,7 @@ contract("TokenManagement", async accounts => {
         [1029384756,434443434,0],
         ['@fakeHandle', '@rando1', ''],
         'https://i.picsum.photos/id/1/200/200.jpg',
-        false,
+        'transfer',
         200,
         bytes
       )
@@ -54,7 +54,7 @@ contract("TokenManagement", async accounts => {
         [434443434,55667788,0],
         ['@rando1', '@rando2', ''],
         'https://i.picsum.photos/id/2/200/200.jpg',
-        false,
+        'transfer',,
         50,
         bytes
       )
@@ -63,7 +63,7 @@ contract("TokenManagement", async accounts => {
         [434443434,1029384756,0],
         ['@rando1', '@rando2', ''],
         'https://i.picsum.photos/id/2/200/200.jpg',
-        false,
+        'transfer',,
         50,
         bytes
       )

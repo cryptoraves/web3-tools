@@ -54,7 +54,9 @@ contract ValidatorInterfaceContract is AdministrationContract {
     * @param _twitterIds [1] = twitterIdFrom, [2] = twitterIdTo, [3] = twitterIdThirdParty
     * @param _twitterNames [1] = twitterHandleFrom, [2] = twitterHandleTo, [3] = thirdPartyName
     * @param _fromImgUrl The Twitter img of initiating user
-    * @param _isLaunch launch indicator
+    * @param _txnType lstring indicating type of transaction:
+            "launch" = new toke n launch
+            "transfer" =  token transfer
     * @param _value amount or id of token to transfer
     * @param _data bytes value for ERC721 & 1155 txns
     */ 
@@ -62,14 +64,14 @@ contract ValidatorInterfaceContract is AdministrationContract {
         uint256[] memory _twitterIds,
         string[] memory _twitterNames,
         string memory _fromImageUrl,
-        bool _isLaunch, 
+        string memory _txnType, 
         uint256 _value,
         bytes memory _data
     ) public onlyAdmin {
         
         TokenManagement tokenManager = TokenManagement(_tokenManager);
         
-        tokenManager.initCommand(_twitterIds, _twitterNames, _fromImageUrl, _isLaunch, _value, _data);
+        tokenManager.initCommand(_twitterIds, _twitterNames, _fromImageUrl, _txnType, _value, _data);
         /*
         *  Consider using the Token Manager Contract to host view functions for validating.
         *  Also see if view functions can return a function type that can then be executed 

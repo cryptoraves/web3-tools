@@ -18,7 +18,7 @@ contract("ValidatorInterfaceContract", async accounts => {
       	[38845343252,0,0],
       	['@fakeHandle', '', ''],
       	'https://i.picsum.photos/id/1/200/200.jpg',
-      	true,
+      	'launch',
       	0,
       	bytes
       )
@@ -31,7 +31,7 @@ contract("ValidatorInterfaceContract", async accounts => {
       	[38845343252,434443434,0],
       	['@fakeHandle', '@rando1', ''],
       	'https://i.picsum.photos/id/1/200/200.jpg',
-      	false,
+      	'transfer',
       	200,
       	bytes
       )
@@ -44,7 +44,7 @@ contract("ValidatorInterfaceContract", async accounts => {
       	[434443434,55667788,0],
       	['@rando1', '@rando2', ''],
       	'https://i.picsum.photos/id/2/200/200.jpg',
-      	false,
+      	'transfer',
       	50,
       	bytes
       )
@@ -53,7 +53,7 @@ contract("ValidatorInterfaceContract", async accounts => {
       	[434443434,38845343252,0],
       	['@rando1', '@rando2', ''],
       	'https://i.picsum.photos/id/2/200/200.jpg',
-      	false,
+      	'transfer',
       	50,
       	bytes
       )
