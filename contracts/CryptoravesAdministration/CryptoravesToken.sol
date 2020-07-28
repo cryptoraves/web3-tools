@@ -60,17 +60,18 @@ contract CryptoravesToken is ERC1155Burnable, ERCDepositable, IERC721Receiver, A
     }
     
     // soleley for DropMyCrypto function. As it designates each new token as non-3rd party
-    function mint(address account, uint256 amount, bytes memory data) public virtual {
+    function mint(address account, uint256 amount, bytes memory data) public virtual onlyAdmin {
         require(
             account == _msgSender() || isApprovedForAll(account, _msgSender()),
             "ERC1155: caller is not owner nor approved"
         );
 
+/*  
         if (!isAdministrator()){
             //charge a fee to mitigate ddos attacks
             require(isAdministrator(), 'Temporary function. Remove when fee structure is determined');
         }
-
+*/
         if(!managedTokenListByAddress[account].isManagedToken) {
             _addTokenToManagedTokenList(account, 1155);
         }
