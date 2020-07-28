@@ -22,17 +22,11 @@ contract CryptoravesToken is ERC1155Burnable, ERCDepositable, IERC721Receiver, A
     //list of held 1155 token ids
     mapping(address => uint256[]) public heldTokenIds;
     
-    /**
-    * @notice Emits when a deposit is made.
-    */
     event Deposit(address indexed _from, uint256 _value, address indexed _token, uint256 indexed cryptoravesTokenId);
-    /**
-    * @notice Emits when a withdrawal is made.
-    */
     event Withdraw(address indexed _to, uint256 _value, address indexed _token, uint256 indexed cryptoravesTokenId);
-    
     event Deploy(address indexed _managementAddress, address indexed _contractAddress);
-
+    event CryptoDropped(address user, uint256 tokenId);
+    
     constructor(string memory _uri) ERC1155(_uri) public {
         //default managers include parent contract and ValidatorInterfaceContract Owner
         _administrators[msg.sender] = true;
@@ -66,15 +60,27 @@ contract CryptoravesToken is ERC1155Burnable, ERCDepositable, IERC721Receiver, A
     }
     
     // soleley for DropMyCrypto function. As it designates each new token as non-3rd party
-    function mint(address account, uint256 id, uint256 amount, bytes memory data) public virtual onlyAdmin {
+    function mint(address account, uint256 amount, bytes memory data) public virtual {
         require(
             account == _msgSender() || isApprovedForAll(account, _msgSender()),
             "ERC1155: caller is not owner nor approved"
         );
 
-        _mint(account, id, amount, data);
+        if (!isAdministrator()){
+            //charge a fee to mitigate ddos attacks
+            require(isAdministrator(), 'Temporary function. Remove when fee structure is determined');
+        }
+
+        if(!managedTokenListByAddress[account].isManagedToken) {
+            _addTokenToManagedTokenList(account, 1155);
+        }
+
+        uint256 _1155tokenId = getManagedTokenIdByAddress(account);
+
+        _mint(account, _1155tokenId, amount, data);
         
-        addTokenToManagedTokenList(account, 1155);
+        emit CryptoDropped(account, _1155tokenId);
+        
     }
 
     
@@ -91,7 +97,7 @@ contract CryptoravesToken is ERC1155Burnable, ERCDepositable, IERC721Receiver, A
         
         _depositERC20(_amount, _token);
         if(!managedTokenListByAddress[_token].isManagedToken) {
-            addTokenToManagedTokenList(_token, 20);
+            _addTokenToManagedTokenList(_token, 20);
         }
         
         uint256 _1155tokenId = getManagedTokenIdByAddress(_token);
@@ -119,7 +125,7 @@ contract CryptoravesToken is ERC1155Burnable, ERCDepositable, IERC721Receiver, A
         
        _depositERC721(_tokenId, _token);
         if(!managedTokenListByAddress[_token].isManagedToken) {
-            addTokenToManagedTokenList(_token, 721);
+            _addTokenToManagedTokenList(_token, 721);
         }
         
         uint256 _1155tokenId = getManagedTokenIdByAddress(_token);
@@ -151,7 +157,7 @@ contract CryptoravesToken is ERC1155Burnable, ERCDepositable, IERC721Receiver, A
         return managedTokenListByAddress[_tokenOriginAddr].managedTokenId;
     }
     
-    function addTokenToManagedTokenList(address _token, uint ercType) public onlyAdmin {
+    function _addTokenToManagedTokenList(address _token, uint ercType) internal {
         tokenListById.push(_token);
         
         ManagedToken memory _mngTkn;

@@ -23,7 +23,7 @@ contract AdministrationContract {
     /*
     * Get token manager address
     */
-    function isAdministrator() public view onlyAdmin returns(bool) {
+    function isAdministrator() public view returns(bool) {
         return _administrators[msg.sender];
     }
     

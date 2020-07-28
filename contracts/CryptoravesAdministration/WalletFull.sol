@@ -44,6 +44,7 @@ contract WalletFull is ERC1155Receiver, AdministrationContract {
         address _cryptoravesTokenAddress = ITokenManager(_walletManager).getCryptoravesTokenAddress();
         
         IERC1155(_cryptoravesTokenAddress).safeTransferFrom(_from, _to, _id, _val, _data);
+        
     }
 }
 

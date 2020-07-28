@@ -14,7 +14,6 @@ contract TokenManagement is AdministrationContract {
     
     event Transfer(address indexed _from, address indexed _to, uint256 _value, uint256 _tokenId);
     
-    event CryptoDropped(address user, uint256 tokenId);
     event CryptoravesTokenAddressChange(address _newContractAddr);
     event UserManagementAddressChange(address _newContractAddr);
 
@@ -152,13 +151,9 @@ contract TokenManagement is AdministrationContract {
         
         CryptoravesToken _cryptoravesToken = CryptoravesToken(_cryptoravesContractAddress);
         
-        uint256 _tokenId = _cryptoravesToken.getManagedTokenIdByAddress(_userAddress);
-        
-        _cryptoravesToken.mint(_userAddress, _tokenId, _standardMintAmount, '');
+        _cryptoravesToken.mint(_userAddress, _standardMintAmount, '');
         
         _userManagement.setDropState(_platformUserId);
-        
-        emit CryptoDropped(_userAddress, _tokenId);
         
         return _userAddress;
     }
