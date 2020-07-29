@@ -20,6 +20,8 @@ contract("TokenManagement", async accounts => {
       console.log(res)
        res = await instance.parseAddr('0XC47EDE26B56258A23B24140b626e5d4d981b5721')
       console.log(res)
+      res = await instance.parseAddr('asddas asdas')
+      console.log(res)
 
     })
 
