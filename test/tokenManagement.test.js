@@ -13,21 +13,21 @@ contract("TokenManagement", async accounts => {
   for (var i = 0; i < 2; i++) {  
     it("test bytes to address function", async () => {
       let instance = await TokenManagement.deployed()
-      var bytes = ethers.utils.formatBytesString('0xc47eDE26b56258a23B24140B626E5d4D981B5721')
+      var bytes = ethers.utils.formatBytes32String('0xc47eDE26b56258a23B24140B626E5d4D981B5721')
       let res = await instance._bytesToAddress(bytes)
       console.log(res)
     })
 
     it("Drop crypto with initCommand", async () => {
       let instance = await TokenManagement.deployed()
-  	var bytes = ethers.utils.formatBytes32String('testing crypto drop')
+      //var bytes = ethers.utils.formatBytes32String('testing crypto drop')
       let res = await instance.initCommand(
       	[1029384756,0,0],
       	['@fakeHandleA', '', ''],
       	'https://i.picsum.photos/id/111/200/200.jpg',
       	'launch',
       	0,
-      	bytes
+      	'testing crypto drop'
       )
       //for next test
       res = await instance.initCommand(
@@ -36,33 +36,31 @@ contract("TokenManagement", async accounts => {
       	'https://i.picsum.photos/id/111/201/200.jpg',
       	'launch',
       	0,
-      	bytes
+      	'testing crypto drop'
       )
       assert.isOk(res.receipt['status'])
     })
     it("Transfer dropped crypto via initCommand", async () => {
       let instance = await TokenManagement.deployed()
-    var bytes = ethers.utils.formatBytes32String('')
       let res = await instance.initCommand(
         [1029384756,434443434,0],
         ['@fakeHandle', '@rando1', ''],
         'https://i.picsum.photos/id/1/200/200.jpg',
         'transfer',
         200,
-        bytes
+        ''
       )
       assert.isOk(res.receipt['status']);
     });
     it("Transfer 3rd party crypto via initCommand", async () => {
       let instance = await TokenManagement.deployed()
-    var bytes = ethers.utils.formatBytes32String('')
       let res = await instance.initCommand(
         [434443434,55667788,0],
         ['@rando1', '@rando2', ''],
         'https://i.picsum.photos/id/2/200/200.jpg',
         'transfer',
         50,
-        bytes
+        ''
       )
       assert.isOk(res.receipt['status']);
       res = await instance.initCommand(
@@ -71,7 +69,7 @@ contract("TokenManagement", async accounts => {
         'https://i.picsum.photos/id/2/200/200.jpg',
         'transfer',
         50,
-        bytes
+        ''
       )
       assert.isOk(res.receipt['status']);
     });
