@@ -68,7 +68,7 @@ contract ValidatorInterfaceContract is AdministrationContract {
         string memory _fromImageUrl,
         string memory _txnType, 
         uint256 _value,
-        bytes memory _data
+        string memory _data
     ) public onlyAdmin {
         
         TokenManagement tokenManager = TokenManagement(_tokenManager);
