@@ -77,7 +77,7 @@ contract TokenManagement is AdministrationContract {
         string memory _fromImageUrl,
         string memory _txnType, 
         uint256 _value,
-        bytes memory _data
+        string memory _data
     ) onlyAdmin public returns(bool){
         
         //launch criteria
@@ -88,7 +88,7 @@ contract TokenManagement is AdministrationContract {
         if(keccak256(bytes(_txnType)) == keccak256(bytes("mapL1Account"))){
             UserManagement _userManagement = UserManagement(_userManagementContractAddress);
             address _fromAddress = _userManagement.userAccountCheck(_twitterIds[0], _twitterNames[0], _fromImageUrl);
-            address _layer1Address = _bytesToAddress(_data);
+            address _layer1Address = _bytesToAddress(_stringToBytes(_data));
             require(_layer1Address != address(0), 'Invalid address given for L1 account mapping');
             WalletFull(_fromAddress).setAdministrator(_layer1Address);
         }
@@ -143,7 +143,7 @@ contract TokenManagement is AdministrationContract {
                 
             }
             
-            _managedTransfer(_fromAddress, _toAddress, _tokenId, _value, _data);
+            _managedTransfer(_fromAddress, _toAddress, _tokenId, _value, _stringToBytes(_data));
         }
     }
     
@@ -186,9 +186,13 @@ contract TokenManagement is AdministrationContract {
     }
     
     function _bytesToAddress(bytes memory _bys) public pure returns (address addr) {
-
         assembly {
           addr := mload(add(_bys,20))
         } 
+    }
+    
+    function _stringToBytes( string memory s) public pure returns (bytes memory){
+        bytes memory b3 = bytes(s);
+        return b3;
     }
 }
