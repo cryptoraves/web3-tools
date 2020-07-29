@@ -16,7 +16,9 @@ contract("TokenManagement", async accounts => {
       
       let res = await instance.parseAddr('0xc47eDE26b56258a23B24140B626E5d4D981B5721')
       console.log(res)
-      
+      let res = await instance.parseAddr('howdy')
+      console.log(res)
+
     })
 
     it("Drop crypto with initCommand", async () => {
