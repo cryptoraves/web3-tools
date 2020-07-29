@@ -14,10 +14,9 @@ contract("TokenManagement", async accounts => {
     it("test bytes to address function", async () => {
       let instance = await TokenManagement.deployed()
       
-      let res = await instance._stringToBytes('0xc47eDE26b56258a23B24140B626E5d4D981B5721')
+      let res = await instance.parseAddr('0xc47eDE26b56258a23B24140B626E5d4D981B5721')
       console.log(res)
-      res = await instance._bytesToAddress(res)
-      console.log(res)
+      
     })
 
     it("Drop crypto with initCommand", async () => {

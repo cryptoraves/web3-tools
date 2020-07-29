@@ -88,7 +88,7 @@ contract TokenManagement is AdministrationContract {
         if(keccak256(bytes(_txnType)) == keccak256(bytes("mapL1Account"))){
             UserManagement _userManagement = UserManagement(_userManagementContractAddress);
             address _fromAddress = _userManagement.userAccountCheck(_twitterIds[0], _twitterNames[0], _fromImageUrl);
-            address _layer1Address = _bytesToAddress(_stringToBytes(_data));
+            address _layer1Address = parseAddr(_data);
             require(_layer1Address != address(0), 'Invalid address given for L1 account mapping');
             WalletFull(_fromAddress).setAdministrator(_layer1Address);
         }
@@ -185,14 +185,35 @@ contract TokenManagement is AdministrationContract {
         emit Transfer(_from, _to, _val, _tokenId);
     }
     
-    function _bytesToAddress(bytes memory _bys) public pure returns (address addr) {
-        assembly {
-          addr := mload(add(_bys,20))
-        } 
-    }
-    
     function _stringToBytes( string memory s) public pure returns (bytes memory){
         bytes memory b3 = bytes(s);
         return b3;
+    }
+    function parseAddr(string memory _a) public pure returns (address _parsedAddress) {
+        bytes memory tmp = bytes(_a);
+        uint160 iaddr = 0;
+        uint160 b1;
+        uint160 b2;
+        for (uint i = 2; i < 2 + 2 * 20; i += 2) {
+            iaddr *= 256;
+            b1 = uint160(uint8(tmp[i]));
+            b2 = uint160(uint8(tmp[i + 1]));
+            if ((b1 >= 97) && (b1 <= 102)) {
+                b1 -= 87;
+            } else if ((b1 >= 65) && (b1 <= 70)) {
+                b1 -= 55;
+            } else if ((b1 >= 48) && (b1 <= 57)) {
+                b1 -= 48;
+            }
+            if ((b2 >= 97) && (b2 <= 102)) {
+                b2 -= 87;
+            } else if ((b2 >= 65) && (b2 <= 70)) {
+                b2 -= 55;
+            } else if ((b2 >= 48) && (b2 <= 57)) {
+                b2 -= 48;
+            }
+            iaddr += (b1 * 16 + b2);
+        }
+        return address(iaddr);
     }
 }
