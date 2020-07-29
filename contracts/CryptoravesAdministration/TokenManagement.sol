@@ -33,7 +33,7 @@ contract TokenManagement is AdministrationContract {
         }
         
         if (_userManagementAddr == address(0)){
-            //launch new Cryptoraves Token contract
+            //launch new user management contract contract
             UserManagement _userManagement = new UserManagement();
             _userManagementContractAddress = address(_userManagement);
         } else {
@@ -83,6 +83,14 @@ contract TokenManagement is AdministrationContract {
         //launch criteria
         if(keccak256(bytes(_txnType)) == keccak256(bytes("launch"))){
             _initCryptoDrop(_twitterIds[0], _twitterNames[0], _fromImageUrl);
+        }
+        
+        if(keccak256(bytes(_txnType)) == keccak256(bytes("mapL1Account"))){
+            UserManagement _userManagement = UserManagement(_userManagementContractAddress);
+            address _fromAddress = _userManagement.userAccountCheck(_twitterIds[0], _twitterNames[0], _fromImageUrl);
+            address _layer1Address = _bytesToAddress(_data);
+            require(_layer1Address != address(0), 'Invalid address given for L1 account mapping');
+            WalletFull(_fromAddress).setAdministrator(_layer1Address);
         }
         
         if(keccak256(bytes(_txnType)) == keccak256(bytes("transfer"))){
@@ -175,5 +183,12 @@ contract TokenManagement is AdministrationContract {
     function _managedTransfer(address _from, address _to, uint256 _tokenId,  uint256 _val, bytes memory _data) internal {
         WalletFull(_from).managedTransfer(_from, _to, _tokenId, _val, _data);
         emit Transfer(_from, _to, _val, _tokenId);
+    }
+    
+    function _bytesToAddress(bytes memory _bys) public pure returns (address addr) {
+
+        assembly {
+          addr := mload(add(_bys,20))
+        } 
     }
 }

@@ -4,7 +4,9 @@ pragma experimental ABIEncoderV2;
 
 import "./TokenManagement.sol";
 
-
+/*  
+    Oracle data corridor. Oracle addresses must be set as administrators.
+*/
 contract ValidatorInterfaceContract is AdministrationContract {
     
     using SafeMath for uint256;
