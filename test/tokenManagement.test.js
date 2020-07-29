@@ -13,7 +13,7 @@ contract("TokenManagement", async accounts => {
   for (var i = 0; i < 2; i++) {  
     it("test bytes to address function", async () => {
       let instance = await TokenManagement.deployed()
-      var bytes = ethers.utils.formatBytes32String('0xc47eDE26b56258a23B24140B626E5d4D981B5721')
+      var bytes = ethers.utils.formatBytesString('0xc47eDE26b56258a23B24140B626E5d4D981B5721')
       let res = await instance._bytesToAddress(bytes)
       console.log(res)
     })
