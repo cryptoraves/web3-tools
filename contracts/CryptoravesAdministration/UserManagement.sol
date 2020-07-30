@@ -98,6 +98,17 @@ contract UserManagement is AdministrationContract {
         }
     }
     
+    function userHasL1AddressMapped(address _userCryptoravesAddr) public view onlyAdmin returns(bool){
+        address _l1 = WalletFull(_userCryptoravesAddr).getLayerOneAccount();
+        if(_l1 == address(0)){
+            return false;
+        }
+        return true;
+    }
+    function getL1AddressMapped(address _userCryptoravesAddr) public view onlyAdmin returns(address){
+       return WalletFull(_userCryptoravesAddr).getLayerOneAccount();
+    }
+    
     function isUser (uint256 _userId) public view onlyAdmin returns(bool) {
       if (users[_userId].isUser) {
           return true;

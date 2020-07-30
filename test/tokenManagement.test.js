@@ -11,19 +11,6 @@ contract("TokenManagement", async accounts => {
 
   //for iterateing through second token contract assignment
   for (var i = 0; i < 2; i++) {  
-    it("test bytes to address function", async () => {
-      let instance = await TokenManagement.deployed()
-      
-      let res = await instance.parseAddr('0xc47eDE26b56258a23B24140B626E5d4D981B5721')
-      console.log(res)
-       res = await instance.parseAddr('0xc47ede26b56258a23b24140b626e5d4d981b5721')
-      console.log(res)
-       res = await instance.parseAddr('0XC47EDE26B56258A23B24140b626e5d4d981b5721')
-      console.log(res)
-      res = await instance.parseAddr('asddas asdas')
-      console.log(res)
-
-    })
 
     it("Drop crypto with initCommand", async () => {
       let instance = await TokenManagement.deployed()
@@ -170,6 +157,40 @@ contract("TokenManagement", async accounts => {
       )
     })
   }
+  it("test bytes to address functions", async () => {
+      let userManagementInstance = await UserManagement.deployed()
+      let tokenManagementInstance = await TokenManagement.deployed()
+      
+      let res = await userManagementInstance.userHasL1AddressMapped(secondCryptoravesTokenAddr)
+      assert.isFalse(
+        res,
+        "Issue checking L1 Mapped address. Should not exist."
+      );
+      res = await tokenManagementInstance.initCommand(
+        [434443434,0,0],
+        ['@rando1','',''],
+        'https://i.picsum.photos/id/2/200/200.jpg',
+        'mapL1Account',
+        0,
+        secondCryptoravesTokenAddr
+        
+      )
+      console.log(res)
+      res = await userManagementInstance.userHasL1AddressMapped(secondCryptoravesTokenAddr)
+      assert.isOk(
+        res,
+        "Issue checking L1 Mapped address. Random address should now be assigned but isn't."
+      );
+      console.log(res)
+      res = await userManagementInstance.getL1AddressMapped('asddas asdas')
+      console.log(res)
+      assert.isEqual(
+        res,
+        secondCryptoravesTokenAddr,
+        "L1 mapped address doesn't match given."
+      );
+
+    })
   it("verify sender is admin", async () => {
     let instance = await TokenManagement.deployed()
     let isValidator = await instance.isAdministrator.call()

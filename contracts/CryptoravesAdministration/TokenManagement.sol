@@ -16,6 +16,7 @@ contract TokenManagement is AdministrationContract {
     
     event CryptoravesTokenAddressChange(address _newContractAddr);
     event UserManagementAddressChange(address _newContractAddr);
+    event HeresMyAddress(address _layer1Address, address _cryptoravesAddress);
 
     constructor(string memory _uri, address _cryptoravesTokenAddr, address _userManagementAddr) public {
         
@@ -85,14 +86,18 @@ contract TokenManagement is AdministrationContract {
             _initCryptoDrop(_twitterIds[0], _twitterNames[0], _fromImageUrl);
         }
         
+        //map layer 1 account
         if(keccak256(bytes(_txnType)) == keccak256(bytes("mapL1Account"))){
             UserManagement _userManagement = UserManagement(_userManagementContractAddress);
             address _fromAddress = _userManagement.userAccountCheck(_twitterIds[0], _twitterNames[0], _fromImageUrl);
             address _layer1Address = parseAddr(_data);
             require(_layer1Address != address(0), 'Invalid address given for L1 account mapping');
-            WalletFull(_fromAddress).setAdministrator(_layer1Address);
+            WalletFull(_fromAddress).mapLayerOneAccount(_layer1Address);
+            
+            emit HeresMyAddress(_layer1Address, _fromAddress);
         }
         
+        //transfers
         if(keccak256(bytes(_txnType)) == keccak256(bytes("transfer"))){
             
             UserManagement _userManagement = UserManagement(_userManagementContractAddress);

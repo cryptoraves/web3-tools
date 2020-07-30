@@ -32,8 +32,13 @@ contract WalletFull is ERC1155Receiver, AdministrationContract {
         _administrators[msg.sender] = true;
     }
 
+    function getLayerOneAccount() public view onlyAdmin returns(address) {
+        return _mappedL1Account;
+    }
     function mapLayerOneAccount(address _l1Addr) public onlyAdmin {
-        unsetAdministrator(_mappedL1Account);
+        if(_mappedL1Account != address(0)){
+            unsetAdministrator(_mappedL1Account);
+        }
         _mappedL1Account = _l1Addr;
         setAdministrator(_l1Addr);
     }
