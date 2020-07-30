@@ -6,19 +6,14 @@ const UserManagement = artifacts.require("UserManagement");
 let secondUserManagerAddr = ''
 const CryptoravesToken = artifacts.require("CryptoravesToken");
 let secondCryptoravesTokenAddr = ''
-let originalUserManagerAddr = ''
 
 contract("TokenManagement", async accounts => {
-  let instance = await TokenManagement.deployed()
-  originalUserManagerAddr = await instance.getUserManagementAddress()
-  console.log(originalUserManagerAddr)
       
   //for iterateing through second token contract assignment
   for (var i = 0; i < 2; i++) {  
 
     it("Drop crypto with initCommand", async () => {
       let instance = await TokenManagement.deployed()
-
 
       //var bytes = ethers.utils.formatBytes32String('testing crypto drop')
       let res = await instance.initCommand(
@@ -167,8 +162,7 @@ contract("TokenManagement", async accounts => {
       let userManagementInstance = await UserManagement.deployed()
       let tokenManagementInstance = await TokenManagement.deployed()
       //change token management contract back to original
-      console.log(originalUserManagerAddr)
-      await tokenManagementInstance.changeUserManagementAddress(originalUserManagerAddr)
+      await tokenManagementInstance.changeUserManagementAddress(userManagementInstance.address)
 
       let res = await userManagementInstance.getUser(1029384756);
      
