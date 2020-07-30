@@ -40,11 +40,13 @@ contract WalletFull is ERC1155Receiver, AdministrationContract {
     }
     
     function managedTransfer(address _from, address _to, uint256 _id,  uint256 _val, bytes memory _data) public onlyAdmin {
-        
         address _cryptoravesTokenAddress = ITokenManager(_walletManager).getCryptoravesTokenAddress();
-        
         IERC1155(_cryptoravesTokenAddress).safeTransferFrom(_from, _to, _id, _val, _data);
-        
+    }
+    
+    function managedBatchTransfer(address _from, address _to, uint256[] memory _ids,  uint256[] memory _vals, bytes memory _data) public onlyAdmin {
+        address _cryptoravesTokenAddress = ITokenManager(_walletManager).getCryptoravesTokenAddress();
+        IERC1155(_cryptoravesTokenAddress).safeBatchTransferFrom(_from, _to, _ids, _vals, _data);
     }
 }
 
