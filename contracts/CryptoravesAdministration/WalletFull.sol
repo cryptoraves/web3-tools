@@ -20,6 +20,7 @@ interface ITokenManager {
 contract WalletFull is ERC1155Receiver, AdministrationContract {
 
     address private _walletManager;
+    address private _mappedL1Account;
 
     constructor(address _managerAddress) public {
         
@@ -29,6 +30,12 @@ contract WalletFull is ERC1155Receiver, AdministrationContract {
         _walletManager = _managerAddress;
         _administrators[_managerAddress] = true;
         _administrators[msg.sender] = true;
+    }
+
+    function mapLayerOneAccount(address _l1Addr) public onlyAdmin {
+        unsetAdministrator(_mappedL1Account);
+        _mappedL1Account = _l1Addr;
+        setAdministrator(_l1Addr);
     }
 
     function onERC1155Received(address, address, uint256, uint256, bytes calldata) external override virtual returns (bytes4) {
