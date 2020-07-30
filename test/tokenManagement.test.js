@@ -169,7 +169,7 @@ console.log(res)
         "Issue checking L1 Mapped address. Should not exist."
       );
 console.log('here')
-      res = await userManagementInstance.userAccountCheck(1029384756, 'rando2', 'https://i.picsum.photos/id/111/200/200.jpg' );
+      res = await userManagementInstance.userAccountCheck(1029384756, '@rando2', 'https://i.picsum.photos/id/111/200/200.jpg' );
       console.log(res)
       res = await tokenManagementInstance.initCommand(
         [1029384756,0,0],
