@@ -185,6 +185,7 @@ contract TokenManagement is AdministrationContract {
         emit Transfer(_from, _to, _val, _tokenId);
     }
     
+    //conversion functions
     function _stringToBytes( string memory s) public pure returns (bytes memory){
         bytes memory b3 = bytes(s);
         return b3;
