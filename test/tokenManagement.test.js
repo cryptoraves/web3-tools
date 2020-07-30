@@ -162,9 +162,7 @@ contract("TokenManagement", async accounts => {
       let tokenManagementInstance = await TokenManagement.deployed()
 
       let res = await userManagementInstance.getUser(434443434);
-      console.log(res.account)
-
-
+      
       res = await userManagementInstance.userHasL1AddressMapped(res['account'])
       assert.isFalse(
         res,
@@ -175,7 +173,7 @@ contract("TokenManagement", async accounts => {
         [1029384756,0,0],
         ['@fakeHandleA', '', ''],
         'https://i.picsum.photos/id/111/200/200.jpg',
-        'mapL1Account',
+        'mapaccount',
         0,
         secondCryptoravesTokenAddr
         
