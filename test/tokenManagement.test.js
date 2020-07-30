@@ -166,13 +166,12 @@ contract("TokenManagement", async accounts => {
 
       let res = await userManagementInstance.getUser(1029384756);
       let addr = res['account']
+      
       res = await userManagementInstance.userHasL1AddressMapped(addr)
       assert.isFalse(
         res,
         "Issue checking L1 Mapped address. Should not exist."
       );
-
-      res = await userManagementInstance.userAccountCheck(1029384756, '@rando2', 'https://i.picsum.photos/id/111/200/200.jpg' );
 
       res = await tokenManagementInstance.initCommand(
         [1029384756,0,0],
