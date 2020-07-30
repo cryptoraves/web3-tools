@@ -161,7 +161,7 @@ contract("TokenManagement", async accounts => {
       let userManagementInstance = await UserManagement.deployed()
       let tokenManagementInstance = await TokenManagement.deployed()
 
-      let res = userManagementInstance.getUser(434443434);
+      let res = await userManagementInstance.getUser(434443434);
       console.log(res)
 
 
