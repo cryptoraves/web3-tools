@@ -135,7 +135,29 @@ contract("TokenManagement", async accounts => {
         "User management contract Address not valid: "+tokenContractAddr
       )
     })
-    it("test heresmyaddress functions", async () => {
+    it("set a new userManagement address and check it", async () => {
+      let instance = await TokenManagement.deployed()
+
+      if(secondUserManagerAddr == ''){
+        //assign new usermanagement and re-run above tests
+        let usrMgmt = await UserManagement.deployed()
+        await usrMgmt.setAdministrator(instance.address)
+        await usrMgmt.changeTokenManagerAddr(instance.address)
+        secondUserManagerAddr = usrMgmt.address
+      }else{
+        secondUserManagerAddr = ethers.Wallet.createRandom().address
+      }
+
+      let res = await instance.changeUserManagementAddress(secondUserManagerAddr) 
+      let userMgmtTokenAddress = await instance.getUserManagementAddress.call()
+      assert.equal(
+        userMgmtTokenAddress,
+        secondUserManagerAddr,
+        "changeUserManagementAddress failed with secondUserManagerAddr as input"
+      )
+    })
+  }
+  it("test heresmyaddress functions", async () => {
       let userManagementInstance = await UserManagement.deployed()
       let tokenManagementInstance = await TokenManagement.deployed()
 
@@ -174,28 +196,6 @@ contract("TokenManagement", async accounts => {
       );
 
     })
-    it("set a new userManagement address and check it", async () => {
-      let instance = await TokenManagement.deployed()
-
-      if(secondUserManagerAddr == ''){
-        //assign new usermanagement and re-run above tests
-        let usrMgmt = await UserManagement.deployed()
-        await usrMgmt.setAdministrator(instance.address)
-        await usrMgmt.changeTokenManagerAddr(instance.address)
-        secondUserManagerAddr = usrMgmt.address
-      }else{
-        secondUserManagerAddr = ethers.Wallet.createRandom().address
-      }
-
-      let res = await instance.changeUserManagementAddress(secondUserManagerAddr) 
-      let userMgmtTokenAddress = await instance.getUserManagementAddress.call()
-      assert.equal(
-        userMgmtTokenAddress,
-        secondUserManagerAddr,
-        "changeUserManagementAddress failed with secondUserManagerAddr as input"
-      )
-    })
-  }
   it("verify sender is admin", async () => {
     let instance = await TokenManagement.deployed()
     let isValidator = await instance.isAdministrator.call()
