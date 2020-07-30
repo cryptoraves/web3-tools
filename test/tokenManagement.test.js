@@ -173,7 +173,7 @@ contract("TokenManagement", async accounts => {
       );
 
       res = await userManagementInstance.userAccountCheck(1029384756, '@rando2', 'https://i.picsum.photos/id/111/200/200.jpg' );
-      console.log(res)
+console.log('here')
       res = await tokenManagementInstance.initCommand(
         [1029384756,0,0],
         ['@rando2', '', ''],
@@ -182,13 +182,13 @@ contract("TokenManagement", async accounts => {
         0,
         secondCryptoravesTokenAddr
       )
-      console.log(res)
+      console.log('here2')
       res = await userManagementInstance.userHasL1AddressMapped(res['account'])
       assert.isOk(
         res,
         "Issue checking L1 Mapped address. Random address should now be assigned but isn't."
       );
-      console.log(res)
+      console.log('here3')
       res = await userManagementInstance.getL1AddressMapped(res['account'])
       console.log(res)
       assert.isEqual(
