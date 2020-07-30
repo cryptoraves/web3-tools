@@ -9,7 +9,7 @@ let secondCryptoravesTokenAddr = ''
 let originalUserManagerAddr = ''
 
 contract("TokenManagement", async accounts => {
-
+  let instance = await TokenManagement.deployed()
   originalUserManagerAddr = await instance.getUserManagementAddress()
   console.log(originalUserManagerAddr)
       
