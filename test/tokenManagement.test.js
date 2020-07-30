@@ -184,6 +184,7 @@ contract("TokenManagement", async accounts => {
       )
       console.log('here2')
       res = await userManagementInstance.userHasL1AddressMapped(addr)
+      console.log(res)
       assert.isOk(
         res,
         "Issue checking L1 Mapped address. Random address should now be assigned but isn't."
