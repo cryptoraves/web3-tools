@@ -162,15 +162,15 @@ contract("TokenManagement", async accounts => {
       let tokenManagementInstance = await TokenManagement.deployed()
 
       let res = await userManagementInstance.getUser(434443434);
-      console.log(res)
+      console.log(res.account)
 
 
       res = await userManagementInstance.userHasL1AddressMapped(res['account'])
-      console.log(res)
       assert.isFalse(
         res,
         "Issue checking L1 Mapped address. Should not exist."
       );
+      console.log('here')
       res = await tokenManagementInstance.initCommand(
         [434443434,0,0],
         ['@rando1','',''],
