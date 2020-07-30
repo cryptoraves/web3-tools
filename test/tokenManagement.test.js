@@ -168,7 +168,7 @@ contract("TokenManagement", async accounts => {
         res,
         "Issue checking L1 Mapped address. Should not exist."
       );
-      console.log(secondCryptoravesTokenAddr)
+      console.log('here')
       res = await tokenManagementInstance.initCommand(
         [1029384756,0,0],
         ['@fakeHandleA', '', ''],
