@@ -183,14 +183,14 @@ contract("TokenManagement", async accounts => {
       )
       res = await userManagementInstance.userHasL1AddressMapped(addr)
       console.log('here')
-      /*assert.isOk(
+      assert.isOk(
         res,
         "Issue checking L1 Mapped address. Random address should now be assigned but isn't."
-      );*/
+      );
       console.log('here3')
       res = await userManagementInstance.getL1AddressMapped(addr)
       console.log(res)
-      assert.isEqual(
+      assert.equal(
         res,
         secondCryptoravesTokenAddr,
         "L1 mapped address doesn't match given."
