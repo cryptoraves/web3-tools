@@ -10,16 +10,16 @@ let originalUserManagerAddr = ''
 
 contract("TokenManagement", async accounts => {
 
+  originalUserManagerAddr = await instance.getUserManagementAddress()
+  console.log(originalUserManagerAddr)
+      
   //for iterateing through second token contract assignment
   for (var i = 0; i < 2; i++) {  
 
     it("Drop crypto with initCommand", async () => {
       let instance = await TokenManagement.deployed()
 
-      if(i == 0){
-        originalUserManagerAddr = await instance.getUserManagementAddress()
-        console.log(originalUserManagerAddr)
-      }
+
       //var bytes = ethers.utils.formatBytes32String('testing crypto drop')
       let res = await instance.initCommand(
       	[1029384756,0,0],
