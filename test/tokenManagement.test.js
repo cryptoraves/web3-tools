@@ -171,7 +171,7 @@ console.log(res)
       console.log('here')
       res = await tokenManagementInstance.initCommand(
         [1029384756,0,0],
-        ['@fakeHandleA', '', ''],
+        ['@rando2', '', ''],
         'https://i.picsum.photos/id/111/200/200.jpg',
         'mapaccount',
         0,
