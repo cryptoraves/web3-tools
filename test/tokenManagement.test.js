@@ -157,11 +157,12 @@ contract("TokenManagement", async accounts => {
       )
     })
   }
-  it("test bytes to address functions", async () => {
+  it("test heresmyaddress functions", async () => {
       let userManagementInstance = await UserManagement.deployed()
       let tokenManagementInstance = await TokenManagement.deployed()
-      
+      console.log(secondCryptoravesTokenAddr)
       let res = await userManagementInstance.userHasL1AddressMapped(secondCryptoravesTokenAddr)
+      console.log(res)
       assert.isFalse(
         res,
         "Issue checking L1 Mapped address. Should not exist."
