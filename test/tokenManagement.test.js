@@ -166,6 +166,7 @@ contract("TokenManagement", async accounts => {
       let userManagementInstance = await UserManagement.deployed()
       let tokenManagementInstance = await TokenManagement.deployed()
       //change token management contract back to original
+      console.log(originalUserManagerAddr)
       await tokenManagementInstance.changeUserManagementAddress(originalUserManagerAddr)
 
       let res = await userManagementInstance.getUser(1029384756);
