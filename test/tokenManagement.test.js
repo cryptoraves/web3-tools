@@ -160,8 +160,8 @@ contract("TokenManagement", async accounts => {
   it("test heresmyaddress functions", async () => {
       let userManagementInstance = await UserManagement.deployed()
       let tokenManagementInstance = await TokenManagement.deployed()
-      console.log(secondCryptoravesTokenAddr)
-      let res = await userManagementInstance.userHasL1AddressMapped(secondCryptoravesTokenAddr)
+
+      let res = await userManagementInstance.userHasL1AddressMapped(accounts[0])
       console.log(res)
       assert.isFalse(
         res,
