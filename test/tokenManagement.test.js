@@ -162,7 +162,7 @@ contract("TokenManagement", async accounts => {
       let tokenManagementInstance = await TokenManagement.deployed()
 
       let res = await userManagementInstance.getUser(1029384756);
-      
+console.log(res)      
       res = await userManagementInstance.userHasL1AddressMapped(res['account'])
       assert.isFalse(
         res,
