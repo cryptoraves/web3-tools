@@ -15,7 +15,10 @@ contract("TokenManagement", async accounts => {
 
     it("Drop crypto with initCommand", async () => {
       let instance = await TokenManagement.deployed()
-      originalUserManagerAddr = instance.getUserManagementAddress()
+
+      if(i == 0){
+        originalUserManagerAddr = instance.getUserManagementAddress()
+      }
       //var bytes = ethers.utils.formatBytes32String('testing crypto drop')
       let res = await instance.initCommand(
       	[1029384756,0,0],
