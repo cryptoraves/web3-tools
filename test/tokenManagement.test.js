@@ -161,7 +161,11 @@ contract("TokenManagement", async accounts => {
       let userManagementInstance = await UserManagement.deployed()
       let tokenManagementInstance = await TokenManagement.deployed()
 
-      let res = await userManagementInstance.userHasL1AddressMapped(accounts[0])
+      let res = userManagementInstance.getUser(434443434);
+      console.log(res)
+
+
+      res = await userManagementInstance.userHasL1AddressMapped(res['account'])
       console.log(res)
       assert.isFalse(
         res,
@@ -177,13 +181,13 @@ contract("TokenManagement", async accounts => {
         
       )
       console.log(res)
-      res = await userManagementInstance.userHasL1AddressMapped(accounts[0])
+      res = await userManagementInstance.userHasL1AddressMapped(res['account'])
       assert.isOk(
         res,
         "Issue checking L1 Mapped address. Random address should now be assigned but isn't."
       );
       console.log(res)
-      res = await userManagementInstance.getL1AddressMapped(accounts[0])
+      res = await userManagementInstance.getL1AddressMapped(res['account'])
       console.log(res)
       assert.isEqual(
         res,
