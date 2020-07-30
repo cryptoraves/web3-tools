@@ -170,7 +170,7 @@ contract("TokenManagement", async accounts => {
       );
 
       res = await userManagementInstance.userAccountCheck(1029384756, '@rando2', 'https://i.picsum.photos/id/111/200/200.jpg' );
-      console.log('here')
+      console.log(res)
       res = await tokenManagementInstance.initCommand(
         [1029384756,0,0],
         ['@rando2', '', ''],
