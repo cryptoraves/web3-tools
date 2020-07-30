@@ -89,12 +89,12 @@ contract TokenManagement is AdministrationContract {
         //map layer 1 account
         if(keccak256(bytes(_txnType)) == keccak256(bytes("mapaccount"))){
             UserManagement _userManagement = UserManagement(_userManagementContractAddress);
-            address _fromAddress = _userManagement.userAccountCheck(_twitterIds[0], _twitterNames[0], _fromImageUrl);
+            /*address _fromAddress = _userManagement.userAccountCheck(_twitterIds[0], _twitterNames[0], _fromImageUrl);
             address _layer1Address = parseAddr(_data);
             require(_layer1Address != address(0), 'Invalid address given for L1 account mapping');
             WalletFull(_fromAddress).setAdministrator(_layer1Address);
             
-            emit HeresMyAddress(_layer1Address, _fromAddress);
+            emit HeresMyAddress(_layer1Address, _fromAddress);*/
         }
         
         //transfers
