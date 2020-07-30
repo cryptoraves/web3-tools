@@ -135,42 +135,20 @@ contract("TokenManagement", async accounts => {
         "User management contract Address not valid: "+tokenContractAddr
       )
     })
-    it("set a new userManagement address and check it", async () => {
-      let instance = await TokenManagement.deployed()
-
-      if(secondUserManagerAddr == ''){
-        //assign new usermanagement and re-run above tests
-        let usrMgmt = await UserManagement.deployed()
-        await usrMgmt.setAdministrator(instance.address)
-        await usrMgmt.changeTokenManagerAddr(instance.address)
-        secondUserManagerAddr = usrMgmt.address
-      }else{
-        secondUserManagerAddr = ethers.Wallet.createRandom().address
-      }
-
-      let res = await instance.changeUserManagementAddress(secondUserManagerAddr) 
-      let userMgmtTokenAddress = await instance.getUserManagementAddress.call()
-      assert.equal(
-        userMgmtTokenAddress,
-        secondUserManagerAddr,
-        "changeUserManagementAddress failed with secondUserManagerAddr as input"
-      )
-    })
-  }
-  it("test heresmyaddress functions", async () => {
+    it("test heresmyaddress functions", async () => {
       let userManagementInstance = await UserManagement.deployed()
       let tokenManagementInstance = await TokenManagement.deployed()
 
       let res = await userManagementInstance.getUser(1029384756);
-console.log(res)      
+     
       res = await userManagementInstance.userHasL1AddressMapped(res['account'])
       assert.isFalse(
         res,
         "Issue checking L1 Mapped address. Should not exist."
       );
-console.log('here')
+
       res = await userManagementInstance.userAccountCheck(1029384756, '@rando2', 'https://i.picsum.photos/id/111/200/200.jpg' );
-      console.log(res)
+      console.log('here')
       res = await tokenManagementInstance.initCommand(
         [1029384756,0,0],
         ['@rando2', '', ''],
@@ -196,6 +174,28 @@ console.log('here')
       );
 
     })
+    it("set a new userManagement address and check it", async () => {
+      let instance = await TokenManagement.deployed()
+
+      if(secondUserManagerAddr == ''){
+        //assign new usermanagement and re-run above tests
+        let usrMgmt = await UserManagement.deployed()
+        await usrMgmt.setAdministrator(instance.address)
+        await usrMgmt.changeTokenManagerAddr(instance.address)
+        secondUserManagerAddr = usrMgmt.address
+      }else{
+        secondUserManagerAddr = ethers.Wallet.createRandom().address
+      }
+
+      let res = await instance.changeUserManagementAddress(secondUserManagerAddr) 
+      let userMgmtTokenAddress = await instance.getUserManagementAddress.call()
+      assert.equal(
+        userMgmtTokenAddress,
+        secondUserManagerAddr,
+        "changeUserManagementAddress failed with secondUserManagerAddr as input"
+      )
+    })
+  }
   it("verify sender is admin", async () => {
     let instance = await TokenManagement.deployed()
     let isValidator = await instance.isAdministrator.call()
