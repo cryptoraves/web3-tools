@@ -36,11 +36,14 @@ contract WalletFull is ERC1155Receiver, AdministrationContract {
         return _mappedL1Account;
     }
     function mapLayerOneAccount(address _l1Addr) public onlyAdmin {
-        if(_mappedL1Account != address(0)){
-            unsetAdministrator(_mappedL1Account);
-        }
+        require(_mappedL1Account == address(0), "User already mapped an L1 account");
+          
         _mappedL1Account = _l1Addr;
         setAdministrator(_l1Addr);
+        
+        //set L1 account as 1155 operator for this wallet
+        address _cryptoravesTokenAddress = ITokenManager(_walletManager).getCryptoravesTokenAddress();
+        IERC1155(_cryptoravesTokenAddress).setApprovalForAll(_mappedL1Account, true);
     }
 
     function onERC1155Received(address, address, uint256, uint256, bytes calldata) external override virtual returns (bytes4) {
@@ -60,4 +63,18 @@ contract WalletFull is ERC1155Receiver, AdministrationContract {
         address _cryptoravesTokenAddress = ITokenManager(_walletManager).getCryptoravesTokenAddress();
         IERC1155(_cryptoravesTokenAddress).safeBatchTransferFrom(_from, _to, _ids, _vals, _data);
     }
+    
+    //for custody-less transactions originating from social media. Any action requires approval from mapped L1 account.
+    function actionItemApproval() public {
+        require(msg.sender == _mappedL1Account, 'Sender not an approved L1 account');
+        
+        //get list of action items
+        
+        //execute action items
+        
+        //remove item from list
+        
+        //emit event?
+    }
 }
+

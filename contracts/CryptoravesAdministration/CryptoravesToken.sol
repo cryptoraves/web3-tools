@@ -66,12 +66,6 @@ contract CryptoravesToken is ERC1155Burnable, ERCDepositable, IERC721Receiver, A
             "ERC1155: caller is not owner nor approved"
         );
 
-/*  
-        if (!isAdministrator()){
-            //charge a fee to mitigate ddos attacks
-            require(isAdministrator(), 'Temporary function. Remove when fee structure is determined');
-        }
-*/
         if(!managedTokenListByAddress[account].isManagedToken) {
             _addTokenToManagedTokenList(account, 1155);
         }
