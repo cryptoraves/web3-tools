@@ -17,6 +17,7 @@ contract("CryptoravesToken", async accounts => {
   	await instance.mint(
   		accounts[0],
   		amount,
+      amount,
   		ethers.utils.formatBytes32String('test')
   	)
     primary_tokenId1155 = await instance.getManagedTokenIdByAddress(accounts[0])
