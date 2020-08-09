@@ -21,7 +21,7 @@ module.exports = function (deployer, network, accounts) {
     const instance = await ERC721Full.deployed()
         
     console.log('\n*************************************************************************\n')
-    console.log('ERP721 Address: '+instance.address)
+    console.log('ERC721 Address: '+instance.address)
     console.log('\n*************************************************************************\n')
   })
   
