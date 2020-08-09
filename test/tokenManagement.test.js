@@ -164,16 +164,14 @@ contract("TokenManagement", async accounts => {
       let cTkn = await CryptoravesToken.deployed()
       //change token management contract back to original
       await tokenManagementInstance.changeUserManagementAddress(userManagementInstance.address)
-      await instance.changeCryptoravesTokenAddress(cTkn.address)
+      await tokenManagementInstance.changeCryptoravesTokenAddress(cTkn.address)
       let res = await userManagementInstance.getUser(1029384756);
       let addr = res['account']
-      
       res = await userManagementInstance.userHasL1AddressMapped(addr)
       assert.isFalse(
         res,
         "Issue checking L1 Mapped address. Should not exist."
       );
-
       res = await tokenManagementInstance.initCommand(
         [1029384756,0,0],
         ['@rando2', '', ''],
@@ -193,7 +191,6 @@ contract("TokenManagement", async accounts => {
         secondCryptoravesTokenAddr,
         "L1 mapped address doesn't match given."
       );
-
     })
   it("verify sender is admin", async () => {
     let instance = await TokenManagement.deployed()
