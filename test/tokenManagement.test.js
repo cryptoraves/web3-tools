@@ -161,9 +161,10 @@ contract("TokenManagement", async accounts => {
   it("test heresmyaddress functions", async () => {
       let userManagementInstance = await UserManagement.deployed()
       let tokenManagementInstance = await TokenManagement.deployed()
+      let cTkn = await CryptoravesToken.deployed()
       //change token management contract back to original
       await tokenManagementInstance.changeUserManagementAddress(userManagementInstance.address)
-
+      await instance.changeCryptoravesTokenAddress(cTkn.address)
       let res = await userManagementInstance.getUser(1029384756);
       let addr = res['account']
       
