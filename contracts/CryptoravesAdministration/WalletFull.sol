@@ -27,7 +27,6 @@ contract WalletFull is ERC1155Receiver, Ravepool {
         _tokenManager = _managerAddress;
         _administrators[_managerAddress] = true;
         _administrators[msg.sender] = true;
-        _userManager = msg.sender;
     }
 
 
