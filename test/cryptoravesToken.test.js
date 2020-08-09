@@ -306,4 +306,64 @@ contract("CryptoravesToken", async accounts => {
   		}
   	}
   })
+  it("burn some fungible tokens", async () => {
+  	let instance = await CryptoravesToken.deployed()
+  	let balance = await instance.balanceOf(accounts[0], primary_tokenId1155)
+  	let amount = Math.floor(Math.random() * Math.floor(100)) //random amount between 
+  	if(amount == 0 ){
+  		amount = amount + 1
+  	}
+  	await instance.burn(accounts[0], primary_tokenId1155, amount);
+  	
+  	let newBalance = await instance.balanceOf(accounts[0], primary_tokenId1155)
+  	assert.equal(
+	  	balance - amount,
+	  	newBalance,
+	  	"Burn went awry.  Result - amount doesn't equal initial amount."
+  	)
+  })
+  it("batch burn some fungible tokens", async () => {
+  	let instance = await CryptoravesToken.deployed()
+  	let balance1 = await instance.balanceOf(accounts[0], ids[0])
+  	let balance2 = await instance.balanceOf(accounts[0], ids[1])
+  	let balance3 = await instance.balanceOf(accounts[0], ids[2])
+  	let balance4 = await instance.balanceOf(accounts[0], ids[3])
+  	let balance5 = await instance.balanceOf(accounts[0], ids[4])
+  	let amount = Math.floor(Math.random() * Math.floor(100)) //random amount between 
+  	if(amount == 0 ){
+  		amount = amount + 1
+  	}
+  	await instance.burnBatch(accounts[0], ids, [amount,amount,amount,amount,amount]);
+  	
+  	let newBalance1 = await instance.balanceOf(accounts[0], ids[0])
+  	let newBalance2 = await instance.balanceOf(accounts[0], ids[1])
+  	let newBalance3 = await instance.balanceOf(accounts[0], ids[2])
+  	let newBalance4 = await instance.balanceOf(accounts[0], ids[3])
+  	let newBalance5 = await instance.balanceOf(accounts[0], ids[4])
+  	assert.equal(
+	  	balance1 - amount,
+	  	newBalance1,
+	  	"Burn went awry.  Result - amount1 doesn't equal initial amount."
+  	)
+  	assert.equal(
+	  	balance2 - amount,
+	  	newBalance2,
+	  	"Burn went awry.  Result - amount2 doesn't equal initial amount."
+  	)
+  	assert.equal(
+	  	balance3 - amount,
+	  	newBalance3,
+	  	"Burn went awry.  Result - amount3 doesn't equal initial amount."
+  	)
+  	assert.equal(
+	  	balance4 - amount,
+	  	newBalance4,
+	  	"Burn went awry.  Result - amount4 doesn't equal initial amount."
+  	)
+  	assert.equal(
+	  	balance5 - amount,
+	  	newBalance5,
+	  	"Burn went awry.  Result - amount5 doesn't equal initial amount."
+  	)
+  })
 })  
