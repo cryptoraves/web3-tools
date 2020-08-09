@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.6.10;
 
-import "/home/cartosys/www/openzeppelin-contracts/contracts/token/ERC1155/ERC1155Burnable.sol";
-import "./AdministrationContract.sol";
+import "./Ravepool.sol";
 
 abstract contract ERC1155Receiver is ERC165, IERC1155Receiver {
     constructor() public {
@@ -13,13 +12,11 @@ abstract contract ERC1155Receiver is ERC165, IERC1155Receiver {
     }
 }
 
-interface ITokenManager {
-    function getCryptoravesTokenAddress() external view returns(address);
-}
-
-contract WalletFull is ERC1155Receiver, AdministrationContract {
-
-    address private _walletManager;
+contract WalletFull is ERC1155Receiver, Ravepool {
+    
+    using SafeMath for uint256;
+    using Address for address;
+    
     address private _mappedL1Account;
 
     constructor(address _managerAddress) public {
@@ -27,10 +24,12 @@ contract WalletFull is ERC1155Receiver, AdministrationContract {
         address _cryptoravesTokenAddress = ITokenManager(_managerAddress).getCryptoravesTokenAddress();
         //setManager 
         IERC1155(_cryptoravesTokenAddress).setApprovalForAll(_managerAddress, true);
-        _walletManager = _managerAddress;
+        _tokenManager = _managerAddress;
         _administrators[_managerAddress] = true;
         _administrators[msg.sender] = true;
+        _userManager = msg.sender;
     }
+
 
     function getLayerOneAccount() public view onlyAdmin returns(address) {
         return _mappedL1Account;
@@ -42,7 +41,7 @@ contract WalletFull is ERC1155Receiver, AdministrationContract {
         setAdministrator(_l1Addr);
         
         //set L1 account as 1155 operator for this wallet
-        address _cryptoravesTokenAddress = ITokenManager(_walletManager).getCryptoravesTokenAddress();
+        address _cryptoravesTokenAddress = ITokenManager(_tokenManager).getCryptoravesTokenAddress();
         IERC1155(_cryptoravesTokenAddress).setApprovalForAll(_mappedL1Account, true);
     }
 
@@ -55,13 +54,23 @@ contract WalletFull is ERC1155Receiver, AdministrationContract {
     }
     
     function managedTransfer(address _from, address _to, uint256 _id,  uint256 _val, bytes memory _data) public onlyAdmin {
-        address _cryptoravesTokenAddress = ITokenManager(_walletManager).getCryptoravesTokenAddress();
+        address _cryptoravesTokenAddress = ITokenManager(_tokenManager).getCryptoravesTokenAddress();
         IERC1155(_cryptoravesTokenAddress).safeTransferFrom(_from, _to, _id, _val, _data);
     }
     
     function managedBatchTransfer(address _from, address _to, uint256[] memory _ids,  uint256[] memory _vals, bytes memory _data) public onlyAdmin {
-        address _cryptoravesTokenAddress = ITokenManager(_walletManager).getCryptoravesTokenAddress();
+        address _cryptoravesTokenAddress = ITokenManager(_tokenManager).getCryptoravesTokenAddress();
         IERC1155(_cryptoravesTokenAddress).safeBatchTransferFrom(_from, _to, _ids, _vals, _data);
+    }
+    
+    function managedBurn(address account, uint256 id, uint256 amount) public onlyAdmin {
+        address _cryptoravesTokenAddress = ITokenManager(_tokenManager).getCryptoravesTokenAddress();
+        ERC1155Burnable(_cryptoravesTokenAddress).burn(account, id, amount);
+    }
+    
+    function managedBurnBatch(address account, uint256[] memory ids, uint256[] memory amounts) public onlyAdmin {
+        address _cryptoravesTokenAddress = ITokenManager(_tokenManager).getCryptoravesTokenAddress();
+        ERC1155Burnable(_cryptoravesTokenAddress).burnBatch(account, ids, amounts);
     }
     
     //for custody-less transactions originating from social media. Any action requires approval from mapped L1 account.
@@ -77,4 +86,3 @@ contract WalletFull is ERC1155Receiver, AdministrationContract {
         //emit event?
     }
 }
-

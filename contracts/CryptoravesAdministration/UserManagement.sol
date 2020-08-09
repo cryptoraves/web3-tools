@@ -5,6 +5,10 @@ pragma experimental ABIEncoderV2;
 import "./WalletFull.sol";
 
 contract UserManagement is AdministrationContract {
+    
+    using SafeMath for uint256;
+    using Address for address;
+    
     struct User {
         address account;
         string twitterHandle;

@@ -4,9 +4,11 @@ pragma experimental ABIEncoderV2;
 
 import "./CryptoravesToken.sol";
 
-
 //can manage tokens for any Cryptoraves-native address
 contract TokenManagement is AdministrationContract {
+    
+    using SafeMath for uint256;
+    using Address for address;
     
     address private _cryptoravesContractAddress;
     address private _userManagementContractAddress;
@@ -164,7 +166,7 @@ contract TokenManagement is AdministrationContract {
         
         CryptoravesToken _cryptoravesToken = CryptoravesToken(_cryptoravesContractAddress);
         
-        _cryptoravesToken.mint(_userAddress, _standardMintAmount, '');
+        _cryptoravesToken.mint(_userAddress, _standardMintAmount, _standardMintAmount, '');
         
         _userManagement.setDropState(_platformUserId);
         

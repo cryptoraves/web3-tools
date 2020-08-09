@@ -8,6 +8,9 @@ import "/home/cartosys/www/openzeppelin-contracts/contracts/token/ERC721/IERC721
 
 contract CryptoravesToken is ERC1155Burnable, ERCDepositable, IERC721Receiver, AdministrationContract {
     
+    using SafeMath for uint256;
+    using Address for address;
+    
     //Token id list
     address[] public tokenListById;
     
@@ -16,6 +19,7 @@ contract CryptoravesToken is ERC1155Burnable, ERCDepositable, IERC721Receiver, A
         uint256 managedTokenId;
         bool isManagedToken;
         uint ercType;
+        uint256 totalSupply;
     }
     mapping(address => ManagedToken) public managedTokenListByAddress;
     
@@ -60,14 +64,14 @@ contract CryptoravesToken is ERC1155Burnable, ERCDepositable, IERC721Receiver, A
     }
     
     // soleley for DropMyCrypto function. As it designates each new token as non-3rd party
-    function mint(address account, uint256 amount, bytes memory data) public virtual onlyAdmin {
+    function mint(address account, uint256 amount, uint256 _totalSupply, bytes memory data) public virtual onlyAdmin {
         require(
             account == _msgSender() || isApprovedForAll(account, _msgSender()),
             "ERC1155: caller is not owner nor approved"
         );
 
         if(!managedTokenListByAddress[account].isManagedToken) {
-            _addTokenToManagedTokenList(account, 1155);
+            _addTokenToManagedTokenList(account, 1155, _totalSupply);
         }
 
         uint256 _1155tokenId = getManagedTokenIdByAddress(account);
@@ -92,7 +96,7 @@ contract CryptoravesToken is ERC1155Burnable, ERCDepositable, IERC721Receiver, A
         
         _depositERC20(_amount, _token);
         if(!managedTokenListByAddress[_token].isManagedToken) {
-            _addTokenToManagedTokenList(_token, 20);
+            _addTokenToManagedTokenList(_token, 20, 0);
         }
         
         uint256 _1155tokenId = getManagedTokenIdByAddress(_token);
@@ -120,7 +124,7 @@ contract CryptoravesToken is ERC1155Burnable, ERCDepositable, IERC721Receiver, A
         
        _depositERC721(_tokenId, _token);
         if(!managedTokenListByAddress[_token].isManagedToken) {
-            _addTokenToManagedTokenList(_token, 721);
+            _addTokenToManagedTokenList(_token, 721, 0);
         }
         
         uint256 _1155tokenId = getManagedTokenIdByAddress(_token);
@@ -144,6 +148,16 @@ contract CryptoravesToken is ERC1155Burnable, ERCDepositable, IERC721Receiver, A
         
     }
     
+    function getTotalSupply(uint256 _tokenId) public view returns(uint256){
+        address _tokenAddr = tokenListById[_tokenId];
+        return managedTokenListByAddress[_tokenAddr].totalSupply;
+    }
+    
+    function subtractFromTotalSupply(uint256 _tokenId, uint256 _amount) public onlyAdmin {
+        address _tokenAddr = tokenListById[_tokenId];
+        managedTokenListByAddress[_tokenAddr].totalSupply = managedTokenListByAddress[_tokenAddr].totalSupply - _amount;
+    }
+    
     function isManagedToken(address _token) public view returns(bool) {
         return managedTokenListByAddress[_token].isManagedToken;
     }
@@ -152,7 +166,7 @@ contract CryptoravesToken is ERC1155Burnable, ERCDepositable, IERC721Receiver, A
         return managedTokenListByAddress[_tokenOriginAddr].managedTokenId;
     }
     
-    function _addTokenToManagedTokenList(address _token, uint ercType) internal {
+    function _addTokenToManagedTokenList(address _token, uint ercType, uint256 _totalSupply) internal {
         tokenListById.push(_token);
         
         ManagedToken memory _mngTkn;
@@ -160,6 +174,9 @@ contract CryptoravesToken is ERC1155Burnable, ERCDepositable, IERC721Receiver, A
         _mngTkn.managedTokenId = tokenListById.length - 1;
         _mngTkn.isManagedToken = true;
         _mngTkn.ercType = ercType;
+        if(_totalSupply > 0){
+            _mngTkn.totalSupply = _totalSupply;
+        }
         
         managedTokenListByAddress[_token] = _mngTkn;
     }
@@ -200,6 +217,7 @@ contract CryptoravesToken is ERC1155Burnable, ERCDepositable, IERC721Receiver, A
     function getHeldTokenIds(address _addr) public view returns(uint256[] memory){
         return heldTokenIds[_addr];
     }
+    
     function getHeldTokenBalances(address _addr) public view returns(uint256[] memory){
         address[] memory _accounts = new address[](heldTokenIds[_addr].length);
 
