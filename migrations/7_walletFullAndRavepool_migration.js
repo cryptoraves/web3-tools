@@ -1,6 +1,6 @@
 const WalletFull = artifacts.require('WalletFull')
 
-module.exports = function (deployer, network, accounts) {
+module.exports = function (deployer, accounts) {
   
   deployer.then(async () => {
 
