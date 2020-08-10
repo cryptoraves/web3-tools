@@ -1,10 +1,10 @@
-const TokenManagement = artifacts.require("TokenManagement");
-
+const TokenManagement = artifacts.require("TokenManagement")
+const WalletFull = artifacts.require("WalletFull")
 const ethers = require('ethers')
 
-const UserManagement = artifacts.require("UserManagement");
+const UserManagement = artifacts.require("UserManagement")
 let secondUserManagerAddr = ''
-const CryptoravesToken = artifacts.require("CryptoravesToken");
+const CryptoravesToken = artifacts.require("CryptoravesToken")
 let secondCryptoravesTokenAddr = ''
 
 contract("TokenManagement", async accounts => {
@@ -192,6 +192,39 @@ contract("TokenManagement", async accounts => {
         "L1 mapped address doesn't match given."
       );
     })
+  it("ravepool activation", async () => {
+    let userManagementInstance = await UserManagement.deployed()
+    let tokenManagementInstance = await TokenManagement.deployed()
+
+    let res = await tokenManagementInstance.initCommand(
+      [9929387656,0,0],
+      ['@rando3', '', ''],
+      'https://i.picsum.photos/id/333/200/200.jpg',
+      'mapaccount',
+      0,
+      accounts[0]
+    )
+    //get WalletFull (Ravepool) contract
+    res = await userManagementInstance.getUser(9929387656);
+    let walletFullAddr = res['account']
+    res = await userManagementInstance.userHasL1AddressMapped(walletFullAddr)
+    assert.isOk(res, "could not map address for new user")
+
+    walletFullInstance = await WalletFull.at(walletFullAddr)
+    res = await walletFullInstance.isRavepoolActivated()
+    assert.isFalse(res, 'Ravepool should not be activated at this point')
+    try{
+      res = await walletFullInstance.activateRavepool({from: ethers.Wallet.createRandom().address})
+      assert.isOk(false, "Activate Ravepool should fail here trying to activate from unauthorized address")
+    }catch(e){
+      assert.isOk(true)
+    }
+    await walletFullInstance.activateRavepool()
+    console.log('here2')
+    res = await walletFullInstance.isRavepoolActivated()
+    assert.isOk(res, 'Error activating Ravepool with authorized address')
+
+  })
   it("verify sender is admin", async () => {
     let instance = await TokenManagement.deployed()
     let isValidator = await instance.isAdministrator.call()

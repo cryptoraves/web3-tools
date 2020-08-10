@@ -129,7 +129,7 @@ contract UserManagement is AdministrationContract {
       return userIDs[_platformHandle];
     }
     
-    function dropState (uint256 _platformUserId) public view onlyAdmin returns(bool) {
+    function dropState (uint256 _platformUserId) public view returns(bool) {
       // can we pull from a Chainlink mapping?
       if (users[_platformUserId].dropped) {
           return true;
