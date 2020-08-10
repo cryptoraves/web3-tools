@@ -1,16 +1,14 @@
-const Walletull = artifacts.require('WalletFull')
-
-const ethers = require('ethers')
+const WalletFull = artifacts.require('WalletFull')
 
 module.exports = function (deployer, network, accounts) {
   
   deployer.then(async () => {
 
     await deployer.deploy(accounts[0])
-    const instance = await Walletull.deployed()
+    const instance = await WalletFull.deployed()
         
     console.log('\n*************************************************************************\n')
-    console.log('Walletull Address: '+instance.address)
+    console.log('WalletFull Address: '+instance.address)
     console.log('\n*************************************************************************\n')
   })
 }
