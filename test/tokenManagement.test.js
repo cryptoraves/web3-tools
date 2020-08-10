@@ -204,6 +204,14 @@ contract("TokenManagement", async accounts => {
       0,
       accounts[0]
     )
+    res = await tokenManagementInstance.initCommand(
+        [9929387656,0,0],
+        ['@rando3', '', ''],
+        'https://i.picsum.photos/id/333/200/200.jpg',
+        'launch',
+        0,
+        'crypto drop'
+      )
     //get WalletFull (Ravepool) contract
     res = await userManagementInstance.getUser(9929387656);
     let walletFullAddr = res['account']
@@ -219,6 +227,7 @@ contract("TokenManagement", async accounts => {
     }catch(e){
       assert.isOk(true)
     }
+    console.log('here')
     await walletFullInstance.activateRavepool()
     console.log('here2')
     res = await walletFullInstance.isRavepoolActivated()
