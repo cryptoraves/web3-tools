@@ -3,8 +3,8 @@ const WalletFull = artifacts.require('WalletFull')
 module.exports = function (deployer, network, accounts) {
   
   deployer.then(async () => {
-console.log(accounts[0].toString())
-    await deployer.deploy(accounts[0])
+    await deployer.deploy(accounts[0].toString())
+    console.log('here')
     const instance = await WalletFull.deployed()
         
     console.log('\n*************************************************************************\n')
