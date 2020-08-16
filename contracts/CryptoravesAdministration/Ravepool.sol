@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.6.10;
 
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC1155/ERC1155Burnable.sol";
 import "./AdministrationContract.sol";
 
 interface CryptoravesTokenManager {
@@ -24,7 +25,10 @@ interface UTokenManager {
 }
 
 contract Ravepool is AdministrationContract {
-
+    
+    using SafeMath for uint256;
+    using Address for address;
+    
     bool private _ravepoolActivated;
     address internal _tokenManager;
     uint256 private _userId;
