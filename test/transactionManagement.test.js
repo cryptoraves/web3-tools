@@ -227,14 +227,14 @@ contract("TransactionManagement", async accounts => {
     }catch(e){
       assert.isOk(true)
     }
-
     await walletFullInstance.activateRavepool()
-
     res = await walletFullInstance.isRavepoolActivated()
     assert.isOk(res, 'Error activating Ravepool with authorized address')
 
     //await walletFullInstance.redeemAndBurnViaRavepool(_sentTokenId, _amountOfPersonalToken, _data)
   })
+
+
   it("verify sender is admin", async () => {
     let instance = await TransactionManagement.deployed()
     let isValidator = await instance.isAdministrator.call()
