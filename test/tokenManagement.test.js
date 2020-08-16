@@ -192,7 +192,7 @@ contract("TokenManagement", async accounts => {
         "L1 mapped address doesn't match given."
       );
     })
-  it("ravepool activation", async () => {
+  it("ravepool activation & distribution", async () => {
     let userManagementInstance = await UserManagement.deployed()
     let tokenManagementInstance = await TokenManagement.deployed()
 
@@ -227,13 +227,14 @@ contract("TokenManagement", async accounts => {
     }catch(e){
       assert.isOk(true)
     }
-    console.log('here')
     await walletFullInstance.activateRavepool()
-    console.log('here2')
     res = await walletFullInstance.isRavepoolActivated()
     assert.isOk(res, 'Error activating Ravepool with authorized address')
 
+    //await walletFullInstance.redeemAndBurnViaRavepool(_sentTokenId, _amountOfPersonalToken, _data)
   })
+
+
   it("verify sender is admin", async () => {
     let instance = await TokenManagement.deployed()
     let isValidator = await instance.isAdministrator.call()
