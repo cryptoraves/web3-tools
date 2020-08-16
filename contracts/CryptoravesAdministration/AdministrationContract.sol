@@ -23,7 +23,7 @@ contract AdministrationContract {
     }
     
     /*
-    * Get token manager address
+    * Return admin flag of sender
     */
     function isAdministrator() public view returns(bool) {
         return _administrators[msg.sender];
@@ -47,5 +47,10 @@ contract AdministrationContract {
         emit RemovedAdministrator(_oldAdmin, address(this));
     }
     
-    
+    /*
+    * For checking if contract is launched
+    */
+    function isAvailable() public pure returns(bool) {
+        return true;
+    }
 }
