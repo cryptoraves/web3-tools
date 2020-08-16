@@ -2,7 +2,7 @@ const ValidatorInterfaceContract = artifacts.require("ValidatorInterfaceContract
 
 const ethers = require('ethers')
 
-const TokenManagement = artifacts.require("TokenManagement");
+const TransactionManagement = artifacts.require("TransactionManagement");
 let secondTokenManagerAddr = ''
 
 contract("ValidatorInterfaceContract", async accounts => {
@@ -76,7 +76,7 @@ contract("ValidatorInterfaceContract", async accounts => {
       let instance = await ValidatorInterfaceContract.deployed()
 
       if(secondTokenManagerAddr==''){
-        let tknMgmt = await TokenManagement.deployed()
+        let tknMgmt = await TransactionManagement.deployed()
         await tknMgmt.setAdministrator(instance.address)
         secondTokenManagerAddr = tknMgmt.address
       }else{

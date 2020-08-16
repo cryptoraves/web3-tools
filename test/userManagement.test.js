@@ -2,7 +2,7 @@ const UserManagement = artifacts.require("UserManagement");
 
 const ethers = require('ethers')
 
-const TokenManagement = artifacts.require("TokenManagement");
+const TransactionManagement = artifacts.require("TransactionManagement");
 let userAccount
 let fakeTwitterId = 1230456987
 let fakeTwitterHandle = '@fakeHandleC'
@@ -11,7 +11,7 @@ let fakeUrl = 'http://test.uri/101'
 contract("UserManagement", async accounts => {
 	it("create an account", async () => {
 	    let instance = await UserManagement.deployed()
-	    let tknMgmt = await TokenManagement.deployed()
+	    let tknMgmt = await TransactionManagement.deployed()
 
 	    instance.changeTokenManagerAddr(tknMgmt.address)
 
