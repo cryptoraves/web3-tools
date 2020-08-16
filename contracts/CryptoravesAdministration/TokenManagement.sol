@@ -1,227 +1,214 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.6.10;
-pragma experimental ABIEncoderV2;
 
+import "./ERCDepositable.sol";
 import "./CryptoravesToken.sol";
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/contracts/token/ERC721/IERC721Receiver.sol";
 
-//can manage tokens for any Cryptoraves-native address
-contract TokenManagement is AdministrationContract {
+contract TokenManagement is  ERCDepositable, IERC721Receiver {
     
     using SafeMath for uint256;
     using Address for address;
     
-    address private _cryptoravesContractAddress;
-    address private _userManagementContractAddress;
-    uint256 private _standardMintAmount = 1000000000000000000000000000; //18 decimal adjusted standard amount (1 billion)
+    address private _cryptoravesTokenAddr;
     
-    event Transfer(address indexed _from, address indexed _to, uint256 _value, uint256 _tokenId);
+    //Token id list
+    address[] public tokenListById;
     
-    event CryptoravesTokenAddressChange(address _newContractAddr);
-    event UserManagementAddressChange(address _newContractAddr);
-    event HeresMyAddress(address _layer1Address, address _cryptoravesAddress);
-
-    constructor(string memory _uri, address _cryptoravesTokenAddr, address _userManagementAddr) public {
-        
+    //mapping for token ids and their origin addresses
+    struct ManagedToken {
+        uint256 managedTokenId;
+        bool isManagedToken;
+        uint ercType;
+        uint256 totalSupply;
+    }
+    mapping(address => ManagedToken) public managedTokenListByAddress;
+    
+    //list of held 1155 token ids
+    mapping(address => uint256[]) public heldTokenIds;
+    
+    event Deposit(address indexed _from, uint256 _value, address indexed _token, uint256 indexed cryptoravesTokenId);
+    event Withdraw(address indexed _to, uint256 _value, address indexed _token, uint256 indexed cryptoravesTokenId);
+    event Deploy(address indexed _managementAddress, address indexed _contractAddress);
+    event CryptoDropped(address user, uint256 tokenId);
+    
+    constructor(string memory _uri) public {
         //default managers include parent contract and ValidatorInterfaceContract Owner
         _administrators[msg.sender] = true;
         _administrators[tx.origin] = true;
-        
-        if (_cryptoravesTokenAddr == address(0)){
-            //launch new Cryptoraves Token contract
-            CryptoravesToken _cryptoravesToken = new CryptoravesToken(_uri);
-            _cryptoravesContractAddress = address(_cryptoravesToken);
-        } else {
-            CryptoravesToken _cryptoravesToken = CryptoravesToken(_cryptoravesTokenAddr);
-            _cryptoravesContractAddress = address(_cryptoravesToken);
-        }
-        
-        if (_userManagementAddr == address(0)){
-            //launch new user management contract contract
-            UserManagement _userManagement = new UserManagement();
-            _userManagementContractAddress = address(_userManagement);
-        } else {
-            UserManagement _userManagement = UserManagement(_userManagementAddr);
-            _userManagementContractAddress = address(_userManagement);
-        }
+        CryptoravesToken newCryptoravesToken = new CryptoravesToken(_uri);
+        _cryptoravesTokenAddr = address(newCryptoravesToken);
+        emit Deploy(msg.sender, address(this));
     }
     
-    function getCryptoravesTokenAddress() public view returns(address){
-        return _cryptoravesContractAddress;
-    } 
 
-    function changeCryptoravesTokenAddress(address _newAddr) public onlyAdmin {
-        _cryptoravesContractAddress = _newAddr;
-        emit CryptoravesTokenAddressChange(_newAddr);
-    } 
-    
-    function getUserManagementAddress() public view returns(address){
-        return _userManagementContractAddress;
-    } 
+    // soleley for DropMyCrypto function. As it designates each new token as non-3rd party
+    function dropCrypto(address account, uint256 amount, uint256 _totalSupply, bytes memory data) public virtual onlyAdmin {
+        
+        if(!managedTokenListByAddress[account].isManagedToken) {
+            _addTokenToManagedTokenList(account, 1155, _totalSupply);
+        }
 
-    function changeUserManagementAddress(address _newAddr) public onlyAdmin {
-        _userManagementContractAddress = _newAddr;
-        emit UserManagementAddressChange(_newAddr); 
-    } 
+        uint256 _1155tokenId = getManagedTokenIdByAddress(account);
+
+        _mint(account, _1155tokenId, amount, data);
+        
+        emit CryptoDropped(account, _1155tokenId);
+        
+    }
     
-     /*
-    * check incoming parsed Tweet data for valid command
-    * @param _twitterIds [0] = twitterIdFrom, [1] = twitterIdTo, [2] = twitterIdThirdParty
-    * @param _twitterNames [0] = twitterHandleFrom, [1] = twitterHandleTo, [2] = thirdPartyName
-    * @param _fromImgUrl The Twitter img of initiating user
-    * @param _txnType lstring indicating type of transaction:
-            "launch" = new toke n launch
-            "transfer" =  token transfer
-    * @param _value amount or id of token to transfer
-    */ 
-        
-    function initCommand(
-        uint256[] memory _twitterIds,
-        string[] memory _twitterNames,
-        string memory _fromImageUrl,
-        string memory _txnType, 
-        uint256 _value,
-        string memory _data
-    ) onlyAdmin public returns(bool){
-        
-        //launch criteria
-        if(keccak256(bytes(_txnType)) == keccak256(bytes("launch"))){
-            _initCryptoDrop(_twitterIds[0], _twitterNames[0], _fromImageUrl);
+    function depositERC20(uint256 _amount, address _token) public payable returns(uint256){
+      
+        _depositERC20(_amount, _token);
+        if(!managedTokenListByAddress[_token].isManagedToken) {
+            _addTokenToManagedTokenList(_token, 20, 0);
         }
         
-        //map layer 1 account
-        if(keccak256(bytes(_txnType)) == keccak256(bytes("mapaccount"))){
-            UserManagement _userManagement = UserManagement(_userManagementContractAddress);
-            address _fromAddress = _userManagement.userAccountCheck(_twitterIds[0], _twitterNames[0], _fromImageUrl);
-            address _layer1Address = parseAddr(_data);
-            require(_layer1Address != address(0), 'Invalid address given for L1 account mapping');
-            WalletFull(_fromAddress).mapLayerOneAccount(_layer1Address);
-            
-            emit HeresMyAddress(_layer1Address, _fromAddress);
+        uint256 _1155tokenId = getManagedTokenIdByAddress(_token);
+        _mint(msg.sender, _1155tokenId, _amount, '');
+        
+        emit Deposit(msg.sender, _amount, _token, _1155tokenId);
+        
+        return _1155tokenId;
+
+    }
+    
+    function withdrawERC20(uint256 _amount, address _token) public payable returns(uint256){
+        _withdrawERC20(_amount, _token);
+        
+        uint256 _1155tokenId = getManagedTokenIdByAddress(_token);
+        _burn(msg.sender, _1155tokenId, _amount);
+        
+        Withdraw(msg.sender, _amount, _token, _1155tokenId);
+        
+        return _1155tokenId;
+
+    }
+    function depositERC721(uint256 _tokenId, address _token) public payable returns(uint256){
+        _depositERC721(_tokenId, _token);
+        
+        if(!managedTokenListByAddress[_token].isManagedToken) {
+            _addTokenToManagedTokenList(_token, 721, 0);
         }
         
-        //transfers
-        if(keccak256(bytes(_txnType)) == keccak256(bytes("transfer"))){
-            
-            UserManagement _userManagement = UserManagement(_userManagementContractAddress);
-            
-            require(_userManagement.isUser(_twitterIds[0]), 'Initiating Twitter user is not a Cryptoraves user');
-            
-            //get addresses
-            address _fromAddress = _userManagement.userAccountCheck(_twitterIds[0], _twitterNames[0], _fromImageUrl);
-            address _toAddress = _userManagement.userAccountCheck(_twitterIds[1], _twitterNames[1], '');
-            
-            uint256 _tokenId;
-            address _userAccount;
-            
-            CryptoravesToken _cryptoravesToken = CryptoravesToken(_cryptoravesContractAddress);
-            
-            //transfer type check
-            if(_twitterIds[2] == 0){
-                
-                _userAccount = _userManagement.getUserAccount(_twitterIds[0]);
-                
-                //check if a ticker is being used
-                bytes memory ticker = bytes(_twitterNames[2]); // Uses memory
-                
-                if (ticker.length != 0) {
-                    
-                    
-                    
-                    //get token by ticker name
-                    address _addr = _cryptoravesToken.getTickerAddress(_twitterNames[2]);
-                    _tokenId = _cryptoravesToken.getManagedTokenIdByAddress(_addr);
-                    
-                    
-                } else {
-                    //No third party given, user transfer using thier dropped tokens
-                    _tokenId = _cryptoravesToken.getManagedTokenIdByAddress(_userAccount);
-                }
-                
-                
-                
-            } else {
-                
-                //user transfer using non-cryptoraves tokens
-                _userAccount = _userManagement.getUserAccount(_twitterIds[2]);
-                
-                require(_userAccount!=address(0), 'Third party token given--with username method--does not exist in system');
-                    //not a dropped token attempted to be transferred. Check for 
-                _tokenId = _cryptoravesToken.getManagedTokenIdByAddress(_userAccount);
-                
+        uint256 _1155tokenId = getManagedTokenIdByAddress(_token);
+        _mint(msg.sender, _1155tokenId, 1, '');
+       
+        emit Deposit(msg.sender, _tokenId, _token, _1155tokenId);
+       
+        return _1155tokenId;
+        
+    }
+    
+    function withdrawERC721(uint256 _tokenId, address _token) public payable returns(uint256){
+        _withdrawERC721(_tokenId, _token);
+        
+        uint256 _1155tokenId = getManagedTokenIdByAddress(_token);
+        _burn(msg.sender, _1155tokenId, 1);
+        
+        Withdraw(msg.sender, _tokenId, _token, _1155tokenId);
+        
+        return _1155tokenId;
+        
+    }
+    
+    function getTotalSupply(uint256 _tokenId) public view returns(uint256){
+        address _tokenAddr = tokenListById[_tokenId];
+        return managedTokenListByAddress[_tokenAddr].totalSupply;
+    }
+    
+    function subtractFromTotalSupply(uint256 _tokenId, uint256 _amount) public onlyAdmin {
+        address _tokenAddr = tokenListById[_tokenId];
+        managedTokenListByAddress[_tokenAddr].totalSupply = managedTokenListByAddress[_tokenAddr].totalSupply - _amount;
+    }
+    
+    function isManagedToken(address _token) public view returns(bool) {
+        return managedTokenListByAddress[_token].isManagedToken;
+    }
+
+    function getManagedTokenIdByAddress(address _tokenOriginAddr) public view returns(uint256) {
+        return managedTokenListByAddress[_tokenOriginAddr].managedTokenId;
+    }
+    
+    function _addTokenToManagedTokenList(address _token, uint ercType, uint256 _totalSupply) internal {
+        tokenListById.push(_token);
+        
+        ManagedToken memory _mngTkn;
+        
+        _mngTkn.managedTokenId = tokenListById.length - 1;
+        _mngTkn.isManagedToken = true;
+        _mngTkn.ercType = ercType;
+        if(_totalSupply > 0){
+            _mngTkn.totalSupply = _totalSupply;
+        }
+        
+        managedTokenListByAddress[_token] = _mngTkn;
+    }
+    
+    function getTokenListCount() public view returns(uint count) {
+        return tokenListById.length;
+    }
+    
+    function _mint( address account, uint256 id, uint256 amount, bytes memory data) private onlyAdmin {
+        CryptoravesToken instanceCryptoravesToken = CryptoravesToken(_cryptoravesTokenAddr);
+        instanceCryptoravesToken.mint(account, id, amount, data);
+    }
+    
+    function _burn( address account, uint256 id, uint256 amount) private onlyAdmin {
+        CryptoravesToken instanceCryptoravesToken = CryptoravesToken(_cryptoravesTokenAddr);
+        instanceCryptoravesToken.burn(account, id, amount);
+    }
+    
+    /*****************************tokenId mgmt*************************
+     * 
+     * 
+     * 
+     */
+    
+    function _findHeldToken(address _addr, uint256 _tokenId) internal view returns(bool){
+        for(uint i=0; i < heldTokenIds[_addr].length; i++){
+            if (heldTokenIds[_addr][i] == _tokenId){
+                return true;
             }
-            
-            _managedTransfer(_fromAddress, _toAddress, _tokenId, _value, _stringToBytes(_data));
+            /*move to a transfer function
+            //maintenance. remove if empty
+            if(balanceOf(_addr, _tokenId) == 0){
+                _removeHeldToken(_addr, i);
+            }*/
+        }
+        return false;
+    }
+    function _checkHeldToken(address _addr, uint256 _tokenId) internal {
+        if(!_findHeldToken(_addr, _tokenId)){
+            heldTokenIds[_addr].push(_tokenId);
         }
     }
-    
-    function _initCryptoDrop(uint256 _platformUserId, string memory _twitterHandleFrom, string memory _imageUrl) internal returns(address) {
-        
-        UserManagement _userManagement = UserManagement(_userManagementContractAddress);
-        
-        //check if user already dropped
-        require(!_userManagement.dropState(_platformUserId), 'User already dropped their crypto.');
-        
-        //init account
-        address _userAddress = _userManagement.userAccountCheck(_platformUserId,_twitterHandleFrom,_imageUrl);
-        
-        CryptoravesToken _cryptoravesToken = CryptoravesToken(_cryptoravesContractAddress);
-        
-        _cryptoravesToken.mint(_userAddress, _standardMintAmount, _standardMintAmount, '');
-        
-        _userManagement.setDropState(_platformUserId);
-        
-        return _userAddress;
+    function _removeHeldToken(address _addr, uint index)  internal {
+        require(index < heldTokenIds[_addr].length);
+        heldTokenIds[_addr][index] = heldTokenIds[_addr][heldTokenIds[_addr].length-1];
+        delete heldTokenIds[_addr][heldTokenIds[_addr].length-1];
     }
+    function getHeldTokenIds(address _addr) public view returns(uint256[] memory){
+        return heldTokenIds[_addr];
+    }
+    
+    function getHeldTokenBalances(address _addr) public view returns(uint256[] memory){
+        CryptoravesToken instanceCryptoravesToken = CryptoravesToken(_cryptoravesTokenAddr);
+        address[] memory _accounts = new address[](heldTokenIds[_addr].length);
 
-    function getTokenIdFromPlatformId(uint256 _platformId) public view returns(uint256) {
-        
-        UserManagement _userManagement = UserManagement(_userManagementContractAddress);
-        CryptoravesToken _cryptoravesToken = CryptoravesToken(_cryptoravesContractAddress);
-        
-        address _userAccount = _userManagement.getUserAccount(_platformId);
-
-        require(_userAccount != address(0), 'User account does not exist');
-
-        return _cryptoravesToken.getManagedTokenIdByAddress(
-            _userAccount
+        for(uint i=0; i < heldTokenIds[_addr].length; i++){
+          _accounts[i] = _addr;  
+            
+        }
+        return instanceCryptoravesToken.balanceOfBatch(
+            _accounts,
+            heldTokenIds[_addr]
         );
     }
     
-    function _managedTransfer(address _from, address _to, uint256 _tokenId,  uint256 _val, bytes memory _data) internal {
-        WalletFull(_from).managedTransfer(_from, _to, _tokenId, _val, _data);
-        emit Transfer(_from, _to, _val, _tokenId);
-    }
     
-    //conversion functions
-    function _stringToBytes( string memory s) public pure returns (bytes memory){
-        bytes memory b3 = bytes(s);
-        return b3;
-    }
-    function parseAddr(string memory _a) public pure returns (address _parsedAddress) {
-        bytes memory tmp = bytes(_a);
-        uint160 iaddr = 0;
-        uint160 b1;
-        uint160 b2;
-        for (uint i = 2; i < 2 + 2 * 20; i += 2) {
-            iaddr *= 256;
-            b1 = uint160(uint8(tmp[i]));
-            b2 = uint160(uint8(tmp[i + 1]));
-            if ((b1 >= 97) && (b1 <= 102)) {
-                b1 -= 87;
-            } else if ((b1 >= 65) && (b1 <= 70)) {
-                b1 -= 55;
-            } else if ((b1 >= 48) && (b1 <= 57)) {
-                b1 -= 48;
-            }
-            if ((b2 >= 97) && (b2 <= 102)) {
-                b2 -= 87;
-            } else if ((b2 >= 65) && (b2 <= 70)) {
-                b2 -= 55;
-            } else if ((b2 >= 48) && (b2 <= 57)) {
-                b2 -= 48;
-            }
-            iaddr += (b1 * 16 + b2);
-        }
-        return address(iaddr);
+    //required for use with safeTransfer in ERC721
+    function onERC721Received(address, address, uint256, bytes memory) public virtual override returns (bytes4) {
+        return this.onERC721Received.selector;
     }
 }

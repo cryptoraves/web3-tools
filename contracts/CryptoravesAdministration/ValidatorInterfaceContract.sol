@@ -2,7 +2,7 @@
 pragma solidity 0.6.10;
 pragma experimental ABIEncoderV2;
 
-import "./TokenManagement.sol";
+import "./TransactionManagement.sol";
 
 /*  
     Oracle data corridor. Oracle addresses must be set as administrators.
@@ -13,42 +13,42 @@ contract ValidatorInterfaceContract is AdministrationContract {
     using Address for address;
 
     //token manager contract address
-    address private _tokenManager;
+    address private _transactionManager;
     
-    event NewTokenManager(address indexed _managementAddr);
+    event NewTransactionManager(address indexed _managementAddr);
     
     //owner can validate by default. Can later revoke self by unsetValidator()
-    constructor(string memory _uri, address _legacyCryptoravesContractAddr, address _legacyUserManagementAddr) public {
+    constructor(string memory _uri, address _legacyTokenManagementAddr, address _legacyUserManagementAddr) public {
         
         //set default validator
          _administrators[msg.sender] = true;
          
          //launch token Manager
-         TokenManagement _tknManager = new TokenManagement(_uri, _legacyCryptoravesContractAddr, _legacyUserManagementAddr);
+         TransactionManagement _tknManager = new TransactionManagement(_uri, _legacyTokenManagementAddr, _legacyUserManagementAddr);
          
          //set default token manager address
-         _tokenManager = address(_tknManager);
+         _transactionManager = address(_tknManager);
          
-         emit NewTokenManager(_tokenManager);
+         emit NewTransactionManager(_transactionManager);
     }
     
     
     /*
     * Get token manager address
     */
-    function getTokenManager() public view onlyAdmin returns(address) {
-        return _tokenManager;
+    function getTransactionManager() public view onlyAdmin returns(address) {
+        return _transactionManager;
     }
 
     /*
     * Change token manager address
-    * @param newTokenManager is the address of new Token Manager
+    * @param newTransactionManager is the address of new Token Manager
     */
-    function changeTokenManager(address newTokenManager) public onlyAdmin {
+    function changeTokenManager(address newTransactionManager) public onlyAdmin {
         
-        require(_tokenManager != newTokenManager);
-        _tokenManager = newTokenManager;
-        emit NewTokenManager(_tokenManager);
+        require(_transactionManager != newTransactionManager);
+        _transactionManager = newTransactionManager;
+        emit NewTransactionManager(_transactionManager);
     }
     
     /*
@@ -71,9 +71,9 @@ contract ValidatorInterfaceContract is AdministrationContract {
         string memory _data
     ) public onlyAdmin {
         
-        TokenManagement tokenManager = TokenManagement(_tokenManager);
+        TransactionManagement transactionManager = TransactionManagement(_transactionManager);
         
-        tokenManager.initCommand(_twitterIds, _twitterNames, _fromImageUrl, _txnType, _value, _data);
+        transactionManager.initCommand(_twitterIds, _twitterNames, _fromImageUrl, _txnType, _value, _data);
         /*
         *  Consider using the Token Manager Contract to host view functions for validating.
         *  Also see if view functions can return a function type that can then be executed 

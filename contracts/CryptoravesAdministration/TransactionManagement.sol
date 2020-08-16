@@ -2,7 +2,8 @@
 pragma solidity 0.6.10;
 pragma experimental ABIEncoderV2;
 
-import "./CryptoravesToken.sol";
+import "./TokenManagement.sol";
+import "./UserManagement.sol";
 
 //can manage tokens for any Cryptoraves-native address
 contract TransactionManagement is AdministrationContract {
@@ -10,48 +11,46 @@ contract TransactionManagement is AdministrationContract {
     using SafeMath for uint256;
     using Address for address;
     
-    address private _cryptoravesContractAddress;
+    address private _tokenManagerContractAddress;
     address private _userManagementContractAddress;
     uint256 private _standardMintAmount = 1000000000000000000000000000; //18 decimal adjusted standard amount (1 billion)
     
     event Transfer(address indexed _from, address indexed _to, uint256 _value, uint256 _tokenId);
     
-    event CryptoravesTokenAddressChange(address _newContractAddr);
+    event TokenManagementAddressChange(address _newContractAddr);
     event UserManagementAddressChange(address _newContractAddr);
-    event HeresMyAddress(address _layer1Address, address _cryptoravesAddress);
+    event HeresMyAddress(address _layer1Address, address _tokenManagerAddress);
 
-    constructor(string memory _uri, address _cryptoravesTokenAddr, address _userManagementAddr) public {
+    constructor(string memory _uri, address _tokenManagerAddr, address _userManagementAddr) public {
         
         //default managers include parent contract and ValidatorInterfaceContract Owner
         _administrators[msg.sender] = true;
         _administrators[tx.origin] = true;
         
-        if (_cryptoravesTokenAddr == address(0)){
+        TokenManagement _tokenManager = new TokenManagement(_uri);
+        if (_tokenManagerAddr == address(0)){
             //launch new Cryptoraves Token contract
-            CryptoravesToken _cryptoravesToken = new CryptoravesToken(_uri);
-            _cryptoravesContractAddress = address(_cryptoravesToken);
+            _tokenManagerContractAddress = address(_tokenManager);
         } else {
-            CryptoravesToken _cryptoravesToken = CryptoravesToken(_cryptoravesTokenAddr);
-            _cryptoravesContractAddress = address(_cryptoravesToken);
+            _tokenManagerContractAddress = address(_tokenManager);
         }
         
+        //launch new user management contract contract
+        UserManagement _userManagement = new UserManagement();
         if (_userManagementAddr == address(0)){
-            //launch new user management contract contract
-            UserManagement _userManagement = new UserManagement();
             _userManagementContractAddress = address(_userManagement);
         } else {
-            UserManagement _userManagement = UserManagement(_userManagementAddr);
             _userManagementContractAddress = address(_userManagement);
         }
     }
     
     function getCryptoravesTokenAddress() public view returns(address){
-        return _cryptoravesContractAddress;
+        return _tokenManagerContractAddress;
     } 
 
-    function changeCryptoravesTokenAddress(address _newAddr) public onlyAdmin {
-        _cryptoravesContractAddress = _newAddr;
-        emit CryptoravesTokenAddressChange(_newAddr);
+    function changeTokenManagerAddress(address _newAddr) public onlyAdmin {
+        _tokenManagerContractAddress = _newAddr;
+        emit TokenManagementAddressChange(_newAddr);
     } 
     
     function getUserManagementAddress() public view returns(address){
@@ -113,7 +112,7 @@ contract TransactionManagement is AdministrationContract {
             uint256 _tokenId;
             address _userAccount;
             
-            CryptoravesToken _cryptoravesToken = CryptoravesToken(_cryptoravesContractAddress);
+            TokenManagement _tokenManager = TokenManagement(_tokenManagerContractAddress);
             
             //transfer type check
             if(_twitterIds[2] == 0){
@@ -128,13 +127,13 @@ contract TransactionManagement is AdministrationContract {
                     
                     
                     //get token by ticker name
-                    address _addr = _cryptoravesToken.getTickerAddress(_twitterNames[2]);
-                    _tokenId = _cryptoravesToken.getManagedTokenIdByAddress(_addr);
+                    address _addr = _tokenManager.getTickerAddress(_twitterNames[2]);
+                    _tokenId = _tokenManager.getManagedTokenIdByAddress(_addr);
                     
                     
                 } else {
                     //No third party given, user transfer using thier dropped tokens
-                    _tokenId = _cryptoravesToken.getManagedTokenIdByAddress(_userAccount);
+                    _tokenId = _tokenManager.getManagedTokenIdByAddress(_userAccount);
                 }
                 
                 
@@ -146,7 +145,7 @@ contract TransactionManagement is AdministrationContract {
                 
                 require(_userAccount!=address(0), 'Third party token given--with username method--does not exist in system');
                     //not a dropped token attempted to be transferred. Check for 
-                _tokenId = _cryptoravesToken.getManagedTokenIdByAddress(_userAccount);
+                _tokenId = _tokenManager.getManagedTokenIdByAddress(_userAccount);
                 
             }
             
@@ -164,9 +163,9 @@ contract TransactionManagement is AdministrationContract {
         //init account
         address _userAddress = _userManagement.userAccountCheck(_platformUserId,_twitterHandleFrom,_imageUrl);
         
-        CryptoravesToken _cryptoravesToken = CryptoravesToken(_cryptoravesContractAddress);
+        TokenManagement _tokenManager = TokenManagement(_tokenManagerContractAddress);
         
-        _cryptoravesToken.mint(_userAddress, _standardMintAmount, _standardMintAmount, '');
+        _tokenManager.dropCrypto(_userAddress, _standardMintAmount, _standardMintAmount, '');
         
         _userManagement.setDropState(_platformUserId);
         
@@ -176,13 +175,13 @@ contract TransactionManagement is AdministrationContract {
     function getTokenIdFromPlatformId(uint256 _platformId) public view returns(uint256) {
         
         UserManagement _userManagement = UserManagement(_userManagementContractAddress);
-        CryptoravesToken _cryptoravesToken = CryptoravesToken(_cryptoravesContractAddress);
+        TokenManagement _tokenManager = TokenManagement(_tokenManagerContractAddress);
         
         address _userAccount = _userManagement.getUserAccount(_platformId);
 
         require(_userAccount != address(0), 'User account does not exist');
 
-        return _cryptoravesToken.getManagedTokenIdByAddress(
+        return _tokenManager.getManagedTokenIdByAddress(
             _userAccount
         );
     }
