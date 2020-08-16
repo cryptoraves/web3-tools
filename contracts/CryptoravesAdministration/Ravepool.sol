@@ -1,87 +1,108 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.6.10;
 
-import "./Ravepool.sol";
+import "./AdministrationContract.sol";
 
-abstract contract ERC1155Receiver is ERC165, IERC1155Receiver {
-    constructor() public {
-        _registerInterface(
-            ERC1155Receiver(0).onERC1155Received.selector ^
-            ERC1155Receiver(0).onERC1155BatchReceived.selector
-        );
-    }
+interface CryptoravesTokenManager {
+    function getManagedTokenIdByAddress(address _account) external view returns(uint256);
+    function getHeldTokenIds(address _addr) external view returns(uint256[] memory);
+    function getHeldTokenBalances(address _addr) external view returns(uint256[] memory);
+    function safeTransferFrom(address from, address to, uint256 id, uint256 amount, bytes memory data) external;
+    function safeBatchTransferFrom(address from, address to, uint256[] memory ids, uint256[] memory amounts, bytes memory data) external;
+    function burn(address, uint256, uint256) external;
+    function getTotalSupply(uint256) external view returns(uint256);
+    function subtractFromTotalSupply(uint256 _tokenId, uint256 _amount) external;
+}
+interface ITokenManager {
+    function getCryptoravesTokenAddress() external view returns(address);
+    function getUserManagementAddress() external view returns(address);
+}
+interface UTokenManager {
+    function userHasL1AddressMapped(address _userCryptoravesAddr) external view returns(bool);
+    function getUserId(address _account) external view returns(uint256);
+    function dropState (uint256 _platformUserId) external view returns(bool);
 }
 
-contract WalletFull is ERC1155Receiver, Ravepool {
-    
-    using SafeMath for uint256;
-    using Address for address;
-    
-    address private _mappedL1Account;
+contract Ravepool is AdministrationContract {
 
-    constructor(address _managerAddress) public {
-        
-        address _cryptoravesTokenAddress = ITokenManager(_managerAddress).getCryptoravesTokenAddress();
-        //setManager 
-        IERC1155(_cryptoravesTokenAddress).setApprovalForAll(_managerAddress, true);
-        _tokenManager = _managerAddress;
-        _administrators[_managerAddress] = true;
-        _administrators[msg.sender] = true;
+    bool private _ravepoolActivated;
+    address internal _tokenManager;
+    uint256 private _userId;
+    
+    event BurnAndRedeem(uint256 _sentTokenId, uint256 _amountOfPersonalToken);
+    
+    modifier ravepoolActivated () {
+      require(_ravepoolActivated, 'Ravepool is not activated. Reverting.');
+      _;
     }
-
-
-    function getLayerOneAccount() public view onlyAdmin returns(address) {
-        return _mappedL1Account;
-    }
-    function mapLayerOneAccount(address _l1Addr) public onlyAdmin {
-        require(_mappedL1Account == address(0), "User already mapped an L1 account");
-          
-        _mappedL1Account = _l1Addr;
-        setAdministrator(_l1Addr);
-        
-        //set L1 account as 1155 operator for this wallet
-        address _cryptoravesTokenAddress = ITokenManager(_tokenManager).getCryptoravesTokenAddress();
-        IERC1155(_cryptoravesTokenAddress).setApprovalForAll(_mappedL1Account, true);
-    }
-
-    function onERC1155Received(address, address, uint256, uint256, bytes calldata) external override virtual returns (bytes4) {
-        return this.onERC1155Received.selector;
-    }
-
-    function onERC1155BatchReceived(address, address, uint256[] calldata, uint256[] calldata, bytes calldata) external override virtual returns (bytes4) {
-        return this.onERC1155BatchReceived.selector;
+    modifier ravepoolNotActivated () {
+      require(!_ravepoolActivated, 'Ravepool is activated. Reverting.');
+      _;
     }
     
-    function managedTransfer(address _from, address _to, uint256 _id,  uint256 _val, bytes memory _data) public onlyAdmin {
-        address _cryptoravesTokenAddress = ITokenManager(_tokenManager).getCryptoravesTokenAddress();
-        IERC1155(_cryptoravesTokenAddress).safeTransferFrom(_from, _to, _id, _val, _data);
+    function activateRavepool() public onlyAdmin ravepoolNotActivated{
+        
+        address _userTokenManager = ITokenManager(_tokenManager).getUserManagementAddress();
+        
+        //require crypto already dropped by user
+        uint256 _userIdToCheck = UTokenManager(_userTokenManager).getUserId(address(this));
+        require(
+            UTokenManager(_userTokenManager).dropState(_userIdToCheck),
+            'User has not yet dropped their cryptoraves personal token.'
+        );
+        
+        //require layer 1 address be mapped by user 
+        require(
+            UTokenManager(_userTokenManager).userHasL1AddressMapped(address(this)),
+            'User has not yet Mapped an L1 address to their cryptoraves address.'
+        );
+        
+        //activate ravepool
+        _ravepoolActivated = true;
+    }
+    function isRavepoolActivated() public view returns(bool) {
+        return _ravepoolActivated;
     }
     
-    function managedBatchTransfer(address _from, address _to, uint256[] memory _ids,  uint256[] memory _vals, bytes memory _data) public onlyAdmin {
+    function redeemAndBurnViaRavepool(uint256 _sentTokenId, uint256 _amountOfPersonalToken, bytes memory _data) public payable onlyAdmin ravepoolActivated {
+        
+        require(_amountOfPersonalToken > 0, 'Amount must be greater than zero');
+        
         address _cryptoravesTokenAddress = ITokenManager(_tokenManager).getCryptoravesTokenAddress();
-        IERC1155(_cryptoravesTokenAddress).safeBatchTransferFrom(_from, _to, _ids, _vals, _data);
-    }
-    
-    function managedBurn(address account, uint256 id, uint256 amount) public onlyAdmin {
-        address _cryptoravesTokenAddress = ITokenManager(_tokenManager).getCryptoravesTokenAddress();
-        ERC1155Burnable(_cryptoravesTokenAddress).burn(account, id, amount);
-    }
-    
-    function managedBurnBatch(address account, uint256[] memory ids, uint256[] memory amounts) public onlyAdmin {
-        address _cryptoravesTokenAddress = ITokenManager(_tokenManager).getCryptoravesTokenAddress();
-        ERC1155Burnable(_cryptoravesTokenAddress).burnBatch(account, ids, amounts);
-    }
-    
-    //for custody-less transactions originating from social media. Any action requires approval from mapped L1 account.
-    function actionItemApproval() public {
-        require(msg.sender == _mappedL1Account, 'Sender not an approved L1 account');
         
-        //get list of action items
+        //get personal token Id
+        uint256 _1155tokenId  = CryptoravesTokenManager(_cryptoravesTokenAddress).getManagedTokenIdByAddress(address(this));
         
-        //execute action items
+        //require sent token to be the designated personal token
+        require(_sentTokenId == _1155tokenId, 'Token ID sent to redeemAndBurnViaRavepool doesn\'t match designated burn token ID');
         
-        //remove item from list
+        //gather list of all held tokens in Ravepool
+        uint256[] memory _heldTokenIds = CryptoravesTokenManager(_cryptoravesTokenAddress).getHeldTokenIds(address(this));
+        uint256[] memory _heldTokenbalances = CryptoravesTokenManager(_cryptoravesTokenAddress).getHeldTokenBalances(address(this));
         
-        //emit event?
+        //total supply used to calculate final share percentaghe
+        uint256 _totalSupplyOfPersonalToken = CryptoravesTokenManager(_cryptoravesTokenAddress).getTotalSupply(_sentTokenId);
+        
+        //calculate percentage of each token to be distributed back to msg sender
+        uint256[] memory _distributionAmounts;
+        
+        //will have to ensure erctype is 20 (fungible) for each of these. Then create another function to facilitate non-fungibles
+        for (uint i=0; i<_heldTokenIds.length; i++) {
+            _distributionAmounts[i] = _heldTokenbalances[i] * _amountOfPersonalToken / _totalSupplyOfPersonalToken;
+        }
+        
+        //send tokens for redemption
+        CryptoravesTokenManager(_cryptoravesTokenAddress).safeTransferFrom(msg.sender, address(this), _sentTokenId, _amountOfPersonalToken, _data);
+        
+        //distribute held tokens
+        CryptoravesTokenManager(_cryptoravesTokenAddress).safeBatchTransferFrom(address(this), msg.sender, _heldTokenIds, _distributionAmounts, _data);
+        
+        //burn spent tokens
+        CryptoravesTokenManager(_cryptoravesTokenAddress).burn(address(this), _sentTokenId, _amountOfPersonalToken);
+        
+        //adjust totalSupply 
+        CryptoravesTokenManager(_cryptoravesTokenAddress).subtractFromTotalSupply(_sentTokenId, _amountOfPersonalToken);
+        
+        emit BurnAndRedeem(_sentTokenId, _amountOfPersonalToken);
     }
 }
