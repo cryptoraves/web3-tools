@@ -1,4 +1,4 @@
-const TokenManagement = artifacts.require("TokenManagement")
+const TransactionManagement = artifacts.require("TransactionManagement")
 const WalletFull = artifacts.require("WalletFull")
 const ethers = require('ethers')
 
@@ -7,13 +7,13 @@ let secondUserManagerAddr = ''
 const CryptoravesToken = artifacts.require("CryptoravesToken")
 let secondCryptoravesTokenAddr = ''
 
-contract("TokenManagement", async accounts => {
+contract("TransactionManagement", async accounts => {
       
   //for iterateing through second token contract assignment
   for (var i = 0; i < 2; i++) {  
 
     it("Drop crypto with initCommand", async () => {
-      let instance = await TokenManagement.deployed()
+      let instance = await TransactionManagement.deployed()
 
       //var bytes = ethers.utils.formatBytes32String('testing crypto drop')
       let res = await instance.initCommand(
@@ -36,7 +36,7 @@ contract("TokenManagement", async accounts => {
       assert.isOk(res.receipt['status'])
     })
     it("Transfer dropped crypto via initCommand", async () => {
-      let instance = await TokenManagement.deployed()
+      let instance = await TransactionManagement.deployed()
       let res = await instance.initCommand(
         [1029384756,434443434,0],
         ['@fakeHandle', '@rando1', ''],
@@ -48,7 +48,7 @@ contract("TokenManagement", async accounts => {
       assert.isOk(res.receipt['status']);
     });
     it("Transfer 3rd party crypto via initCommand", async () => {
-      let instance = await TokenManagement.deployed()
+      let instance = await TransactionManagement.deployed()
       let res = await instance.initCommand(
         [434443434,55667788,0],
         ['@rando1', '@rando2', ''],
@@ -69,7 +69,7 @@ contract("TokenManagement", async accounts => {
       assert.isOk(res.receipt['status']);
     });
     it("get token from twitter id", async () => {
-      let instance = await TokenManagement.deployed()
+      let instance = await TransactionManagement.deployed()
       let tokenId = await instance.getTokenIdFromPlatformId.call(1029388888)
   //WARNING Zero is returned if no tokenId exists. Must fix??
       assert.isAbove(
@@ -83,7 +83,7 @@ contract("TokenManagement", async accounts => {
   	* Begin UserManager Portion
   	*/
     it("twitter id not registered. Should revert.", async () => {
-      let instance = await TokenManagement.deployed()
+      let instance = await TransactionManagement.deployed()
       let tokenId
       try{
         tokenId = await instance.getTokenIdFromPlatformId.call(18)
@@ -94,7 +94,7 @@ contract("TokenManagement", async accounts => {
       }
     })
     it("verify cryptoraves token address is valid", async () => {
-      let instance = await TokenManagement.deployed()
+      let instance = await TransactionManagement.deployed()
       let tokenContractAddr = await instance.getCryptoravesTokenAddress.call()
       
       assert.notEqual('0x0000000000000000000000000000000000000000', tokenContractAddr, "Token Manager Address is zero address")
@@ -106,7 +106,7 @@ contract("TokenManagement", async accounts => {
     })
 
     it("set a new cryptoraves token address and check it", async () => {
-      let instance = await TokenManagement.deployed()
+      let instance = await TransactionManagement.deployed()
 
       if(secondCryptoravesTokenAddr==''){
         //assign new usermanagement and cryptoravestoken and re-run above tests
@@ -126,7 +126,7 @@ contract("TokenManagement", async accounts => {
       )
     })
     it("verify userManagement contract address is valid", async () => {
-      let instance = await TokenManagement.deployed()
+      let instance = await TransactionManagement.deployed()
       let tokenContractAddr = await instance.getUserManagementAddress.call()
       
       assert.notEqual('0x0000000000000000000000000000000000000000', tokenContractAddr, "User Manager Address is zero address")
@@ -137,7 +137,7 @@ contract("TokenManagement", async accounts => {
       )
     })
     it("set a new userManagement address and check it", async () => {
-      let instance = await TokenManagement.deployed()
+      let instance = await TransactionManagement.deployed()
 
       if(secondUserManagerAddr == ''){
         //assign new usermanagement and re-run above tests
@@ -160,11 +160,11 @@ contract("TokenManagement", async accounts => {
   }
   it("test heresmyaddress functions", async () => {
       let userManagementInstance = await UserManagement.deployed()
-      let tokenManagementInstance = await TokenManagement.deployed()
+      let TransactionManagementInstance = await TransactionManagement.deployed()
       let cTkn = await CryptoravesToken.deployed()
       //change token management contract back to original
-      await tokenManagementInstance.changeUserManagementAddress(userManagementInstance.address)
-      await tokenManagementInstance.changeCryptoravesTokenAddress(cTkn.address)
+      await TransactionManagementInstance.changeUserManagementAddress(userManagementInstance.address)
+      await TransactionManagementInstance.changeCryptoravesTokenAddress(cTkn.address)
       let res = await userManagementInstance.getUser(1029384756);
       let addr = res['account']
       res = await userManagementInstance.userHasL1AddressMapped(addr)
@@ -172,7 +172,7 @@ contract("TokenManagement", async accounts => {
         res,
         "Issue checking L1 Mapped address. Should not exist."
       );
-      res = await tokenManagementInstance.initCommand(
+      res = await TransactionManagementInstance.initCommand(
         [1029384756,0,0],
         ['@rando2', '', ''],
         'https://i.picsum.photos/id/111/200/200.jpg',
@@ -194,9 +194,9 @@ contract("TokenManagement", async accounts => {
     })
   it("ravepool activation & distribution", async () => {
     let userManagementInstance = await UserManagement.deployed()
-    let tokenManagementInstance = await TokenManagement.deployed()
+    let TransactionManagementInstance = await TransactionManagement.deployed()
 
-    let res = await tokenManagementInstance.initCommand(
+    let res = await TransactionManagementInstance.initCommand(
       [9929387656,0,0],
       ['@rando3', '', ''],
       'https://i.picsum.photos/id/333/200/200.jpg',
@@ -204,7 +204,7 @@ contract("TokenManagement", async accounts => {
       0,
       accounts[0]
     )
-    res = await tokenManagementInstance.initCommand(
+    res = await TransactionManagementInstance.initCommand(
         [9929387656,0,0],
         ['@rando3', '', ''],
         'https://i.picsum.photos/id/333/200/200.jpg',
@@ -236,7 +236,7 @@ contract("TokenManagement", async accounts => {
 
 
   it("verify sender is admin", async () => {
-    let instance = await TokenManagement.deployed()
+    let instance = await TransactionManagement.deployed()
     let isValidator = await instance.isAdministrator.call()
     assert.isOk(
       isValidator,
@@ -244,7 +244,7 @@ contract("TokenManagement", async accounts => {
     );
   });
   it("revert since different sender is not admin", async () => {
-    let instance = await TokenManagement.deployed()
+    let instance = await TransactionManagement.deployed()
     let isValidator
     try{
       isValidator = await instance.isAdministrator.call({from: ethers.Wallet.createRandom().address})
@@ -255,7 +255,7 @@ contract("TokenManagement", async accounts => {
     }
   });
   it("set a new administrator and check it", async () => {
-    let instance = await TokenManagement.deployed()
+    let instance = await TransactionManagement.deployed()
 
     let wallet = ethers.Wallet.createRandom()
 
@@ -267,7 +267,7 @@ contract("TokenManagement", async accounts => {
     );
   });
   it("should UNSET a new administrator and check it", async () => {
-    let instance = await TokenManagement.deployed()
+    let instance = await TransactionManagement.deployed()
     let wallet = ethers.Wallet.createRandom()
     let res = await instance.setAdministrator(wallet.address) 
     assert.isOk(res)
