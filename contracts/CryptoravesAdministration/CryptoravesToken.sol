@@ -40,22 +40,12 @@ contract CryptoravesToken is ERC1155Burnable, AdministrationContract {
         data;
     }
 */
-    // General mint function
+    // General mint functions
     function mint(address account, uint256 id, uint256 amount, bytes memory data) public virtual onlyAdmin {
-        /*require(
-            account == _msgSender() || isApprovedForAll(account, _msgSender()),
-            "ERC1155: caller is not owner nor approved"
-        );*/
         _mint(account, id, amount, data);
     }
 
-    
     function mintBatch(address account, uint256[] memory ids, uint256[] memory amounts, bytes memory data) public virtual onlyAdmin {
-        require(
-            account == _msgSender() || isApprovedForAll(account, _msgSender()),
-            "ERC1155: caller is not owner nor approved"
-        );
-
         _mintBatch(account, ids, amounts, data);
     }
 }
