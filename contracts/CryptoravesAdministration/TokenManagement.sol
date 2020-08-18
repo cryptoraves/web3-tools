@@ -39,7 +39,7 @@ contract TokenManagement is  ERCDepositable, IERC721Receiver {
         _cryptoravesTokenAddr = address(newCryptoravesToken);
         
         //set zero token
-        _addTokenToManagedTokenList(address(0), 0, 0);
+        //_addTokenToManagedTokenList(address(0), 0, 0);
         
     }
     
