@@ -29,7 +29,6 @@ contract TokenManagement is  ERCDepositable, IERC721Receiver {
     
     event Deposit(address indexed _from, uint256 _value, address indexed _token, uint256 indexed cryptoravesTokenId);
     event Withdraw(address indexed _to, uint256 _value, address indexed _token, uint256 indexed cryptoravesTokenId);
-    event Deploy(address indexed _managementAddress, address indexed _contractAddress);
     event CryptoDropped(address user, uint256 tokenId);
     
     constructor(string memory _uri) public {
@@ -38,7 +37,10 @@ contract TokenManagement is  ERCDepositable, IERC721Receiver {
         _administrators[tx.origin] = true;
         CryptoravesToken newCryptoravesToken = new CryptoravesToken(_uri);
         _cryptoravesTokenAddr = address(newCryptoravesToken);
-        emit Deploy(msg.sender, address(this));
+        
+        //set zero token
+        _addTokenToManagedTokenList(address(0), 0, 0);
+        
     }
     
 
