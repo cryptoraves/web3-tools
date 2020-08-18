@@ -46,7 +46,7 @@ contract CryptoravesToken is ERC1155Burnable, AdministrationContract {
             account == _msgSender() || isApprovedForAll(account, _msgSender()),
             "ERC1155: caller is not owner nor approved"
         );
-        mint(account, id, amount, data);
+        _mint(account, id, amount, data);
     }
 
     
