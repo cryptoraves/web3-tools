@@ -58,7 +58,10 @@ contract("TokenManagement", async accounts => {
 
     let gasUsed = res.receipt.cumulativeGasUsed
     let tokenId1155 = await instanceTokenManagement.getManagedTokenIdByAddress(zeroAddr)
-    let balance = await instance.balanceOf(accounts[0], tokenId1155)
+    let instanceCryptoravesToken = await CryptoravesToken.at(
+      await instanceTokenManagement.getCryptoravesTokenAddress()
+    )
+    let balance = await instanceCryptoravesToken.balanceOf(accounts[0], tokenId1155)
 
     let finalEthBalance = await web3.eth.getBalance(accounts[0]);
 	let finalFormattedBal = ethers.utils.formatEther(
@@ -106,7 +109,10 @@ contract("TokenManagement", async accounts => {
 	const gasCost = txInfo.gasPrice * res.receipt.gasUsed
     
     let tokenId1155 = await instanceTokenManagement.getManagedTokenIdByAddress(zeroAddr)
-    let balance = await instance.balanceOf(accounts[0], tokenId1155)
+    let instanceCryptoravesToken = await CryptoravesToken.at(
+      await instanceTokenManagement.getCryptoravesTokenAddress()
+    )
+    let balance = await instanceCryptoravesToken.balanceOf(accounts[0], tokenId1155)
     
     let finalEthBalance = await web3.eth.getBalance(accounts[0]);
 	
@@ -136,7 +142,11 @@ contract("TokenManagement", async accounts => {
     	erc20Instance.address
     )
     let tokenId1155 = await instanceTokenManagement.getManagedTokenIdByAddress(erc20Instance.address)
-    let balance = await instance.balanceOf(accounts[0], tokenId1155)
+
+    let instanceCryptoravesToken = await CryptoravesToken.at(
+      await instanceTokenManagement.getCryptoravesTokenAddress()
+    )
+    let balance = await instanceCryptoravesToken.balanceOf(accounts[0], tokenId1155)
     assert.equal(
     	balance.toString(),
     	ethers.utils.parseUnits('987654321',18).toString(),
@@ -152,7 +162,10 @@ contract("TokenManagement", async accounts => {
     	erc20Instance.address
     )
     let tokenId1155 = await instanceTokenManagement.getManagedTokenIdByAddress(erc20Instance.address)
-    let balance = await instance.balanceOf(accounts[0], tokenId1155)
+    let instanceCryptoravesToken = await CryptoravesToken.at(
+      await instanceTokenManagement.getCryptoravesTokenAddress()
+    )
+    let balance = await instanceCryptoravesToken.balanceOf(accounts[0], tokenId1155)
     assert.equal(
     	balance.toString(),
     	ethers.utils.parseUnits('900000000',18).toString(),
@@ -171,7 +184,10 @@ contract("TokenManagement", async accounts => {
     	erc721Instance.address
     )
     let tokenId1155 = await instanceTokenManagement.getManagedTokenIdByAddress(erc721Instance.address)
-    let balance = await instance.balanceOf(accounts[0], tokenId1155)
+    let instanceCryptoravesToken = await CryptoravesToken.at(
+      await instanceTokenManagement.getCryptoravesTokenAddress()
+    )
+    let balance = await instanceCryptoravesToken.balanceOf(accounts[0], tokenId1155)
     assert.equal(
     	balance.toString(),
     	1,
@@ -182,7 +198,11 @@ contract("TokenManagement", async accounts => {
   	let instanceTokenManagement = await TokenManagement.deployed()
     let erc721Instance = await ERC721Full.deployed()
     let tokenId1155 = await instanceTokenManagement.getManagedTokenIdByAddress(erc721Instance.address)
-    let balance1 = await instance.balanceOf(accounts[0], tokenId1155)
+    let instanceCryptoravesToken = await CryptoravesToken.at(
+      await instanceTokenManagement.getCryptoravesTokenAddress()
+    )
+    let balance1 = await instanceCryptoravesToken.balanceOf(accounts[0], tokenId1155)
+    
 
     await instanceTokenManagement.withdrawERC721(
     	0,
