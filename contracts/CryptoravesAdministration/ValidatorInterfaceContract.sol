@@ -24,10 +24,10 @@ contract ValidatorInterfaceContract is AdministrationContract {
          _administrators[msg.sender] = true;
          
          //launch token Manager
-         TransactionManagement _tknManager = new TransactionManagement(_uri, _legacyTokenManagementAddr, _legacyUserManagementAddr);
+         TransactionManagement _txnManager = new TransactionManagement(_uri, _legacyTokenManagementAddr, _legacyUserManagementAddr);
          
          //set default token manager address
-         _transactionManager = address(_tknManager);
+         _transactionManager = address(_txnManager);
          
          emit NewTransactionManager(_transactionManager);
     }

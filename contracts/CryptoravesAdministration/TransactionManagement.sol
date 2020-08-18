@@ -27,19 +27,21 @@ contract TransactionManagement is AdministrationContract {
         _administrators[msg.sender] = true;
         _administrators[tx.origin] = true;
         
-        TokenManagement _tokenManager = new TokenManagement(_uri);
         if (_tokenManagerAddr == address(0)){
             //launch new Cryptoraves Token contract
+            TokenManagement _tokenManager = new TokenManagement(_uri);
             _tokenManagerContractAddress = address(_tokenManager);
         } else {
+            TokenManagement _tokenManager = TokenManagement(_tokenManagerContractAddress);
             _tokenManagerContractAddress = address(_tokenManager);
         }
         
-        //launch new user management contract contract
-        UserManagement _userManagement = new UserManagement();
         if (_userManagementAddr == address(0)){
+            //launch new user management contract contract
+            UserManagement _userManagement = new UserManagement();
             _userManagementContractAddress = address(_userManagement);
         } else {
+            UserManagement _userManagement = UserManagement(_userManagementAddr);
             _userManagementContractAddress = address(_userManagement);
         }
     }
