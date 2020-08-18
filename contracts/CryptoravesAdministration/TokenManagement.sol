@@ -43,6 +43,12 @@ contract TokenManagement is  ERCDepositable, IERC721Receiver {
     
 
     // soleley for DropMyCrypto function. As it designates each new token as non-3rd party
+    /* 
+    
+        Turn this public and make it free if through social media.   Charge fee if not. 
+        This will reduce false account creation attacks, while allowing dapp-only launches
+        
+    */
     function dropCrypto(address account, uint256 amount, uint256 _totalSupply, bytes memory data) public virtual onlyAdmin {
         
         if(!managedTokenListByAddress[account].isManagedToken) {
