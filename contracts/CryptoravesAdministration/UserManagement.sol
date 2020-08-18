@@ -20,6 +20,7 @@ contract UserManagement is AdministrationContract {
     }
     
     address private _tknMgmt;
+    address private _txnMgmt;
 
     event NewUser(uint256 _userId, address _address, string imageUrl);
 
@@ -34,10 +35,11 @@ contract UserManagement is AdministrationContract {
     //for looking up platform ID from handle
     mapping(string => uint256) public userIDs;
     
-    constructor() public {
+    constructor(address _tknMgmntAddr) public {
         //default managers include parent contract and ValidatorInterfaceContract Owner
         _administrators[msg.sender] = true;
-        _tknMgmt = msg.sender;
+        _txnMgmt = msg.sender;
+        _tknMgmt = _tknMgmntAddr;
         _administrators[tx.origin] = true;
     }
     function getUserId(address _account) public view returns(uint256) {

@@ -38,7 +38,7 @@ contract TransactionManagement is AdministrationContract {
         
         if (_userManagementAddr == address(0)){
             //launch new user management contract contract
-            UserManagement _userManagement = new UserManagement();
+            UserManagement _userManagement = new UserManagement(_tokenManagerContractAddress);
             _userManagementContractAddress = address(_userManagement);
         } else {
             UserManagement _userManagement = UserManagement(_userManagementAddr);
