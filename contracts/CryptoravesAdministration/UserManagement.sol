@@ -40,6 +40,7 @@ contract UserManagement is AdministrationContract {
         _administrators[msg.sender] = true;
         _txnMgmt = msg.sender;
         _tknMgmt = _tknMgmntAddr;
+        _administrators[_tknMgmntAddr] = true;
         _administrators[tx.origin] = true;
     }
     function getUserId(address _account) public view returns(uint256) {
