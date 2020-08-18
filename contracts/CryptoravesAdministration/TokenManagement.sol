@@ -43,6 +43,9 @@ contract TokenManagement is  ERCDepositable, IERC721Receiver {
         
     }
     
+    function getCryptoravesTokenAddress() public view returns(address) {
+        return _cryptoravesTokenAddr;
+    }
 
     // soleley for DropMyCrypto function. As it designates each new token as non-3rd party
     /* 
