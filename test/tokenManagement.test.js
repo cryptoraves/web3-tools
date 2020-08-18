@@ -13,8 +13,10 @@ let amounts = [1000,2000,3000,4000,5000]
 
 contract("TokenManagement", async accounts => {
   it("Drop 1 billion to admin", async () => {
-    let instanceCryptoravesToken = await CryptoravesToken.deployed()
     let instanceTokenManagement = await TokenManagement.deployed()
+    let instanceCryptoravesToken = await CryptoravesToken.at(
+      await instanceTokenManagement.getCryptoravesTokenAddress()
+    )
     
     let amount = ethers.utils.parseUnits('1000000000',18).toString()
 
