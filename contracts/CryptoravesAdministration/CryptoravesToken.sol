@@ -2,7 +2,7 @@
 pragma solidity 0.6.10;
 
 import "./AdministrationContract.sol";
-import "/home/cartosys/www/openzeppelin-contracts/contracts/token/ERC1155/ERC1155Burnable.sol";
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC1155/ERC1155Burnable.sol";
 
 contract CryptoravesToken is ERC1155Burnable, AdministrationContract {
     
@@ -42,10 +42,10 @@ contract CryptoravesToken is ERC1155Burnable, AdministrationContract {
 */
     // General mint function
     function mint(address account, uint256 id, uint256 amount, bytes memory data) public virtual onlyAdmin {
-        require(
+        /*require(
             account == _msgSender() || isApprovedForAll(account, _msgSender()),
             "ERC1155: caller is not owner nor approved"
-        );
+        );*/
         _mint(account, id, amount, data);
     }
 
