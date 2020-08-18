@@ -1,3 +1,4 @@
+const TokenManagement = artifacts.require("TokenManagement");
 const CryptoravesToken = artifacts.require("CryptoravesToken");
 
 const ERC20Full = artifacts.require('ERC20Full')
@@ -10,46 +11,109 @@ let ids = [11111,22222,33333,44444,55555]
 let amounts = [1000,2000,3000,4000,5000]
 
 contract("CryptoravesToken", async accounts => {
-  it("Mint 1 billion to admin", async () => {
-  	let instance = await CryptoravesToken.deployed()
-  	
-  	let amount = ethers.utils.parseUnits('1000000000',18).toString()
-  	await instance.mint(
-  		accounts[0],
-  		amount,
-      amount,
-  		ethers.utils.formatBytes32String('test')
-  	)
-    primary_tokenId1155 = await instance.getManagedTokenIdByAddress(accounts[0])
+  it("Drop 1 billion to admin", async () => {
+    let instanceCryptoravesToken = await CryptoravesToken.deployed()
+    let instanceTokenManagement = await TokenManagement.deployed()
+    
+    let amount = ethers.utils.parseUnits('1000000000',18).toString()
 
-  	let balance = await instance.balanceOf(accounts[0], primary_tokenId1155)
-  	assert.equal(
-    	balance.toString(),
-    	amount,
-    	'ERC1155 mint failed'
+    await instanceTokenManagement.dropCrypto(
+      accounts[0],
+      amount,
+      amount,
+      ethers.utils.formatBytes32String('test')
+    )
+    primary_tokenId1155 = await instanceTokenManagement.getManagedTokenIdByAddress(accounts[0])
+    let balance = await instanceCryptoravesToken.balanceOf(accounts[0], primary_tokenId1155)
+    assert.equal(
+      balance.toString(),
+      amount,
+      'ERC1155 mint failed'
     )
   })
   it("batch mint multiple to accounts[1]", async () => {
-  	let instance = await CryptoravesToken.deployed()
-  	let amount = ethers.utils.parseUnits('1000000000',18).toString()
-  	
-  	await instance.mintBatch(
-  		accounts[0],
-  		ids, 
-  		amounts,
-  		ethers.utils.formatBytes32String('batch test')
-  	)
-  	for (var i = 0; i < 5; i++) {
-  		let balance = await instance.balanceOf(accounts[0], ids[i])
-  		assert.equal(
-	    	balance.toString(),
-	    	amounts[i],
-	    	'ERC1155 mint failed'
-	    )
- 	}
+    let instanceCryptoravesToken = await CryptoravesToken.deployed()
+    let amount = ethers.utils.parseUnits('1000000000',18).toString()
+    
+    await instanceCryptoravesToken.mintBatch(
+      accounts[0],
+      ids, 
+      amounts,
+      ethers.utils.formatBytes32String('batch test')
+    )
+    for (var i = 0; i < 5; i++) {
+      let balance = await instanceCryptoravesToken.balanceOf(accounts[0], ids[i])
+      assert.equal(
+        balance.toString(),
+        amounts[i],
+        'ERC1155 mint failed'
+      )
+  }
   })
+  it("burn some fungible tokens", async () => {
+    let instanceCryptoravesToken = await CryptoravesToken.deployed()
+    let balance = await instanceCryptoravesToken.balanceOf(accounts[0], primary_tokenId1155)
+    let amount = Math.floor(Math.random() * Math.floor(100)) //random amount between 
+    if(amount == 0 ){
+      amount = amount + 1
+    }
+    await instanceCryptoravesToken.burn(accounts[0], primary_tokenId1155, amount);
+    
+    let newBalance = await instanceCryptoravesToken.balanceOf(accounts[0], primary_tokenId1155)
+    assert.equal(
+      balance - amount,
+      newBalance,
+      "Burn went awry.  Result - amount doesn't equal initial amount."
+    )
+  })
+  it("batch burn some fungible tokens", async () => {
+    let instanceCryptoravesToken = await CryptoravesToken.deployed()
+    let balance1 = await instanceCryptoravesToken.balanceOf(accounts[0], ids[0])
+    let balance2 = await instanceCryptoravesToken.balanceOf(accounts[0], ids[1])
+    let balance3 = await instanceCryptoravesToken.balanceOf(accounts[0], ids[2])
+    let balance4 = await instanceCryptoravesToken.balanceOf(accounts[0], ids[3])
+    let balance5 = await instanceCryptoravesToken.balanceOf(accounts[0], ids[4])
+    let amount = Math.floor(Math.random() * Math.floor(100)) //random amount between 
+    if(amount == 0 ){
+      amount = amount + 1
+    }
+    await instanceCryptoravesToken.burnBatch(accounts[0], ids, [amount,amount,amount,amount,amount]);
+    
+    let newBalance1 = await instanceCryptoravesToken.balanceOf(accounts[0], ids[0])
+    let newBalance2 = await instanceCryptoravesToken.balanceOf(accounts[0], ids[1])
+    let newBalance3 = await instanceCryptoravesToken.balanceOf(accounts[0], ids[2])
+    let newBalance4 = await instanceCryptoravesToken.balanceOf(accounts[0], ids[3])
+    let newBalance5 = await instanceCryptoravesToken.balanceOf(accounts[0], ids[4])
+    assert.equal(
+      balance1 - amount,
+      newBalance1,
+      "Burn went awry.  Result - amount1 doesn't equal initial amount."
+    )
+    assert.equal(
+      balance2 - amount,
+      newBalance2,
+      "Burn went awry.  Result - amount2 doesn't equal initial amount."
+    )
+    assert.equal(
+      balance3 - amount,
+      newBalance3,
+      "Burn went awry.  Result - amount3 doesn't equal initial amount."
+    )
+    assert.equal(
+      balance4 - amount,
+      newBalance4,
+      "Burn went awry.  Result - amount4 doesn't equal initial amount."
+    )
+    assert.equal(
+      balance5 - amount,
+      newBalance5,
+      "Burn went awry.  Result - amount5 doesn't equal initial amount."
+    )
+  })
+})  
+contract("TokenManagement", async accounts => {
   it("deposits ETH", async () => {
-  	let instance = await CryptoravesToken.deployed()
+  	let instanceTokenManagement = await TokenManagement.deployed()
 
   	let zeroAddr = '0x0000000000000000000000000000000000000000'
   	let ethAmt = '1.14'
@@ -60,7 +124,7 @@ contract("CryptoravesToken", async accounts => {
 		initialEthBalance
 	).toString()
 
-    let res = await instance.depositERC20(
+    let res = await instanceTokenManagement.depositERC20(
     	formatttedWeiAmt, 
     	zeroAddr,
     	{
@@ -70,7 +134,7 @@ contract("CryptoravesToken", async accounts => {
     )
 
     let gasUsed = res.receipt.cumulativeGasUsed
-    let tokenId1155 = await instance.getManagedTokenIdByAddress(zeroAddr)
+    let tokenId1155 = await instanceTokenManagement.getManagedTokenIdByAddress(zeroAddr)
     let balance = await instance.balanceOf(accounts[0], tokenId1155)
 
     let finalEthBalance = await web3.eth.getBalance(accounts[0]);
@@ -104,21 +168,21 @@ contract("CryptoravesToken", async accounts => {
 
   })
   it("withdraws ETH", async () => {
-  	let instance = await CryptoravesToken.deployed()
+  	let instanceTokenManagement = await TokenManagement.deployed()
     let zeroAddr = '0x0000000000000000000000000000000000000000'
   	let ethAmt = '1.14'
   	let formatttedWeiAmt = ethers.utils.parseEther(ethAmt).toString()
 
   	let initialEthBalance = await web3.eth.getBalance(accounts[0]);
 
-    let res = await instance.withdrawERC20(
+    let res = await instanceTokenManagement.withdrawERC20(
     	formatttedWeiAmt, 
     	zeroAddr
     )
     const txInfo = await web3.eth.getTransaction(res.tx); 
 	const gasCost = txInfo.gasPrice * res.receipt.gasUsed
     
-    let tokenId1155 = await instance.getManagedTokenIdByAddress(zeroAddr)
+    let tokenId1155 = await instanceTokenManagement.getManagedTokenIdByAddress(zeroAddr)
     let balance = await instance.balanceOf(accounts[0], tokenId1155)
     
     let finalEthBalance = await web3.eth.getBalance(accounts[0]);
@@ -138,17 +202,17 @@ contract("CryptoravesToken", async accounts => {
     )
   })
   it("deposits ERC20", async () => {
-  	let instance = await CryptoravesToken.deployed()
+  	let instanceTokenManagement = await TokenManagement.deployed()
     let erc20Instance = await ERC20Full.deployed()	
     let appr = await erc20Instance.approve(
-    	instance.address,
+    	instanceTokenManagement.address,
     	ethers.utils.parseUnits('987654321',18)
     )
-    await instance.depositERC20(
+    await instanceTokenManagement.depositERC20(
     	ethers.utils.parseUnits('987654321',18), 
     	erc20Instance.address
     )
-    let tokenId1155 = await instance.getManagedTokenIdByAddress(erc20Instance.address)
+    let tokenId1155 = await instanceTokenManagement.getManagedTokenIdByAddress(erc20Instance.address)
     let balance = await instance.balanceOf(accounts[0], tokenId1155)
     assert.equal(
     	balance.toString(),
@@ -157,14 +221,14 @@ contract("CryptoravesToken", async accounts => {
     )
   })
   it("withdraws ERC20", async () => {
-  	let instance = await CryptoravesToken.deployed()
+  	let instanceTokenManagement = await TokenManagement.deployed()
     let erc20Instance = await ERC20Full.deployed()	
 
-    await instance.withdrawERC20(
+    await instanceTokenManagement.withdrawERC20(
     	ethers.utils.parseUnits('87654321',18), 
     	erc20Instance.address
     )
-    let tokenId1155 = await instance.getManagedTokenIdByAddress(erc20Instance.address)
+    let tokenId1155 = await instanceTokenManagement.getManagedTokenIdByAddress(erc20Instance.address)
     let balance = await instance.balanceOf(accounts[0], tokenId1155)
     assert.equal(
     	balance.toString(),
@@ -173,17 +237,17 @@ contract("CryptoravesToken", async accounts => {
     )
   })
   it("deposits ERC721", async () => {
-  	let instance = await CryptoravesToken.deployed()
+  	let instanceTokenManagement = await TokenManagement.deployed()
     let erc721Instance = await ERC721Full.deployed()
     let appr = await erc721Instance.approve(
-    	instance.address,
+    	instanceTokenManagement.address,
     	0
     )
-    await instance.depositERC721(
+    await instanceTokenManagement.depositERC721(
     	0,
     	erc721Instance.address
     )
-    let tokenId1155 = await instance.getManagedTokenIdByAddress(erc721Instance.address)
+    let tokenId1155 = await instanceTokenManagement.getManagedTokenIdByAddress(erc721Instance.address)
     let balance = await instance.balanceOf(accounts[0], tokenId1155)
     assert.equal(
     	balance.toString(),
@@ -192,12 +256,12 @@ contract("CryptoravesToken", async accounts => {
     )
   })
   it("withdraws ERC721", async () => {
-  	let instance = await CryptoravesToken.deployed()
+  	let instanceTokenManagement = await TokenManagement.deployed()
     let erc721Instance = await ERC721Full.deployed()
-    let tokenId1155 = await instance.getManagedTokenIdByAddress(erc721Instance.address)
+    let tokenId1155 = await instanceTokenManagement.getManagedTokenIdByAddress(erc721Instance.address)
     let balance1 = await instance.balanceOf(accounts[0], tokenId1155)
 
-    await instance.withdrawERC721(
+    await instanceTokenManagement.withdrawERC721(
     	0,
     	erc721Instance.address
     )
@@ -210,20 +274,20 @@ contract("CryptoravesToken", async accounts => {
     )
   })
   it("checks if both ERC20/721 token addresses are managed by contract", async () => {
-  	let instance = await CryptoravesToken.deployed()
+  	let instanceTokenManagement = await TokenManagement.deployed()
   	let erc721Instance = await ERC721Full.deployed()
   	let erc20Instance = await ERC20Full.deployed()
 
-  	assert.isOk(await instance.isManagedToken(erc721Instance.address))
-  	assert.isOk(await instance.isManagedToken(erc20Instance.address))
+  	assert.isOk(await instanceTokenManagement.isManagedToken(erc721Instance.address))
+  	assert.isOk(await instanceTokenManagement.isManagedToken(erc20Instance.address))
   })
   it("get managed token id by address", async () => {
-  	let instance = await CryptoravesToken.deployed()
+  	let instanceTokenManagement = await TokenManagement.deployed()
   	let erc721Instance = await ERC721Full.deployed()
   	let erc20Instance = await ERC20Full.deployed()
 
-  	let id20 = await instance.getManagedTokenIdByAddress(erc20Instance.address)
-  	let id721 = await instance.getManagedTokenIdByAddress(erc721Instance.address)
+  	let id20 = await instanceTokenManagement.getManagedTokenIdByAddress(erc20Instance.address)
+  	let id721 = await instanceTokenManagement.getManagedTokenIdByAddress(erc721Instance.address)
 
   	assert.equal(
   		id20.toString(),
@@ -237,9 +301,9 @@ contract("CryptoravesToken", async accounts => {
   	)
   })
   it("add managed token to list", async () => {
-  	let instance = await CryptoravesToken.deployed()
+  	let instanceTokenManagement = await TokenManagement.deployed()
     //let wallet = ethers.Wallet.createRandom()
-  	let id7 = await instance.getManagedTokenIdByAddress(accounts[0])
+  	let id7 = await instanceTokenManagement.getManagedTokenIdByAddress(accounts[0])
   	assert.equal(
   		id7.toNumber(),
   		primary_tokenId1155,
@@ -247,8 +311,8 @@ contract("CryptoravesToken", async accounts => {
   	)
   })
   it("token list length ok", async () => {
-  	let instance = await CryptoravesToken.deployed()
-  	let count = await instance.getTokenListCount()
+  	let instanceTokenManagement = await TokenManagement.deployed()
+  	let count = await instanceTokenManagement.getTokenListCount()
   	assert.isNumber(
   		count.toNumber(),
   		"Managed token count failed isNumber test"
@@ -259,8 +323,8 @@ contract("CryptoravesToken", async accounts => {
   	)
   })
   it("get held token ids", async () => {
-  	let instance = await CryptoravesToken.deployed()
-  	let heldIds = await instance.getHeldTokenIds(accounts[0])
+  	let instanceTokenManagement = await TokenManagement.deployed()
+  	let heldIds = await instanceTokenManagement.getHeldTokenIds(accounts[0])
   	
   	assert.isAbove(heldIds.length, 0, 'No held token ids returned.')
 
@@ -279,8 +343,8 @@ contract("CryptoravesToken", async accounts => {
   	}
   })
   it("get held token balances", async () => {
-  	let instance = await CryptoravesToken.deployed()
-  	let balances = await instance.getHeldTokenBalances(accounts[0])
+  	let instanceTokenManagement = await TokenManagement.deployed()
+  	let balances = await instanceTokenManagement.getHeldTokenBalances(accounts[0])
   	assert.isAbove(balances.length, 0, 'No held token ids returned.')
 
   	for(i=0; i < balances.length; i++){
@@ -306,65 +370,5 @@ contract("CryptoravesToken", async accounts => {
 	  		case 8:	assert.equal(0, balances[i], 'balanceB does not match'); break;
   		}
   	}
-  })
-  it("burn some fungible tokens", async () => {
-  	let instance = await CryptoravesToken.deployed()
-  	let balance = await instance.balanceOf(accounts[0], primary_tokenId1155)
-  	let amount = Math.floor(Math.random() * Math.floor(100)) //random amount between 
-  	if(amount == 0 ){
-  		amount = amount + 1
-  	}
-  	await instance.burn(accounts[0], primary_tokenId1155, amount);
-  	
-  	let newBalance = await instance.balanceOf(accounts[0], primary_tokenId1155)
-  	assert.equal(
-	  	balance - amount,
-	  	newBalance,
-	  	"Burn went awry.  Result - amount doesn't equal initial amount."
-  	)
-  })
-  it("batch burn some fungible tokens", async () => {
-  	let instance = await CryptoravesToken.deployed()
-  	let balance1 = await instance.balanceOf(accounts[0], ids[0])
-  	let balance2 = await instance.balanceOf(accounts[0], ids[1])
-  	let balance3 = await instance.balanceOf(accounts[0], ids[2])
-  	let balance4 = await instance.balanceOf(accounts[0], ids[3])
-  	let balance5 = await instance.balanceOf(accounts[0], ids[4])
-  	let amount = Math.floor(Math.random() * Math.floor(100)) //random amount between 
-  	if(amount == 0 ){
-  		amount = amount + 1
-  	}
-  	await instance.burnBatch(accounts[0], ids, [amount,amount,amount,amount,amount]);
-  	
-  	let newBalance1 = await instance.balanceOf(accounts[0], ids[0])
-  	let newBalance2 = await instance.balanceOf(accounts[0], ids[1])
-  	let newBalance3 = await instance.balanceOf(accounts[0], ids[2])
-  	let newBalance4 = await instance.balanceOf(accounts[0], ids[3])
-  	let newBalance5 = await instance.balanceOf(accounts[0], ids[4])
-  	assert.equal(
-	  	balance1 - amount,
-	  	newBalance1,
-	  	"Burn went awry.  Result - amount1 doesn't equal initial amount."
-  	)
-  	assert.equal(
-	  	balance2 - amount,
-	  	newBalance2,
-	  	"Burn went awry.  Result - amount2 doesn't equal initial amount."
-  	)
-  	assert.equal(
-	  	balance3 - amount,
-	  	newBalance3,
-	  	"Burn went awry.  Result - amount3 doesn't equal initial amount."
-  	)
-  	assert.equal(
-	  	balance4 - amount,
-	  	newBalance4,
-	  	"Burn went awry.  Result - amount4 doesn't equal initial amount."
-  	)
-  	assert.equal(
-	  	balance5 - amount,
-	  	newBalance5,
-	  	"Burn went awry.  Result - amount5 doesn't equal initial amount."
-  	)
   })
 })  
