@@ -2,9 +2,9 @@
 pragma solidity 0.6.10;
 
 import "./AdministrationContract.sol";
-import "/home/cartosys/www/openzeppelin-contracts/contracts/token/ERC1155/ERC1155Burnable.sol";
+import "/home/cartosys/www/openzeppelin-contracts/contracts/token/ERC1155/ERC1155.sol";
 
-contract CryptoravesToken is ERC1155Burnable, AdministrationContract {
+contract CryptoravesToken is ERC1155, AdministrationContract {
     
     using SafeMath for uint256;
     using Address for address;
@@ -40,12 +40,20 @@ contract CryptoravesToken is ERC1155Burnable, AdministrationContract {
         data;
     }
 */
-    // General mint functions
+    // General mint function
     function mint(address account, uint256 id, uint256 amount, bytes memory data) public virtual onlyAdmin {
         _mint(account, id, amount, data);
     }
-
+    
     function mintBatch(address account, uint256[] memory ids, uint256[] memory amounts, bytes memory data) public virtual onlyAdmin {
         _mintBatch(account, ids, amounts, data);
+    }
+    
+    function burn(address account, uint256 id, uint256 value) public virtual {
+        _burn(account, id, value);
+    }
+
+    function burnBatch(address account, uint256[] memory ids, uint256[] memory values) public virtual {
+        _burnBatch(account, ids, values);
     }
 }
