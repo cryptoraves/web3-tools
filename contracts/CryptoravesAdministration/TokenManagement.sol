@@ -47,8 +47,8 @@ contract TokenManagement is  ERCDepositable, IERC721Receiver {
         return _cryptoravesTokenAddr;
     }
 
-    // soleley for DropMyCrypto function. As it designates each new token as non-3rd party
     /* 
+        Soleley for DropMyCrypto function. As it designates each new token as non-3rd party 
     
         Turn this public and make it free if through social media.   Charge fee if not. 
         This will reduce false account creation attacks, while allowing dapp-only launches

@@ -40,7 +40,7 @@ contract UserManagement is AdministrationContract {
         _administrators[msg.sender] = true;
         _txnMgmt = msg.sender;
         _tknMgmt = _tknMgmntAddr;
-        _administrators[_tknMgmntAddr] = true;
+        //_administrators[_tknMgmntAddr] = true;
         _administrators[tx.origin] = true;
     }
     function getUserId(address _account) public view returns(uint256) {
@@ -52,16 +52,16 @@ contract UserManagement is AdministrationContract {
         return users[_userId].account;
     }
 
-    function getTokenManagerAddr() public view returns(address) {
-        return _tknMgmt;
+    function getTransactionManagerAddr() public view returns(address) {
+        return _txnMgmt;
     }
-    function changeTokenManagerAddr(address _newAddr) public onlyAdmin{
-        _tknMgmt = _newAddr;
+    function changeTransactionManagerAddr(address _newAddr) public onlyAdmin{
+        _txnMgmt = _newAddr;
     }
     
     function launchL2Account(uint256 _userId, string memory _twitterHandleFrom, string memory _imageUrl) public onlyAdmin returns (address) {
         //launch a managed wallet
-        WalletFull receiver = new WalletFull(_tknMgmt);
+        WalletFull receiver = new WalletFull(_txnMgmt);
         
          //create a new user
         User memory user;
