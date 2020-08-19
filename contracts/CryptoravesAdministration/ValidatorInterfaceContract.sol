@@ -18,13 +18,13 @@ contract ValidatorInterfaceContract is AdministrationContract {
     event NewTransactionManager(address indexed _managementAddr);
     
     //owner can validate by default. Can later revoke self by unsetValidator()
-    constructor(string memory _uri, address _legacyTokenManagementAddr, address _legacyUserManagementAddr) public {
+    constructor(string memory _uri, address _legacyTransactionManagementAddr, address _legacyUserManagementAddr) public {
         
         //set default validator
          _administrators[msg.sender] = true;
          
          //launch token Manager
-         TransactionManagement _txnManager = new TransactionManagement(_uri, _legacyTokenManagementAddr, _legacyUserManagementAddr);
+         TransactionManagement _txnManager = new TransactionManagement(_uri, _legacyTransactionManagementAddr, _legacyUserManagementAddr);
          
          //set default token manager address
          _transactionManager = address(_txnManager);
@@ -44,7 +44,7 @@ contract ValidatorInterfaceContract is AdministrationContract {
     * Change token manager address
     * @param newTransactionManager is the address of new Token Manager
     */
-    function changeTokenManager(address newTransactionManager) public onlyAdmin {
+    function changeTransactionManager(address newTransactionManager) public onlyAdmin {
         
         require(_transactionManager != newTransactionManager);
         _transactionManager = newTransactionManager;

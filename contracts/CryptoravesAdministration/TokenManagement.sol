@@ -163,6 +163,7 @@ contract TokenManagement is  ERCDepositable, IERC721Receiver {
     function _mint( address account, uint256 id, uint256 amount, bytes memory data) private onlyAdmin {
         CryptoravesToken instanceCryptoravesToken = CryptoravesToken(_cryptoravesTokenAddr);
         instanceCryptoravesToken.mint(account, id, amount, data);
+        _checkHeldToken(account, id);
     }
     
     function _burn( address account, uint256 id, uint256 amount) private onlyAdmin {

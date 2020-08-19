@@ -4,7 +4,7 @@ const TokenManagement = artifacts.require('TokenManagement')
 module.exports = function (deployer) {
   
   deployer.then(async () => {
-    await deployer.deploy(UserManagement, TokenManagement.address)
+    await deployer.deploy(UserManagement)
     const instance = await UserManagement.deployed()
         
     console.log('\n*************************************************************************\n')

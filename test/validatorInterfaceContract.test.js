@@ -57,34 +57,34 @@ contract("ValidatorInterfaceContract", async accounts => {
       )
       assert.isOk(res.receipt['status']);
     });
-    it("verify token manager address is valid", async () => {
+    it("verify transaction manager address is valid", async () => {
       let instance = await ValidatorInterfaceContract.deployed()
-      let tokenManagerAddr = await instance.getTokenManager.call()
+      let txnManagerAddr = await instance.getTransactionManager()
       
-      assert.notEqual('0x0000000000000000000000000000000000000000', tokenManagerAddr, "Token Manager Address is zero address")
+      assert.notEqual('0x0000000000000000000000000000000000000000', txnManagerAddr, "Token Manager Address is zero address")
       assert.lengthOf(
-        tokenManagerAddr,
+        txnManagerAddr,
         42,
-        "Token Manager Address not valid: "+tokenManagerAddr
+        "Token Manager Address not valid: "+txnManagerAddr
       );
     });
 
     
-    it("set a new tokenManager and check it", async () => {
+    it("set a new transactionManager and check it", async () => {
       let instance = await ValidatorInterfaceContract.deployed()
 
       if(secondTokenManagerAddr==''){
-        let tknMgmt = await TransactionManagement.deployed()
-        await tknMgmt.setAdministrator(instance.address)
-        secondTokenManagerAddr = tknMgmt.address
+        let txnMgmt = await TransactionManagement.deployed()
+        await txnMgmt.setAdministrator(instance.address)
+        secondTokenManagerAddr = txnMgmt.address
       }else{
         secondTokenManagerAddr = ethers.Wallet.createRandom().address
       }
 
-      let res = await instance.changeTokenManager(secondTokenManagerAddr) 
-      let tokenManagerAddr = await instance.getTokenManager.call()
+      let res = await instance.changeTransactionManager(secondTokenManagerAddr) 
+      let transactionManagerAddr = await instance.getTransactionManager()
       assert.equal(
-        tokenManagerAddr,
+        transactionManagerAddr,
         secondTokenManagerAddr,
         "changeTokenManager failed with random wallet.address as input"
       );

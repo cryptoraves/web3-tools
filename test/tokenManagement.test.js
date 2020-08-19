@@ -7,12 +7,12 @@ const ERC721Full = artifacts.require('ERC721Full')
 const ethers = require('ethers')
 
 let primary_tokenId1155 = 12345
-let ids = [11111,22222,33333,44444,55555]
-let amounts = [1000,2000,3000,4000,5000]
+let ids = []
+let amounts = []
 
 
 contract("TokenManagement", async accounts => {
-  it("Drop 1 billion to admin", async () => {
+  it("Drop 1 billion to admin & 5 test accounts", async () => {
     let instanceTokenManagement = await TokenManagement.deployed()
     let instanceCryptoravesToken = await CryptoravesToken.at(
       await instanceTokenManagement.getCryptoravesTokenAddress()
@@ -26,9 +26,19 @@ contract("TokenManagement", async accounts => {
       amount,
       ethers.utils.formatBytes32String('test')
     )
+    let randoAddr = ''
+    for(i=0; i < 5; i++){
+      randoWallet = ethers.Wallet.createRandom()
+      randoAddr = randoWallet.address
+      await instanceTokenManagement.dropCrypto(randoAddr, amount, amount, ethers.utils.formatBytes32String('test'))
+      ids[i] = await instanceTokenManagement.getManagedTokenIdByAddress(randoAddr)
+      amounts[i] = getRandomInt(1, 100000000)
+      await instanceCryptoravesToken.setApprovalForAll(accounts[0], true, {from: randoWallet})
+      await instanceCryptoravesToken.safeTransferFrom(randoAddr, accounts[0], ids[i], amounts[i], ethers.utils.formatBytes32String('rando'))
+    }
     primary_tokenId1155 = await instanceTokenManagement.getManagedTokenIdByAddress(accounts[0])
     let balance = await instanceCryptoravesToken.balanceOf(accounts[0], primary_tokenId1155)
-    console.log(accounts[0])
+
     assert.equal(
       balance.toString(),
       amount,
@@ -266,7 +276,7 @@ contract("TokenManagement", async accounts => {
   	)
   })
   it("get held token ids", async () => {
-  	let instanceTokenManagement = await TokenManagement.deployed()
+    let instanceTokenManagement = await TokenManagement.deployed()
   	let heldIds = await instanceTokenManagement.getHeldTokenIds(accounts[0])
   	
   	assert.isAbove(heldIds.length, 0, 'No held token ids returned.')
@@ -315,3 +325,8 @@ contract("TokenManagement", async accounts => {
   	}
   })
 })  
+function getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}

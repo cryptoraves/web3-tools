@@ -45,7 +45,7 @@ contract("TransactionManagement", async accounts => {
         200,
         ''
       )
-      assert.isOk(res.receipt['status']);
+      assert.isOk(res.receipt['status'], 'Transfer to @rando1 failed')
     });
     it("Transfer 3rd party crypto via initCommand", async () => {
       let instance = await TransactionManagement.deployed()
@@ -57,16 +57,16 @@ contract("TransactionManagement", async accounts => {
         50,
         ''
       )
-      assert.isOk(res.receipt['status']);
+      assert.isOk(res.receipt['status'], 'Transfer to @rando2 failed')
       res = await instance.initCommand(
         [434443434,1029384756,0],
-        ['@rando1', '@rando2', ''],
+        ['@rando1', '@rando3', ''],
         'https://i.picsum.photos/id/2/200/200.jpg',
         'transfer',
         50,
         ''
       )
-      assert.isOk(res.receipt['status']);
+      assert.isOk(res.receipt['status'], 'Transfer to @rando3 failed')
     });
     it("get token from twitter id", async () => {
       let instance = await TransactionManagement.deployed()
@@ -104,27 +104,6 @@ contract("TransactionManagement", async accounts => {
         "Token cryptoraves token Address not valid: "+tokenContractAddr
       )
     })
-
-    it("set a new cryptoraves token address and check it", async () => {
-      let instance = await TransactionManagement.deployed()
-
-      if(secondCryptoravesTokenAddr==''){
-        //assign new usermanagement and cryptoravestoken and re-run above tests
-        let cTkn = await CryptoravesToken.deployed()
-        await cTkn.setAdministrator(instance.address)
-        secondCryptoravesTokenAddr = cTkn.address
-      }else{
-        secondCryptoravesTokenAddr = ethers.Wallet.createRandom().address
-      }
-
-      let res = await instance.changeCryptoravesTokenAddress(secondCryptoravesTokenAddr) 
-      let cryptoravesTokenAddress = await instance.getCryptoravesTokenAddress.call()
-      assert.equal(
-        cryptoravesTokenAddress,
-        secondCryptoravesTokenAddr,
-        "changeCryptoravesTokenAddress failed with secondCryptoravesTokenAddr as input"
-      )
-    })
     it("verify userManagement contract address is valid", async () => {
       let instance = await TransactionManagement.deployed()
       let tokenContractAddr = await instance.getUserManagementAddress.call()
@@ -143,7 +122,7 @@ contract("TransactionManagement", async accounts => {
         //assign new usermanagement and re-run above tests
         let usrMgmt = await UserManagement.deployed()
         await usrMgmt.setAdministrator(instance.address)
-        await usrMgmt.changeTokenManagerAddr(instance.address)
+        await usrMgmt.changeTransactionManagerAddr(instance.address)
         secondUserManagerAddr = usrMgmt.address
       }else{
         secondUserManagerAddr = ethers.Wallet.createRandom().address
@@ -164,7 +143,7 @@ contract("TransactionManagement", async accounts => {
       let cTkn = await CryptoravesToken.deployed()
       //change token management contract back to original
       await TransactionManagementInstance.changeUserManagementAddress(userManagementInstance.address)
-      await TransactionManagementInstance.changeCryptoravesTokenAddress(cTkn.address)
+      await TransactionManagementInstance.changeTokenManagerAddress(cTkn.address)
       let res = await userManagementInstance.getUser(1029384756);
       let addr = res['account']
       res = await userManagementInstance.userHasL1AddressMapped(addr)

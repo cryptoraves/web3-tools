@@ -13,7 +13,7 @@ contract("UserManagement", async accounts => {
 	    let instance = await UserManagement.deployed()
 	    let tknMgmt = await TransactionManagement.deployed()
 
-	    instance.changeTokenManagerAddr(tknMgmt.address)
+	    instance.changeTransactionManagerAddr(tknMgmt.address)
 
 	    let res = await instance.launchL2Account(
 	    	fakeTwitterId, 
@@ -51,15 +51,15 @@ contract("UserManagement", async accounts => {
 			'getUserId from twitter handle failed'
 		)
 	})
-	it("verify cryptoraves token address is valid", async () => {
+	it("verify transaction manager address is valid", async () => {
 		let instance = await UserManagement.deployed()
-		let tokenManagerAddr = await instance.getTokenManagerAddr.call()
+		let transactionManagerAddr = await instance.getTransactionManagerAddr.call()
 
-		assert.notEqual('0x0000000000000000000000000000000000000000', tokenManagerAddr, "Token Manager Address is zero address")
+		assert.notEqual('0x0000000000000000000000000000000000000000', transactionManagerAddr, "Token Manager Address is zero address")
 		assert.lengthOf(
-		  tokenManagerAddr,
+		  transactionManagerAddr,
 		  42,
-		  "Token cryptoraves token Address not valid: "+tokenManagerAddr
+		  "Token cryptoraves token Address not valid: "+transactionManagerAddr
 		)
 	})
 	it('user account check w/ existing user', async () => {

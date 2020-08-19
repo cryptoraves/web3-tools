@@ -38,7 +38,7 @@ contract TransactionManagement is AdministrationContract {
         
         if (_userManagementAddr == address(0)){
             //launch new user management contract contract
-            UserManagement _userManagement = new UserManagement(_tokenManagerContractAddress);
+            UserManagement _userManagement = new UserManagement();
             _userManagementContractAddress = address(_userManagement);
         } else {
             UserManagement _userManagement = UserManagement(_userManagementAddr);
@@ -47,8 +47,13 @@ contract TransactionManagement is AdministrationContract {
     }
     
     function getCryptoravesTokenAddress() public view returns(address){
-        return _tokenManagerContractAddress;
+        TokenManagement _tokenManager = TokenManagement(_tokenManagerContractAddress);
+        return _tokenManager.getCryptoravesTokenAddress();
     } 
+
+    function getTokenManagerAddress() public view returns(address) {
+        return _tokenManagerContractAddress;
+    }
 
     function changeTokenManagerAddress(address _newAddr) public onlyAdmin {
         _tokenManagerContractAddress = _newAddr;
