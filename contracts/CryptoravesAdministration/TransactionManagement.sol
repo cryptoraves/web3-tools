@@ -19,7 +19,7 @@ contract TransactionManagement is AdministrationContract {
     
     event TokenManagementAddressChange(address _newContractAddr);
     event UserManagementAddressChange(address _newContractAddr);
-    event HeresMyAddress(address _layer1Address, address _tokenManagementAddress);
+    event HeresMyAddress(address _layer1Address, address _walletContractAddress);
 
     constructor(string memory _uri, address _tokenManagementAddr, address _userManagementAddr) public {
         

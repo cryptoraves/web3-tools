@@ -4,8 +4,8 @@ const ethers = require('ethers')
 
 const UserManagement = artifacts.require("UserManagement")
 let secondUserManagerAddr = ''
-const CryptoravesToken = artifacts.require("CryptoravesToken")
-let secondCryptoravesTokenAddr = ''
+const TokenManagement = artifacts.require("TokenManagement")
+
 
 contract("TransactionManagement", async accounts => {
       
@@ -140,7 +140,7 @@ contract("TransactionManagement", async accounts => {
   it("test heresmyaddress functions", async () => {
       let userManagementInstance = await UserManagement.deployed()
       let TransactionManagementInstance = await TransactionManagement.deployed()
-      let cTkn = await CryptoravesToken.deployed()
+      let cTkn = await TokenManagement.deployed()
       //change token management contract back to original
       await TransactionManagementInstance.changeUserManagementAddress(userManagementInstance.address)
       await TransactionManagementInstance.changeTokenManagementAddress(cTkn.address)
@@ -160,6 +160,7 @@ contract("TransactionManagement", async accounts => {
         0,
         randoAddr
       )
+      res = await userManagementInstance.getUser(1029384756);
       res = await userManagementInstance.userHasL1AddressMapped(addr)
       assert.isOk(
         res,
@@ -172,7 +173,7 @@ contract("TransactionManagement", async accounts => {
         "L1 mapped address doesn't match given."
       );
     })
-  it("ravepool activation & distribution", async () => {
+  /*it("ravepool activation & distribution", async () => {
     let userManagementInstance = await UserManagement.deployed()
     let TransactionManagementInstance = await TransactionManagement.deployed()
 
@@ -212,7 +213,7 @@ contract("TransactionManagement", async accounts => {
     assert.isOk(res, 'Error activating Ravepool with authorized address')
 
     //await walletFullInstance.redeemAndBurnViaRavepool(_sentTokenId, _amountOfPersonalToken, _data)
-  })
+  })*/
 
 
   it("verify sender is admin", async () => {
