@@ -93,7 +93,9 @@ contract("ValidatorInterfaceContract", async accounts => {
       let bytes = ethers.utils.formatBytes32String('')
       for(i=0; i < 5; i++){
         ids[i] = getRandomInt(100000000, 200000000)
-        amounts[i] = getRandomInt(1, 999999999)
+        let rInt = getRandomInt(1, 999999999).toString()+'.0'
+
+        amounts[i] = ethers.utils.parseUnits(rInt,18)
         let uri = 'https://i.picsum.photos/id/'+ids[i].toString()+'/200/200.jpg'
         await instance.validateCommand([ids[i],0,0], ['@rando'+ids[i].toString(), '', ''], uri, 'launch', 0, bytes)
         await instance.validateCommand([ids[i],primaryUserId,0], ['@rando'+ids[i].toString(), '@fakeHandle', ''], uri, 'transfer', amounts[i], bytes)
@@ -102,45 +104,30 @@ contract("ValidatorInterfaceContract", async accounts => {
       let heldIds = await instanceTokenManagement.getHeldTokenIds(
         primaryUserAccount
       )
-      console.log(primaryUserAccount)
-      console.log(heldIds)
       assert.isAbove(heldIds.length, 0, 'No held token ids returned.')
-      console.log(ids)
-      console.log(amounts)
-      for(i=0; i < heldIds.length; i++){
+      let tokenId, userAddr;
+      for(i=0; i < 5; i++){
+        userAddr = await instanceUserManagement.getUserAccount(ids[i])
+        tokenId = await instanceTokenManagement.getManagedTokenIdByAddress(userAddr)
         switch(i){
-          case 0: assert.equal(ids[i], heldIds[i], 'heldid corresponding to id0 does not match'); break;
-          case 1: assert.equal(ids[i], heldIds[i], 'heldid corresponding to id1 does not match'); break;
-          case 2: assert.equal(ids[i], heldIds[i], 'heldid corresponding to id2 does not match'); break;
-          case 3: assert.equal(ids[i], heldIds[i], 'heldid corresponding to id3 does not match'); break;
-          case 4: assert.equal(ids[i], heldIds[i], 'heldid corresponding to id4 does not match'); break;
+          case 0: assert.equal(tokenId.toString(), heldIds[i+1].toString(), 'heldid corresponding to id0 does not match'); break;
+          case 1: assert.equal(tokenId.toString(), heldIds[i+1].toString(), 'heldid corresponding to id1 does not match'); break;
+          case 2: assert.equal(tokenId.toString(), heldIds[i+1].toString(), 'heldid corresponding to id2 does not match'); break;
+          case 3: assert.equal(tokenId.toString(), heldIds[i+1].toString(), 'heldid corresponding to id3 does not match'); break;
+          case 4: assert.equal(tokenId.toString(), heldIds[i+1].toString(), 'heldid corresponding to id4 does not match'); break;
           
         }
       }
-      let balances = await instanceTokenManagement.getHeldTokenBalances(accounts[0])
+      let balances = await instanceTokenManagement.getHeldTokenBalances(primaryUserAccount)
       assert.isAbove(balances.length, 0, 'No held token ids returned.')
-
       for(i=0; i < balances.length; i++){
         switch(i){
-          case 0: assert.equal(
-              ethers.utils.parseUnits('1000000000',18).toString(), 
-              balances[i].toString(), 
-              'tokenId11555 does not match'
-            )
-          break;
-          case 1: assert.equal(amounts[i-1], balances[i], 'batchmint balance1 does not match'); break;
-          case 2: assert.equal(amounts[i-1], balances[i], 'batchmint balance2 does not match'); break;
-          case 3: assert.equal(amounts[i-1], balances[i], 'batchmint balance3 does not match'); break;
-          case 4: assert.equal(amounts[i-1], balances[i], 'batchmint balance4 does not match'); break;
-          case 5: assert.equal(amounts[i-1], balances[i], 'batchmint balance5 does not match'); break;
-          case 6: assert.equal(0, balances[i], 'erc721  balance does not match'); break;
-          case 7: assert.equal(
-              ethers.utils.parseUnits('900000000',18).toString(), 
-              balances[i], 
-              'minted fungible balance does not match'
-            ) 
-          break;
-          case 8: assert.equal(0, balances[i], 'balanceB does not match'); break;
+          case 0: assert.equal(amounts[i].toString(), balances[i+1].toString(), 'transferred balance0 does not match'); break;
+          case 1: assert.equal(amounts[i].toString(), balances[i+1].toString(), 'transferred balance1 does not match'); break;
+          case 2: assert.equal(amounts[i].toString(), balances[i+1].toString(), 'transferred balance2 does not match'); break;
+          case 3: assert.equal(amounts[i].toString(), balances[i+1].toString(), 'transferred balance3 does not match'); break;
+          case 4: assert.equal(amounts[i].toString(), balances[i+1].toString(), 'transferred balance4 does not match'); break;
+
         }
       }
     })
