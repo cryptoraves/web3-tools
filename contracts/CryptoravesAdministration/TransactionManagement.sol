@@ -193,9 +193,11 @@ contract TransactionManagement is AdministrationContract {
         );
     }
     
-    function _managedTransfer(address _from, address _to, uint256 _tokenId,  uint256 _val, bytes memory _data) internal {
-        WalletFull(_from).managedTransfer(_from, _to, _tokenId, _val, _data);
-        emit Transfer(_from, _to, _val, _tokenId);
+    function _managedTransfer(address _from, address _to, uint256 _id,  uint256 _val, bytes memory _data) internal {
+        TokenManagement _tokenManagement = TokenManagement(_tokenManagementContractAddress);
+        _tokenManagement.managedTransfer(_from, _to, _id, _val, _data);
+        //TODO: emit platformId and change _from & _to vars to userIds on given platform
+        emit Transfer(_from, _to, _val, _id); 
     }
     
     //conversion functions

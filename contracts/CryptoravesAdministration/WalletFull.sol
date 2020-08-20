@@ -12,20 +12,26 @@ abstract contract ERC1155Receiver is ERC165, IERC1155Receiver {
     }
 }
 
+interface IERC1155Mintable {
+    function mint() external view returns(address);
+    function getUserManagementAddress() external view returns(address);
+}
+
 contract WalletFull is ERC1155Receiver, Ravepool {
     
     using SafeMath for uint256;
     using Address for address;
     
     address private _mappedL1Account;
+    address private _transactionManagementAddress;
 
-    constructor(address _managerAddress) public {
+    constructor(address _txnManagerAddress) public {
         
-        address _cryptoravesTokenAddress = ITokenManager(_managerAddress).getCryptoravesTokenAddress();
+        address _cryptoravesTokenAddress = ITokenManager(_txnManagerAddress).getCryptoravesTokenAddress();
         //setManager 
-        IERC1155(_cryptoravesTokenAddress).setApprovalForAll(_managerAddress, true);
-        _tokenManager = _managerAddress;
-        _administrators[_managerAddress] = true;
+        IERC1155(_cryptoravesTokenAddress).setApprovalForAll(_txnManagerAddress, true);
+        _transactionManagementAddress = _txnManagerAddress;
+        _administrators[_txnManagerAddress] = true;
         _administrators[msg.sender] = true;
     }
 
@@ -40,7 +46,7 @@ contract WalletFull is ERC1155Receiver, Ravepool {
         setAdministrator(_l1Addr);
         
         //set L1 account as 1155 operator for this wallet
-        address _cryptoravesTokenAddress = ITokenManager(_tokenManager).getCryptoravesTokenAddress();
+        address _cryptoravesTokenAddress = ITokenManager(_transactionManagementAddress).getCryptoravesTokenAddress();
         IERC1155(_cryptoravesTokenAddress).setApprovalForAll(_mappedL1Account, true);
     }
 
@@ -53,22 +59,22 @@ contract WalletFull is ERC1155Receiver, Ravepool {
     }
     
     function managedTransfer(address _from, address _to, uint256 _id,  uint256 _val, bytes memory _data) public onlyAdmin {
-        address _cryptoravesTokenAddress = ITokenManager(_tokenManager).getCryptoravesTokenAddress();
+        address _cryptoravesTokenAddress = ITokenManager(_transactionManagementAddress).getCryptoravesTokenAddress();
         IERC1155(_cryptoravesTokenAddress).safeTransferFrom(_from, _to, _id, _val, _data);
     }
     
     function managedBatchTransfer(address _from, address _to, uint256[] memory _ids,  uint256[] memory _vals, bytes memory _data) public onlyAdmin {
-        address _cryptoravesTokenAddress = ITokenManager(_tokenManager).getCryptoravesTokenAddress();
+        address _cryptoravesTokenAddress = ITokenManager(_transactionManagementAddress).getCryptoravesTokenAddress();
         IERC1155(_cryptoravesTokenAddress).safeBatchTransferFrom(_from, _to, _ids, _vals, _data);
     }
     
     function managedBurn(address account, uint256 id, uint256 amount) public onlyAdmin {
-        address _cryptoravesTokenAddress = ITokenManager(_tokenManager).getCryptoravesTokenAddress();
+        address _cryptoravesTokenAddress = ITokenManager(_transactionManagementAddress).getCryptoravesTokenAddress();
         ERC1155Burnable(_cryptoravesTokenAddress).burn(account, id, amount);
     }
     
     function managedBurnBatch(address account, uint256[] memory ids, uint256[] memory amounts) public onlyAdmin {
-        address _cryptoravesTokenAddress = ITokenManager(_tokenManager).getCryptoravesTokenAddress();
+        address _cryptoravesTokenAddress = ITokenManager(_transactionManagementAddress).getCryptoravesTokenAddress();
         ERC1155Burnable(_cryptoravesTokenAddress).burnBatch(account, ids, amounts);
     }
     

@@ -46,6 +46,9 @@ contract TokenManagement is  ERCDepositable, IERC721Receiver {
     function getCryptoravesTokenAddress() public view returns(address) {
         return _cryptoravesTokenAddr;
     }
+    function changeCryptoravesTokenAddress(address newAddr) public onlyAdmin {
+        _cryptoravesTokenAddr = newAddr;
+    }
 
     /* 
         Soleley for DropMyCrypto function. As it designates each new token as non-3rd party 
@@ -121,6 +124,11 @@ contract TokenManagement is  ERCDepositable, IERC721Receiver {
         
         return _1155tokenId;
         
+    }
+    
+    function managedTransfer(address _from, address _to, uint256 _id,  uint256 _val, bytes memory _data) public onlyAdmin {
+        IERC1155(_cryptoravesTokenAddr).safeTransferFrom(_from, _to, _id, _val, _data);
+        _checkHeldToken(_to, _id);
     }
     
     function getTotalSupply(uint256 _tokenId) public view returns(uint256){
