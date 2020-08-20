@@ -7,12 +7,9 @@ const ERC721Full = artifacts.require('ERC721Full')
 const ethers = require('ethers')
 
 let primary_tokenId1155 = 12345
-let ids = []
-let amounts = []
-
 
 contract("TokenManagement", async accounts => {
-  it("Drop 1 billion to admin & 5 test accounts", async () => {
+  it("Drop 1 billion to admin", async () => {
     let instanceTokenManagement = await TokenManagement.deployed()
     let instanceCryptoravesToken = await CryptoravesToken.at(
       await instanceTokenManagement.getCryptoravesTokenAddress()
@@ -26,16 +23,7 @@ contract("TokenManagement", async accounts => {
       amount,
       ethers.utils.formatBytes32String('test')
     )
-    let randoAddr = ''
-    for(i=0; i < 5; i++){
-      randoWallet = ethers.Wallet.createRandom()
-      randoAddr = randoWallet.address
-      await instanceTokenManagement.dropCrypto(randoAddr, amount, amount, ethers.utils.formatBytes32String('test'))
-      ids[i] = await instanceTokenManagement.getManagedTokenIdByAddress(randoAddr)
-      amounts[i] = getRandomInt(1, 100000000)
-      await instanceCryptoravesToken.setApprovalForAll(accounts[0], true, {from: randoWallet})
-      await instanceCryptoravesToken.safeTransferFrom(randoAddr, accounts[0], ids[i], amounts[i], ethers.utils.formatBytes32String('rando'))
-    }
+    
     primary_tokenId1155 = await instanceTokenManagement.getManagedTokenIdByAddress(accounts[0])
     let balance = await instanceCryptoravesToken.balanceOf(accounts[0], primary_tokenId1155)
 
@@ -275,58 +263,5 @@ contract("TokenManagement", async accounts => {
   		"Managed token count failed > 0 test"
   	)
   })
-  it("get held token ids", async () => {
-    let instanceTokenManagement = await TokenManagement.deployed()
-  	let heldIds = await instanceTokenManagement.getHeldTokenIds(accounts[0])
-  	
-  	assert.isAbove(heldIds.length, 0, 'No held token ids returned.')
 
-  	for(i=0; i < heldIds.length; i++){
-  		switch(i){
-  			case 0:	assert.equal(primary_tokenId1155.toString(), heldIds[i].toString(), 'primary_tokenId1155 does not match'); break;
-	  		case 1:	assert.equal(ids[i-1], heldIds[i], 'batchmint id1 does not match'); break;
-	  		case 2:	assert.equal(ids[i-1], heldIds[i], 'batchmint id2 does not match'); break;
-	  		case 3:	assert.equal(ids[i-1], heldIds[i], 'batchmint id3 does not match'); break;
-	  		case 4:	assert.equal(ids[i-1], heldIds[i], 'batchmint id4 does not match'); break;
-	  		case 5:	assert.equal(ids[i-1], heldIds[i], 'batchmint id5 does not match'); break;
-	  		case 6:	assert.equal(1, heldIds[i], 'erc721  id does not match'); break;
-	  		case 7:	assert.equal(2, heldIds[i], 'minted fungible does not match'); break;
-	  		case 8:	assert.equal(3, heldIds[i], 'idB does not match'); break;
-  		}
-  	}
-  })
-  it("get held token balances", async () => {
-  	let instanceTokenManagement = await TokenManagement.deployed()
-  	let balances = await instanceTokenManagement.getHeldTokenBalances(accounts[0])
-  	assert.isAbove(balances.length, 0, 'No held token ids returned.')
-
-  	for(i=0; i < balances.length; i++){
-  		switch(i){
-  			case 0:	assert.equal(
-	  				ethers.utils.parseUnits('1000000000',18).toString(), 
-	  				balances[i].toString(), 
-	  				'tokenId11555 does not match'
-  				)
-  			break;
-	  		case 1:	assert.equal(amounts[i-1], balances[i], 'batchmint balance1 does not match'); break;
-	  		case 2:	assert.equal(amounts[i-1], balances[i], 'batchmint balance2 does not match'); break;
-	  		case 3:	assert.equal(amounts[i-1], balances[i], 'batchmint balance3 does not match'); break;
-	  		case 4:	assert.equal(amounts[i-1], balances[i], 'batchmint balance4 does not match'); break;
-	  		case 5:	assert.equal(amounts[i-1], balances[i], 'batchmint balance5 does not match'); break;
-	  		case 6:	assert.equal(0, balances[i], 'erc721  balance does not match'); break;
-	  		case 7:	assert.equal(
-		  			ethers.utils.parseUnits('900000000',18).toString(), 
-		  			balances[i], 
-		  			'minted fungible balance does not match'
-	  			) 
-	  		break;
-	  		case 8:	assert.equal(0, balances[i], 'balanceB does not match'); break;
-  		}
-  	}
-  })
 })  
-function getRandomInt(min, max) {
-    min = Math.ceil(min);
-    max = Math.floor(max);
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-}
