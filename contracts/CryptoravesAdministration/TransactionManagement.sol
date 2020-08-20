@@ -11,7 +11,7 @@ contract TransactionManagement is AdministrationContract {
     using SafeMath for uint256;
     using Address for address;
     
-    address private _tokenManagerContractAddress;
+    address private _tokenManagementContractAddress;
     address private _userManagementContractAddress;
     uint256 private _standardMintAmount = 1000000000000000000000000000; //18 decimal adjusted standard amount (1 billion)
     
@@ -19,21 +19,22 @@ contract TransactionManagement is AdministrationContract {
     
     event TokenManagementAddressChange(address _newContractAddr);
     event UserManagementAddressChange(address _newContractAddr);
-    event HeresMyAddress(address _layer1Address, address _tokenManagerAddress);
+    event HeresMyAddress(address _layer1Address, address _tokenManagementAddress);
 
-    constructor(string memory _uri, address _tokenManagerAddr, address _userManagementAddr) public {
+    constructor(string memory _uri, address _tokenManagementAddr, address _userManagementAddr) public {
         
         //default managers include parent contract and ValidatorInterfaceContract Owner
         _administrators[msg.sender] = true;
         _administrators[tx.origin] = true;
         
-        if (_tokenManagerAddr == address(0)){
+        if (_tokenManagementAddr == address(0)){
             //launch new Cryptoraves Token contract
-            TokenManagement _tokenManager = new TokenManagement(_uri);
-            _tokenManagerContractAddress = address(_tokenManager);
+            TokenManagement _tokenManagement = new TokenManagement(_uri);
+            _tokenManagementContractAddress = address(_tokenManagement);
         } else {
-            TokenManagement _tokenManager = TokenManagement(_tokenManagerContractAddress);
-            _tokenManagerContractAddress = address(_tokenManager);
+            TokenManagement _tokenManagement = TokenManagement(_tokenManagementContractAddress);
+            _tokenManagementContractAddress = address(_tokenManagement);
+            _tokenManagement.setAdministrator(address(this));
         }
         
         if (_userManagementAddr == address(0)){
@@ -43,20 +44,21 @@ contract TransactionManagement is AdministrationContract {
         } else {
             UserManagement _userManagement = UserManagement(_userManagementAddr);
             _userManagementContractAddress = address(_userManagement);
+            _userManagement.setAdministrator(address(this));
         }
     }
     
     function getCryptoravesTokenAddress() public view returns(address){
-        TokenManagement _tokenManager = TokenManagement(_tokenManagerContractAddress);
-        return _tokenManager.getCryptoravesTokenAddress();
+        TokenManagement _tokenManagement = TokenManagement(_tokenManagementContractAddress);
+        return _tokenManagement.getCryptoravesTokenAddress();
     } 
 
-    function getTokenManagerAddress() public view returns(address) {
-        return _tokenManagerContractAddress;
+    function getTokenManagementAddress() public view returns(address) {
+        return _tokenManagementContractAddress;
     }
 
-    function changeTokenManagerAddress(address _newAddr) public onlyAdmin {
-        _tokenManagerContractAddress = _newAddr;
+    function changeTokenManagementAddress(address _newAddr) public onlyAdmin {
+        _tokenManagementContractAddress = _newAddr;
         emit TokenManagementAddressChange(_newAddr);
     } 
     
@@ -119,7 +121,7 @@ contract TransactionManagement is AdministrationContract {
             uint256 _tokenId;
             address _userAccount;
             
-            TokenManagement _tokenManager = TokenManagement(_tokenManagerContractAddress);
+            TokenManagement _tokenManagement = TokenManagement(_tokenManagementContractAddress);
             
             //transfer type check
             if(_twitterIds[2] == 0){
@@ -134,13 +136,13 @@ contract TransactionManagement is AdministrationContract {
                     
                     
                     //get token by ticker name
-                    address _addr = _tokenManager.getTickerAddress(_twitterNames[2]);
-                    _tokenId = _tokenManager.getManagedTokenIdByAddress(_addr);
+                    address _addr = _tokenManagement.getTickerAddress(_twitterNames[2]);
+                    _tokenId = _tokenManagement.getManagedTokenIdByAddress(_addr);
                     
                     
                 } else {
                     //No third party given, user transfer using thier dropped tokens
-                    _tokenId = _tokenManager.getManagedTokenIdByAddress(_userAccount);
+                    _tokenId = _tokenManagement.getManagedTokenIdByAddress(_userAccount);
                 }
                 
                 
@@ -152,7 +154,7 @@ contract TransactionManagement is AdministrationContract {
                 
                 require(_userAccount!=address(0), 'Third party token given--with username method--does not exist in system');
                     //not a dropped token attempted to be transferred. Check for 
-                _tokenId = _tokenManager.getManagedTokenIdByAddress(_userAccount);
+                _tokenId = _tokenManagement.getManagedTokenIdByAddress(_userAccount);
                 
             }
             
@@ -170,9 +172,9 @@ contract TransactionManagement is AdministrationContract {
         //init account
         address _userAddress = _userManagement.userAccountCheck(_platformUserId,_twitterHandleFrom,_imageUrl);
         
-        TokenManagement _tokenManager = TokenManagement(_tokenManagerContractAddress);
+        TokenManagement _tokenManagement = TokenManagement(_tokenManagementContractAddress);
         
-        _tokenManager.dropCrypto(_userAddress, _standardMintAmount, _standardMintAmount, '');
+        _tokenManagement.dropCrypto(_userAddress, _standardMintAmount, _standardMintAmount, '');
         
         _userManagement.setDropState(_platformUserId);
         
@@ -182,13 +184,13 @@ contract TransactionManagement is AdministrationContract {
     function getTokenIdFromPlatformId(uint256 _platformId) public view returns(uint256) {
         
         UserManagement _userManagement = UserManagement(_userManagementContractAddress);
-        TokenManagement _tokenManager = TokenManagement(_tokenManagerContractAddress);
+        TokenManagement _tokenManagement = TokenManagement(_tokenManagementContractAddress);
         
         address _userAccount = _userManagement.getUserAccount(_platformId);
 
         require(_userAccount != address(0), 'User account does not exist');
 
-        return _tokenManager.getManagedTokenIdByAddress(
+        return _tokenManagement.getManagedTokenIdByAddress(
             _userAccount
         );
     }
