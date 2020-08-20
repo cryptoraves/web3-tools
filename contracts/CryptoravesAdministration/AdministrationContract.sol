@@ -9,14 +9,9 @@ contract AdministrationContract {
     * Legit list of admin addresses 
     */
     mapping(address => bool) internal _administrators;
-    address public parentContract;
     
     event NewAdministrator(address indexed _newAdminAddr, address indexed _fromContractAddr);
     event RemovedAdministrator(address indexed _oldAdminAddr, address indexed _fromContractAddr);
-    
-    constructor () public {
-        parentContract = msg.sender;
-    }
     
     /*
     * Require msg.sender to be administrator
