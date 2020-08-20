@@ -126,11 +126,6 @@ contract TokenManagement is  ERCDepositable, IERC721Receiver {
         
     }
     
-    function managedTransfer(address _from, address _to, uint256 _id,  uint256 _val, bytes memory _data) public onlyAdmin {
-        IERC1155(_cryptoravesTokenAddr).safeTransferFrom(_from, _to, _id, _val, _data);
-        _checkHeldToken(_to, _id);
-    }
-    
     function getTotalSupply(uint256 _tokenId) public view returns(uint256){
         address _tokenAddr = tokenListById[_tokenId];
         return managedTokenListByAddress[_tokenAddr].totalSupply;
@@ -198,7 +193,7 @@ contract TokenManagement is  ERCDepositable, IERC721Receiver {
         }
         return false;
     }
-    function _checkHeldToken(address _addr, uint256 _tokenId) internal {
+    function _checkHeldToken(address _addr, uint256 _tokenId) public onlyAdmin {
         if(!_findHeldToken(_addr, _tokenId)){
             heldTokenIds[_addr].push(_tokenId);
         }

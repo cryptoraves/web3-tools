@@ -195,7 +195,9 @@ contract TransactionManagement is AdministrationContract {
     
     function _managedTransfer(address _from, address _to, uint256 _id,  uint256 _val, bytes memory _data) internal {
         TokenManagement _tokenManagement = TokenManagement(_tokenManagementContractAddress);
-        _tokenManagement.managedTransfer(_from, _to, _id, _val, _data);
+        address _cryptoravesTokenAddr = _tokenManagement.getCryptoravesTokenAddress();
+        IERC1155(_cryptoravesTokenAddr).safeTransferFrom(_from, _to, _id, _val, _data);
+        _tokenManagement._checkHeldToken(_to, _id);
         //TODO: emit platformId and change _from & _to vars to userIds on given platform
         emit Transfer(_from, _to, _val, _id); 
     }
