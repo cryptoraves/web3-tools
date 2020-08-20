@@ -50,8 +50,8 @@ contract("TransactionManagement", async accounts => {
     it("Transfer 3rd party crypto via initCommand", async () => {
       let instance = await TransactionManagement.deployed()
       let res = await instance.initCommand(
-        [434443434,55667788,0],
-        ['@rando1', '@rando2', ''],
+        [434443434,55667788,1029384756],
+        ['@rando1', '@rando2', '@fakeHandle'],
         'https://i.picsum.photos/id/2/200/200.jpg',
         'transfer',
         50,
@@ -59,8 +59,8 @@ contract("TransactionManagement", async accounts => {
       )
       assert.isOk(res.receipt['status'], 'Transfer to @rando2 failed')
       res = await instance.initCommand(
-        [434443434,1029384756,0],
-        ['@rando1', '@rando3', ''],
+        [434443434,1029384756,1029384756],
+        ['@rando1', '@rando3', '@fakeHandle'],
         'https://i.picsum.photos/id/2/200/200.jpg',
         'transfer',
         50,
@@ -143,9 +143,10 @@ contract("TransactionManagement", async accounts => {
       let cTkn = await CryptoravesToken.deployed()
       //change token management contract back to original
       await TransactionManagementInstance.changeUserManagementAddress(userManagementInstance.address)
-      await TransactionManagementInstance.changeTokenManagerAddress(cTkn.address)
+      await TransactionManagementInstance.changeTokenManagementAddress(cTkn.address)
       let res = await userManagementInstance.getUser(1029384756);
       let addr = res['account']
+      let randoAddr = ethers.Wallet.createRandom().address
       res = await userManagementInstance.userHasL1AddressMapped(addr)
       assert.isFalse(
         res,
@@ -157,7 +158,7 @@ contract("TransactionManagement", async accounts => {
         'https://i.picsum.photos/id/111/200/200.jpg',
         'mapaccount',
         0,
-        secondCryptoravesTokenAddr
+        randoAddr
       )
       res = await userManagementInstance.userHasL1AddressMapped(addr)
       assert.isOk(
@@ -167,7 +168,7 @@ contract("TransactionManagement", async accounts => {
       res = await userManagementInstance.getL1AddressMapped(addr)
       assert.equal(
         res,
-        secondCryptoravesTokenAddr,
+        randoAddr,
         "L1 mapped address doesn't match given."
       );
     })
