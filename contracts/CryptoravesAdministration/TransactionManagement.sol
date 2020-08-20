@@ -34,7 +34,6 @@ contract TransactionManagement is AdministrationContract {
         } else {
             TokenManagement _tokenManagement = TokenManagement(_tokenManagementContractAddress);
             _tokenManagementContractAddress = address(_tokenManagement);
-            _tokenManagement.setAdministrator(address(this));
         }
         
         if (_userManagementAddr == address(0)){
@@ -44,7 +43,6 @@ contract TransactionManagement is AdministrationContract {
         } else {
             UserManagement _userManagement = UserManagement(_userManagementAddr);
             _userManagementContractAddress = address(_userManagement);
-            _userManagement.setAdministrator(address(this));
         }
     }
     
