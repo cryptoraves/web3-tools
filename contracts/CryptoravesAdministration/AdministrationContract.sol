@@ -6,9 +6,10 @@ import "./AdministrationContract.sol";
 contract AdministrationContract {
 
     /*
-    * Legit list of admin addresses 
+    * Legit list of admin addresses & loopable array
     */
     mapping(address => bool) internal _administrators;
+    address [] internal _administratorList;
     
     event NewAdministrator(address indexed _newAdminAddr, address indexed _fromContractAddr);
     event RemovedAdministrator(address indexed _oldAdminAddr, address indexed _fromContractAddr);

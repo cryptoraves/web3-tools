@@ -65,7 +65,7 @@ contract("ValidatorInterfaceContract", async accounts => {
     });
     it("verify transaction manager address is valid", async () => {
       let instance = await ValidatorInterfaceContract.deployed()
-      let txnManagerAddr = await instance.getTransactionManager()
+      let txnManagerAddr = await instance.getTransactionManagementAddress()
       
       assert.notEqual('0x0000000000000000000000000000000000000000', txnManagerAddr, "Token Manager Address is zero address")
       assert.lengthOf(
@@ -79,7 +79,7 @@ contract("ValidatorInterfaceContract", async accounts => {
       let instance = await ValidatorInterfaceContract.deployed()
 
       let instanceTransactionManagement = await TransactionManagement.at(
-        await instance.getTransactionManager()
+        await instance.getTransactionManagementAddress()
       )
       let instanceTokenManagement = await TokenManagement.at(
         await instanceTransactionManagement.getTokenManagementAddress()
@@ -142,8 +142,8 @@ contract("ValidatorInterfaceContract", async accounts => {
         secondTokenManagerAddr = ethers.Wallet.createRandom().address
       }
 
-      let res = await instance.changeTransactionManager(secondTokenManagerAddr) 
-      let transactionManagerAddr = await instance.getTransactionManager()
+      let res = await instance.getTransactionManagementAddress(secondTokenManagerAddr) 
+      let transactionManagerAddr = await instance.getTransactionManagementAddress()
       assert.equal(
         transactionManagerAddr,
         secondTokenManagerAddr,

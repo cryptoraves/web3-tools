@@ -3,6 +3,7 @@ pragma solidity 0.6.10;
 pragma experimental ABIEncoderV2;
 
 import "./WalletFull.sol";
+import "./TransactionManagement.sol";
 
 contract UserManagement is AdministrationContract {
     
@@ -18,12 +19,10 @@ contract UserManagement is AdministrationContract {
         bool dropped;
         uint256 tokenId;
     }
-    
-    address private _txnMgmt;
 
     event NewUser(uint256 _userId, address _address, string imageUrl);
-
     event HandleChange(uint256 _userId, string _handle);
+    event ImageChange(uint256 _userId, string imageUrl);
     
     //maps platform user id to User object
     mapping(uint256 => User) public users;
@@ -35,30 +34,30 @@ contract UserManagement is AdministrationContract {
     mapping(string => uint256) public userIDs;
     
     constructor() public {
-        //default managers include parent contract and ValidatorInterfaceContract Owner
-        _txnMgmt = msg.sender;
-        _administrators[_txnMgmt] = true;
+        //default administrators include parent contract and ValidatorInterfaceContract Owner
+        _administrators[msg.sender] = true;
         _administrators[tx.origin] = true;
     }
+    
     function getUserId(address _account) public view returns(uint256) {
-        
         return userAccounts[_account];
     }
+    
     function getUserAccount(uint256 _userId) public view returns(address) {
-        
         return users[_userId].account;
     }
 
-    function getTransactionManagerAddr() public view returns(address) {
-        return _txnMgmt;
+    function getTransactionManagerAddress() public view returns(address) {
+        return _findTransactionManagementAddress();
     }
-    function changeTransactionManagerAddr(address _newAddr) public onlyAdmin{
-        _txnMgmt = _newAddr;
+    
+    function changeTransactionManagerAddress(address _newAddr) public onlyAdmin{
+        //TODO: _transactionManagementAddress = _newAddr;
     }
     
     function launchL2Account(uint256 _userId, string memory _twitterHandleFrom, string memory _imageUrl) public onlyAdmin returns (address) {
         //launch a managed wallet
-        WalletFull receiver = new WalletFull(_txnMgmt);
+        WalletFull receiver = new WalletFull(getTransactionManagerAddress());
         
          //create a new user
         User memory user;
@@ -109,6 +108,7 @@ contract UserManagement is AdministrationContract {
         }
         return true;
     }
+    
     function getL1AddressMapped(address _userCryptoravesAddr) public view returns(address){
        return WalletFull(_userCryptoravesAddr).getLayerOneAccount();
     }
@@ -140,6 +140,23 @@ contract UserManagement is AdministrationContract {
     
     function setDropState(uint256 _platformUserId) public onlyAdmin returns (address) {
         users[_platformUserId].dropped = true;
+    }
+    /*
+    * Admin Address Looper for hook functionality
+    */
+    function _findTransactionManagementAddress() internal view onlyAdmin returns(address){
+        require(_administratorList.length < 1000, 'List of administrators is too damn long!');
+        
+        for (uint i=0; i<_administratorList.length; i++) {
+            
+            try TransactionManagement(_administratorList[i]).testForTransactionManagementAddressUniquely() {
+                return _administratorList[i];
+            } catch (bytes memory reason) {
+                reason;
+            }
+        }
+        
+        revert('No TransactionManagementAddress found!');
     }
     
     function _stringsMatch (string memory a, string memory b) internal pure returns (bool) {

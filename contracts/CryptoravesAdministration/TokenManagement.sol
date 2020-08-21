@@ -37,10 +37,6 @@ contract TokenManagement is  ERCDepositable, IERC721Receiver {
         _administrators[tx.origin] = true;
         CryptoravesToken newCryptoravesToken = new CryptoravesToken(_uri);
         _cryptoravesTokenAddr = address(newCryptoravesToken);
-        
-        //set zero token
-        //_addTokenToManagedTokenList(address(0), 0, 0);
-        
     }
     
     function getCryptoravesTokenAddress() public view returns(address) {
@@ -98,6 +94,7 @@ contract TokenManagement is  ERCDepositable, IERC721Receiver {
         return _1155tokenId;
 
     }
+    
     function depositERC721(uint256 _tokenId, address _token) public payable returns(uint256){
         _depositERC721(_tokenId, _token);
         
@@ -144,7 +141,11 @@ contract TokenManagement is  ERCDepositable, IERC721Receiver {
         return managedTokenListByAddress[_tokenOriginAddr].managedTokenId;
     }
     
-    function _addTokenToManagedTokenList(address _token, uint ercType, uint256 _totalSupply) internal {
+    function getTokenListCount() public view returns(uint count) {
+        return tokenListById.length;
+    }
+    
+    function _addTokenToManagedTokenList(address _token, uint ercType, uint256 _totalSupply) private onlyAdmin{
         tokenListById.push(_token);
         
         ManagedToken memory _mngTkn;
@@ -157,10 +158,6 @@ contract TokenManagement is  ERCDepositable, IERC721Receiver {
         }
         
         managedTokenListByAddress[_token] = _mngTkn;
-    }
-    
-    function getTokenListCount() public view returns(uint count) {
-        return tokenListById.length;
     }
     
     function _mint( address account, uint256 id, uint256 amount, bytes memory data) private onlyAdmin {
@@ -185,7 +182,7 @@ contract TokenManagement is  ERCDepositable, IERC721Receiver {
             if (heldTokenIds[_addr][i] == _tokenId){
                 return true;
             }
-            /*move to a transfer function
+            /*move to a transfer function?
             //maintenance. remove if empty
             if(balanceOf(_addr, _tokenId) == 0){
                 _removeHeldToken(_addr, i);
@@ -193,16 +190,19 @@ contract TokenManagement is  ERCDepositable, IERC721Receiver {
         }
         return false;
     }
+    
     function _checkHeldToken(address _addr, uint256 _tokenId) public onlyAdmin {
         if(!_findHeldToken(_addr, _tokenId)){
             heldTokenIds[_addr].push(_tokenId);
         }
     }
-    function _removeHeldToken(address _addr, uint index)  internal {
+    
+    function _removeHeldToken(address _addr, uint index) private onlyAdmin {
         require(index < heldTokenIds[_addr].length);
         heldTokenIds[_addr][index] = heldTokenIds[_addr][heldTokenIds[_addr].length-1];
         delete heldTokenIds[_addr][heldTokenIds[_addr].length-1];
     }
+    
     function getHeldTokenIds(address _addr) public view returns(uint256[] memory){
         return heldTokenIds[_addr];
     }
@@ -220,7 +220,6 @@ contract TokenManagement is  ERCDepositable, IERC721Receiver {
             heldTokenIds[_addr]
         );
     }
-    
     
     //required for use with safeTransfer in ERC721
     function onERC721Received(address, address, uint256, bytes memory) public virtual override returns (bytes4) {

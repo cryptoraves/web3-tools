@@ -5,7 +5,7 @@ pragma experimental ABIEncoderV2;
 import "./TransactionManagement.sol";
 
 /*  
-    Oracle data corridor. Oracle addresses must be set as administrators.
+    Oracle data corridor. Oracle address(es) must be set as administrator.
 */
 contract ValidatorInterfaceContract is AdministrationContract {
     
@@ -17,26 +17,26 @@ contract ValidatorInterfaceContract is AdministrationContract {
     
     event NewTransactionManager(address indexed _managementAddr);
     
-    //owner can validate by default. Can later revoke self by unsetValidator()
+    //owner is administrator ("validator") by default. Can later revoke self by unsetValidator()
     constructor(string memory _uri, address _legacyTransactionManagementAddr, address _legacyUserManagementAddr) public {
         
         //set default validator
-         _administrators[msg.sender] = true;
+        _administrators[msg.sender] = true;
          
-         //launch token Manager
-         TransactionManagement _txnManager = new TransactionManagement(_uri, _legacyTransactionManagementAddr, _legacyUserManagementAddr);
+        //launch token Manager
+        TransactionManagement _txnManager = new TransactionManagement(_uri, _legacyTransactionManagementAddr, _legacyUserManagementAddr);
          
-         //set default token manager address
-         _transactionManager = address(_txnManager);
-         
-         emit NewTransactionManager(_transactionManager);
+        //set default token manager address
+        _transactionManager = address(_txnManager);
+        
+        emit NewTransactionManager(_transactionManager);
     }
     
     
     /*
     * Get token manager address
     */
-    function getTransactionManager() public view onlyAdmin returns(address) {
+    function getTransactionManagementAddress() public view onlyAdmin returns(address) {
         return _transactionManager;
     }
 
@@ -44,7 +44,7 @@ contract ValidatorInterfaceContract is AdministrationContract {
     * Change token manager address
     * @param newTransactionManager is the address of new Token Manager
     */
-    function changeTransactionManager(address newTransactionManager) public onlyAdmin {
+    function changeTransactionManagementAddress(address newTransactionManager) public onlyAdmin {
         
         require(_transactionManager != newTransactionManager);
         _transactionManager = newTransactionManager;

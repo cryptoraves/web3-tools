@@ -13,7 +13,7 @@ contract TransactionManagement is AdministrationContract {
     
     address private _tokenManagementContractAddress;
     address private _userManagementContractAddress;
-    uint256 private _standardMintAmount = 1000000000000000000000000000; //18 decimal adjusted standard amount (1 billion)
+    uint256 private _standardMintAmount = 1000000000000000000000000000; //18-decimal adjusted standard amount (1 billion)
     
     event Transfer(address indexed _from, address indexed _to, uint256 _value, uint256 _tokenId);
     
@@ -23,10 +23,11 @@ contract TransactionManagement is AdministrationContract {
 
     constructor(string memory _uri, address _tokenManagementAddr, address _userManagementAddr) public {
         
-        //default managers include parent contract and ValidatorInterfaceContract Owner
+        //default administrators include parent contract and its owner
         _administrators[msg.sender] = true;
         _administrators[tx.origin] = true;
         
+        //launch child contracts if no address arguments specified
         if (_tokenManagementAddr == address(0)){
             //launch new Cryptoraves Token contract
             TokenManagement _tokenManagement = new TokenManagement(_uri);
@@ -45,12 +46,11 @@ contract TransactionManagement is AdministrationContract {
             _userManagementContractAddress = address(_userManagement);
         }
     }
+    //unique function for identifying this contract
+    function testForTransactionManagementAddressUniquely() public pure returns(bool){
+        return true;
+    }
     
-    function getCryptoravesTokenAddress() public view returns(address){
-        TokenManagement _tokenManagement = TokenManagement(_tokenManagementContractAddress);
-        return _tokenManagement.getCryptoravesTokenAddress();
-    } 
-
     function getTokenManagementAddress() public view returns(address) {
         return _tokenManagementContractAddress;
     }
@@ -69,6 +69,10 @@ contract TransactionManagement is AdministrationContract {
         emit UserManagementAddressChange(_newAddr); 
     } 
     
+    function getCryptoravesTokenAddress() public view returns(address){
+        TokenManagement _tokenManagement = TokenManagement(_tokenManagementContractAddress);
+        return _tokenManagement.getCryptoravesTokenAddress();
+    } 
      /*
     * check incoming parsed Tweet data for valid command
     * @param _twitterIds [0] = twitterIdFrom, [1] = twitterIdTo, [2] = twitterIdThirdParty
@@ -198,7 +202,7 @@ contract TransactionManagement is AdministrationContract {
         address _cryptoravesTokenAddr = _tokenManagement.getCryptoravesTokenAddress();
         IERC1155(_cryptoravesTokenAddr).safeTransferFrom(_from, _to, _id, _val, _data);
         _tokenManagement._checkHeldToken(_to, _id);
-        //TODO: emit platformId and change _from & _to vars to userIds on given platform
+        //TODO: emit platformId and change _from & _to vars to userIds and/or handles on given platform
         emit Transfer(_from, _to, _val, _id); 
     }
     
@@ -207,6 +211,7 @@ contract TransactionManagement is AdministrationContract {
         bytes memory b3 = bytes(s);
         return b3;
     }
+    
     function parseAddr(string memory _a) public pure returns (address _parsedAddress) {
         bytes memory tmp = bytes(_a);
         uint160 iaddr = 0;

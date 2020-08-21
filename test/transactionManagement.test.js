@@ -122,7 +122,7 @@ contract("TransactionManagement", async accounts => {
         //assign new usermanagement and re-run above tests
         let usrMgmt = await UserManagement.deployed()
         await usrMgmt.setAdministrator(instance.address)
-        await usrMgmt.changeTransactionManagerAddr(instance.address)
+        await usrMgmt.changeTransactionManagerAddress(instance.address)
         secondUserManagerAddr = usrMgmt.address
       }else{
         secondUserManagerAddr = ethers.Wallet.createRandom().address
