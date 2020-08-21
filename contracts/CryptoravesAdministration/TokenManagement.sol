@@ -3,6 +3,7 @@ pragma solidity 0.6.10;
 
 import "./ERCDepositable.sol";
 import "./CryptoravesToken.sol";
+import "./TransactionManagement.sol";
 import "/home/cartosys/www/openzeppelin-contracts/contracts/token/ERC721/IERC721Receiver.sol";
 
 contract TokenManagement is  ERCDepositable, IERC721Receiver {
@@ -38,9 +39,14 @@ contract TokenManagement is  ERCDepositable, IERC721Receiver {
         _cryptoravesTokenAddr = address(newCryptoravesToken);
     }
     
+    function getTransactionManagerAddress() public view returns(address) {
+        return _findTransactionManagementAddress();
+    }
+    
     function getCryptoravesTokenAddress() public view returns(address) {
         return _cryptoravesTokenAddr;
     }
+    
     function changeCryptoravesTokenAddress(address newAddr) public onlyAdmin {
         _cryptoravesTokenAddr = newAddr;
     }
@@ -218,6 +224,21 @@ contract TokenManagement is  ERCDepositable, IERC721Receiver {
             _accounts,
             heldTokenIds[_addr]
         );
+    }
+    
+    function _findTransactionManagementAddress() internal view returns(address){
+        require(_administratorList.length < 1000, 'List of administrators is too damn long!');
+        
+        for (uint i=0; i<_administratorList.length; i++) {
+            
+            try TransactionManagement(_administratorList[i]).testForTransactionManagementAddressUniquely() {
+                return _administratorList[i];
+            } catch (bytes memory reason) {
+                reason;
+            }
+        }
+        
+        revert('No TransactionManagementAddress found!');
     }
     
     //required for use with safeTransfer in ERC721
