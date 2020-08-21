@@ -10,19 +10,17 @@ let fakeUrl = 'http://test.uri/101'
 
 contract("UserManagement", async accounts => {
 	it("create an account", async () => {
-	    let instance = await UserManagement.deployed()
-	    let tknMgmt = await TransactionManagement.deployed()
+		let txnMgmt = await TransactionManagement.deployed()
+	    let instance = await UserManagement.at(
+	    	await txnMgmt.getUserManagementAddress()
+	    )
 
-	    instance.changeTransactionManagerAddress(tknMgmt.address)
-	    tknMgmt.changeUserManagementAddress(instance.address)
-	    
 	    let res = await instance.launchL2Account(
 	    	fakeTwitterId, 
 	    	fakeTwitterHandle, 
 	    	fakeUrl
 	    )
-	    
-	    userAccount = res.logs[0]['args']['_address']
+	    userAccount = await instance.getUserAccount(fakeTwitterId)
 	    assert.notEqual('0x0000000000000000000000000000000000000000', userAccount, "Token Manager Address is zero address")
 	    assert.lengthOf(
 	      userAccount,
@@ -31,7 +29,10 @@ contract("UserManagement", async accounts => {
 	    )
   	})
 	it('check getUserAccount & getUserId functions', async () => {
-		let instance = await UserManagement.deployed()
+		let txnMgmt = await TransactionManagement.deployed()
+	    let instance = await UserManagement.at(
+	    	await txnMgmt.getUserManagementAddress()
+	    )
 		let userId = await instance.getUserId(userAccount)
 		let accountCheck = await instance.getUserAccount(userId)
 
@@ -42,7 +43,10 @@ contract("UserManagement", async accounts => {
 		)
 	})
 	it('check getUserId from Handle', async () => {
-		let instance = await UserManagement.deployed()
+		let txnMgmt = await TransactionManagement.deployed()
+	    let instance = await UserManagement.at(
+	    	await txnMgmt.getUserManagementAddress()
+	    )
 		let userId = await instance.getUserIdByPlatformHandle(fakeTwitterHandle)
 		let account = await instance.getUser(userId)
 
@@ -53,7 +57,10 @@ contract("UserManagement", async accounts => {
 		)
 	})
 	it("verify transaction manager address is valid", async () => {
-		let instance = await UserManagement.deployed()
+		let txnMgmt = await TransactionManagement.deployed()
+	    let instance = await UserManagement.at(
+	    	await txnMgmt.getUserManagementAddress()
+	    )
 		let transactionManagerAddr = await instance.getTransactionManagerAddress.call()
 
 		assert.notEqual('0x0000000000000000000000000000000000000000', transactionManagerAddr, "Token Manager Address is zero address")
@@ -64,7 +71,10 @@ contract("UserManagement", async accounts => {
 		)
 	})
 	it('user account check w/ existing user', async () => {
-		let instance = await UserManagement.deployed()
+		let txnMgmt = await TransactionManagement.deployed()
+	    let instance = await UserManagement.at(
+	    	await txnMgmt.getUserManagementAddress()
+	    )
 	    let res = await instance.getUser(fakeTwitterId)
 
 	    assert.equal(res.account, userAccount, 'User account lookup doesn\'t match')

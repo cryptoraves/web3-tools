@@ -142,7 +142,7 @@ contract("ValidatorInterfaceContract", async accounts => {
         secondTokenManagerAddr = ethers.Wallet.createRandom().address
       }
 
-      let res = await instance.getTransactionManagementAddress(secondTokenManagerAddr) 
+      let res = await instance.changeTransactionManagementAddress(secondTokenManagerAddr) 
       let transactionManagerAddr = await instance.getTransactionManagementAddress()
       assert.equal(
         transactionManagerAddr,
