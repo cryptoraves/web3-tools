@@ -31,7 +31,6 @@ contract WalletFull is ERC1155Receiver, Ravepool {
         //setManager 
         IERC1155(_cryptoravesTokenAddress).setApprovalForAll(_txnManagerAddress, true);
         _transactionManagementAddress = _txnManagerAddress;
-        setAdministrator(msg.sender);
         setAdministrator(_txnManagerAddress);
     }
 

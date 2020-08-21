@@ -35,7 +35,6 @@ contract UserManagement is AdministrationContract {
     
     constructor() public {
         //default administrators include parent contract and ValidatorInterfaceContract Owner
-        setAdministrator(msg.sender);
         setAdministrator(tx.origin);
     }
     

@@ -1,208 +1,81 @@
-const ValidatorInterfaceContract = artifacts.require("ValidatorInterfaceContract")
+// SPDX-License-Identifier: MIT
+pragma solidity 0.6.10;
+pragma experimental ABIEncoderV2;
 
-const TransactionManagement = artifacts.require("TransactionManagement");
-const TokenManagement = artifacts.require("TokenManagement");
-const UserManagement = artifacts.require("UserManagement");
+import "./TransactionManagement.sol";
 
-const ethers = require('ethers')
+/*  
+    Oracle data corridor. Oracle address(es) must be set as administrator.
+*/
+contract ValidatorInterfaceContract is AdministrationContract {
+    
+    using SafeMath for uint256;
+    using Address for address;
 
-let secondTokenManagerAddr = ''
-let ids = []
-let amounts = []
-let primaryUserId = 38845343252
+    //token manager contract address
+    address private _transactionManager;
+    
+    event NewTransactionManager(address indexed _managementAddr);
+    
+    //owner is administrator ("validator") by default. Can later revoke self by unsetValidator()
+    constructor(string memory _uri, address _legacyTransactionManagementAddr, address _legacyUserManagementAddr) public {
 
-contract("ValidatorInterfaceContract", async accounts => {
-  
-  //for iterateing through second token contract assignment
-  for (var i = 0; i < 2; i++) {  
-    it("Drop crypto", async () => {
-      let instance = await ValidatorInterfaceContract.deployed()
-  	var bytes = ethers.utils.formatBytes32String('')
-      let res = await instance.validateCommand(
-      	[primaryUserId,0,0],
-      	['@fakeHandle', '', ''],
-      	'https://i.picsum.photos/id/1/200/200.jpg',
-      	'launch',
-      	0,
-      	bytes
-      )
-      assert.isOk(res);
-    });
-    it("Transfer dropped crypto", async () => {
-      let instance = await ValidatorInterfaceContract.deployed()
-  	var bytes = ethers.utils.formatBytes32String('')
-      let res = await instance.validateCommand(
-      	[primaryUserId,434443434,0],
-      	['@fakeHandle', '@rando1', ''],
-      	'https://i.picsum.photos/id/1/200/200.jpg',
-      	'transfer',
-      	200,
-      	bytes
-      )
-      assert.isOk(res.receipt['status']);
-    });
-    it("Transfer 3rd party crypto", async () => {
-      let instance = await ValidatorInterfaceContract.deployed()
-  	var bytes = ethers.utils.formatBytes32String('')
-      let res = await instance.validateCommand(
-      	[434443434,55667788,0],
-      	['@rando1', '@rando2', ''],
-      	'https://i.picsum.photos/id/2/200/200.jpg',
-      	'transfer',
-      	50,
-      	bytes
-      )
-      assert.isOk(res.receipt['status']);
-      res = await instance.validateCommand(
-      	[434443434,primaryUserId,0],
-      	['@rando1', '@rando2', ''],
-      	'https://i.picsum.photos/id/2/200/200.jpg',
-      	'transfer',
-      	50,
-      	bytes
-      )
-      assert.isOk(res.receipt['status']);
-    });
-    it("verify transaction manager address is valid", async () => {
-      let instance = await ValidatorInterfaceContract.deployed()
-      let txnManagerAddr = await instance.getTransactionManagementAddress()
-      
-      assert.notEqual('0x0000000000000000000000000000000000000000', txnManagerAddr, "Token Manager Address is zero address")
-      assert.lengthOf(
-        txnManagerAddr,
-        42,
-        "Token Manager Address not valid: "+txnManagerAddr
-      );
-    });
+        //launch token Manager
+        TransactionManagement _txnManager = new TransactionManagement(_uri, _legacyTransactionManagementAddr, _legacyUserManagementAddr);
+         
+        //set default token manager address
+        _transactionManager = address(_txnManager);
+        
+        emit NewTransactionManager(_transactionManager);
+    }
+    
+    
+    /*
+    * Get token manager address
+    */
+    function getTransactionManagementAddress() public view onlyAdmin returns(address) {
+        return _transactionManager;
+    }
 
-    it("get held token balances", async () => {
-      let instance = await ValidatorInterfaceContract.deployed()
-
-      let instanceTransactionManagement = await TransactionManagement.at(
-        await instance.getTransactionManagementAddress()
-      )
-      let instanceTokenManagement = await TokenManagement.at(
-        await instanceTransactionManagement.getTokenManagementAddress()
-      )
-      let instanceUserManagement = await UserManagement.at(
-        await instanceTransactionManagement.getUserManagementAddress()
-      )
-      
-      //generate dummy data
-      let randoAddr = ''
-      let bytes = ethers.utils.formatBytes32String('')
-      for(i=0; i < 5; i++){
-        ids[i] = getRandomInt(100000000, 200000000)
-        let rInt = getRandomInt(1, 999999999).toString()+'.0'
-
-        amounts[i] = ethers.utils.parseUnits(rInt,18)
-        let uri = 'https://i.picsum.photos/id/'+ids[i].toString()+'/200/200.jpg'
-        await instance.validateCommand([ids[i],0,0], ['@rando'+ids[i].toString(), '', ''], uri, 'launch', 0, bytes)
-        await instance.validateCommand([ids[i],primaryUserId,0], ['@rando'+ids[i].toString(), '@fakeHandle', ''], uri, 'transfer', amounts[i], bytes)
-      }
-      let primaryUserAccount = await instanceUserManagement.getUserAccount(primaryUserId)
-      let heldIds = await instanceTokenManagement.getHeldTokenIds(
-        primaryUserAccount
-      )
-      assert.isAbove(heldIds.length, 0, 'No held token ids returned.')
-      let tokenId, userAddr;
-      for(i=0; i < 5; i++){
-        userAddr = await instanceUserManagement.getUserAccount(ids[i])
-        tokenId = await instanceTokenManagement.getManagedTokenIdByAddress(userAddr)
-        switch(i){
-          case 0: assert.equal(tokenId.toString(), heldIds[i+1].toString(), 'heldid corresponding to id0 does not match'); break;
-          case 1: assert.equal(tokenId.toString(), heldIds[i+1].toString(), 'heldid corresponding to id1 does not match'); break;
-          case 2: assert.equal(tokenId.toString(), heldIds[i+1].toString(), 'heldid corresponding to id2 does not match'); break;
-          case 3: assert.equal(tokenId.toString(), heldIds[i+1].toString(), 'heldid corresponding to id3 does not match'); break;
-          case 4: assert.equal(tokenId.toString(), heldIds[i+1].toString(), 'heldid corresponding to id4 does not match'); break;
-          
-        }
-      }
-      let balances = await instanceTokenManagement.getHeldTokenBalances(primaryUserAccount)
-      assert.isAbove(balances.length, 0, 'No held token ids returned.')
-      for(i=0; i < balances.length; i++){
-        switch(i){
-          case 0: assert.equal(amounts[i].toString(), balances[i+1].toString(), 'transferred balance0 does not match'); break;
-          case 1: assert.equal(amounts[i].toString(), balances[i+1].toString(), 'transferred balance1 does not match'); break;
-          case 2: assert.equal(amounts[i].toString(), balances[i+1].toString(), 'transferred balance2 does not match'); break;
-          case 3: assert.equal(amounts[i].toString(), balances[i+1].toString(), 'transferred balance3 does not match'); break;
-          case 4: assert.equal(amounts[i].toString(), balances[i+1].toString(), 'transferred balance4 does not match'); break;
-
-        }
-      }
-    })
-    it("set a new transactionManager and check it", async () => {
-      let instance = await ValidatorInterfaceContract.deployed()
-
-      if(secondTokenManagerAddr==''){
-        let txnMgmt = await TransactionManagement.deployed()
-        await txnMgmt.setAdministrator(instance.address)
-        secondTokenManagerAddr = txnMgmt.address
-      }else{
-        secondTokenManagerAddr = ethers.Wallet.createRandom().address
-      }
-
-      let res = await instance.getTransactionManagementAddress(secondTokenManagerAddr) 
-      let transactionManagerAddr = await instance.getTransactionManagementAddress()
-      assert.equal(
-        transactionManagerAddr,
-        secondTokenManagerAddr,
-        "changeTokenManager failed with random wallet.address as input"
-      );
-    });
-  }
-    it("verify sender is admin", async () => {
-      let instance = await ValidatorInterfaceContract.deployed()
-      let isValidator = await instance.isAdministrator.call()
-      assert.isOk(
-        isValidator,
-        "isValidator failed with main address as msg.sender"
-      );
-    });
-    it("revert since different sender is not admin", async () => {
-      let instance = await ValidatorInterfaceContract.deployed()
-      let isValidator
-      try{
-      	isValidator = await instance.isAdministrator.call({from: ethers.Wallet.createRandom().address})
-      	assert.isOk(!isValidator, "isAdmin failing. revert")
-      }catch(e){
-      	//reverts as predicted
-      	assert.isOk(true)
-      }
-    });
-    it("set a new administrator and check it", async () => {
-      let instance = await ValidatorInterfaceContract.deployed()
-
-      let wallet = ethers.Wallet.createRandom()
-
-      let res = await instance.setAdministrator(wallet.address) 
-      let isValidator = await instance.isAdministrator.call({ from: wallet.address })
-      assert.isOk(
-        isValidator,
-        "isValidator failed with random wallet.address as msg.sender"
-      );
-    });
-    it("should UNSET a new administrator and check it", async () => {
-      let instance = await ValidatorInterfaceContract.deployed()
-
-      let wallet = ethers.Wallet.createRandom()
-
-      let res = await instance.setAdministrator(wallet.address) 
-      assert.isOk(res)
-      res = await instance.unsetAdministrator(wallet.address) 
-      
-      try{
-      	isValidator = await instance.isAdministrator.call({ from: wallet.address })
-      	assert.isOk(!isValidator, "unsetValidator failing. Should revert")
-      }catch(e){
-      	//reverts as predicted
-      	assert.isOk(true)
-      }
-    });
-
-});
-function getRandomInt(min, max) {
-    min = Math.ceil(min);
-    max = Math.floor(max);
-    return Math.floor(Math.random() * (max - min + 1)) + min;
+    /*
+    * Change token manager address
+    * @param newTransactionManager is the address of new Token Manager
+    */
+    function changeTransactionManagementAddress(address newTransactionManager) public onlyAdmin {
+        
+        require(_transactionManager != newTransactionManager);
+        _transactionManager = newTransactionManager;
+        emit NewTransactionManager(_transactionManager);
+    }
+    
+    /*
+    * check incoming parsed Tweet data for valid command
+    * @param _twitterIds [1] = twitterIdFrom, [2] = twitterIdTo, [3] = twitterIdThirdParty
+    * @param _twitterNames [1] = twitterHandleFrom, [2] = twitterHandleTo, [3] = thirdPartyName
+    * @param _fromImgUrl The Twitter img of initiating user
+    * @param _txnType lstring indicating type of transaction:
+            "launch" = new toke n launch
+            "transfer" =  token transfer
+    * @param _value amount or id of token to transfer
+    * @param _data bytes value for ERC721 & 1155 txns
+    */ 
+    function validateCommand(
+        uint256[] memory _twitterIds,
+        string[] memory _twitterNames,
+        string memory _fromImageUrl,
+        string memory _txnType, 
+        uint256 _value,
+        string memory _data
+    ) public onlyAdmin {
+        
+        TransactionManagement transactionManager = TransactionManagement(_transactionManager);
+        
+        transactionManager.initCommand(_twitterIds, _twitterNames, _fromImageUrl, _txnType, _value, _data);
+        /*
+        *  Consider using the Token Manager Contract to host view functions for validating.
+        *  Also see if view functions can return a function type that can then be executed 
+        *  from here if valid.
+        */
+    }
+    
 }
