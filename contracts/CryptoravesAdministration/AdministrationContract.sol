@@ -36,6 +36,7 @@ contract AdministrationContract {
     */
     function setAdministrator(address _newAdmin) public onlyAdmin {
         _administrators[_newAdmin] = true;
+        _administratorList.push(_newAdmin);
         emit NewAdministrator(_newAdmin, address(this));
     }
     
