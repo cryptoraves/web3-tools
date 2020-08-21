@@ -11,8 +11,8 @@ contract CryptoravesToken is ERC1155, AdministrationContract {
     
     constructor(string memory _uri) ERC1155(_uri) public {
         //default managers include parent contract and ValidatorInterfaceContract Owner
-        _administrators[msg.sender] = true;
-        _administrators[tx.origin] = true;
+        setAdministrator(msg.sender);
+        setAdministrator(tx.origin);
     }
  /*   
     function _beforeTokenTransfer(

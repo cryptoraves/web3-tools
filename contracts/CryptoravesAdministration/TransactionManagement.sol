@@ -24,8 +24,8 @@ contract TransactionManagement is AdministrationContract {
     constructor(string memory _uri, address _tokenManagementAddr, address _userManagementAddr) public {
         
         //default administrators include parent contract and its owner
-        _administrators[msg.sender] = true;
-        _administrators[tx.origin] = true;
+        setAdministrator(msg.sender);
+        setAdministrator(tx.origin);
         
         //launch child contracts if no address arguments specified
         if (_tokenManagementAddr == address(0)){

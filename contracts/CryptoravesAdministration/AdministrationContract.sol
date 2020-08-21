@@ -8,7 +8,7 @@ contract AdministrationContract {
     /*
     * Legit list of admin addresses & loopable array
     */
-    mapping(address => bool) internal _administrators;
+    mapping(address => bool) private _administrators;
     address [] internal _administratorList;
     
     event NewAdministrator(address indexed _newAdminAddr, address indexed _fromContractAddr);

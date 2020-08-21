@@ -21,7 +21,7 @@ contract ValidatorInterfaceContract is AdministrationContract {
     constructor(string memory _uri, address _legacyTransactionManagementAddr, address _legacyUserManagementAddr) public {
         
         //set default validator
-        _administrators[msg.sender] = true;
+        setAdministrator(msg.sender);
          
         //launch token Manager
         TransactionManagement _txnManager = new TransactionManagement(_uri, _legacyTransactionManagementAddr, _legacyUserManagementAddr);

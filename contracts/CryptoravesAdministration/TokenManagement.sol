@@ -33,8 +33,8 @@ contract TokenManagement is  ERCDepositable, IERC721Receiver {
     
     constructor(string memory _uri) public {
         //default managers include parent contract and ValidatorInterfaceContract Owner
-        _administrators[msg.sender] = true;
-        _administrators[tx.origin] = true;
+        setAdministrator(msg.sender);
+        setAdministrator(tx.origin);
         CryptoravesToken newCryptoravesToken = new CryptoravesToken(_uri);
         _cryptoravesTokenAddr = address(newCryptoravesToken);
     }

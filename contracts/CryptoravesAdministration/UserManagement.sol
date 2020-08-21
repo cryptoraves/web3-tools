@@ -35,8 +35,8 @@ contract UserManagement is AdministrationContract {
     
     constructor() public {
         //default administrators include parent contract and ValidatorInterfaceContract Owner
-        _administrators[msg.sender] = true;
-        _administrators[tx.origin] = true;
+        setAdministrator(msg.sender);
+        setAdministrator(tx.origin);
     }
     
     function getUserId(address _account) public view returns(uint256) {

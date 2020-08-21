@@ -7,12 +7,7 @@ import "./AdministrationContract.sol";
 contract ERCDepositable is AdministrationContract {
     
     mapping(string => address) public tokenAddressesByTicker;
-    
-    constructor() internal {
-        
-    }
-    
-    
+
     function getTickerAddress(string memory _ticker) external view returns (address) {
        
         return tokenAddressesByTicker[_ticker];
