@@ -14,6 +14,11 @@ contract AdministrationContract {
     event NewAdministrator(address indexed _newAdminAddr, address indexed _fromContractAddr);
     event RemovedAdministrator(address indexed _oldAdminAddr, address indexed _fromContractAddr);
     
+    constructor() public {
+        _administrators[msg.sender] = true;
+        _administratorList.push(msg.sender);
+    }
+    
     /*
     * Require msg.sender to be administrator
     */
