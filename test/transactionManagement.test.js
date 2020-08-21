@@ -4,6 +4,7 @@ const ethers = require('ethers')
 
 const UserManagement = artifacts.require("UserManagement")
 let secondUserManagerAddr = ''
+let secondTokenManagerAddr = ''
 const TokenManagement = artifacts.require("TokenManagement")
 
 
@@ -115,35 +116,15 @@ contract("TransactionManagement", async accounts => {
         "User management contract Address not valid: "+tokenContractAddr
       )
     })
-    it("set a new userManagement address and check it", async () => {
-      let instance = await TransactionManagement.deployed()
-
-      if(secondUserManagerAddr == ''){
-        //assign new usermanagement and re-run above tests
-        let usrMgmt = await UserManagement.deployed()
-        await usrMgmt.setAdministrator(instance.address)
-        await usrMgmt.changeTransactionManagerAddress(instance.address)
-        secondUserManagerAddr = usrMgmt.address
-      }else{
-        secondUserManagerAddr = ethers.Wallet.createRandom().address
-      }
-
-      let res = await instance.changeUserManagementAddress(secondUserManagerAddr) 
-      let userMgmtTokenAddress = await instance.getUserManagementAddress.call()
-      assert.equal(
-        userMgmtTokenAddress,
-        secondUserManagerAddr,
-        "changeUserManagementAddress failed with secondUserManagerAddr as input"
-      )
-    })
-  }
-  it("test heresmyaddress functions", async () => {
-      let userManagementInstance = await UserManagement.deployed()
+    it("test heresmyaddress functions", async () => {
       let TransactionManagementInstance = await TransactionManagement.deployed()
-      let cTkn = await TokenManagement.deployed()
+      let userManagementInstance = await UserManagement.at(
+        await TransactionManagementInstance.getUserManagementAddress()
+      )  
+      let cTkn = await TokenManagement.at(
+        await TransactionManagementInstance.getTokenManagementAddress()
+      )
       //change token management contract back to original
-      await TransactionManagementInstance.changeUserManagementAddress(userManagementInstance.address)
-      await TransactionManagementInstance.changeTokenManagementAddress(cTkn.address)
       let res = await userManagementInstance.getUser(1029384756);
       let addr = res['account']
       let randoAddr = ethers.Wallet.createRandom().address
@@ -173,6 +154,37 @@ contract("TransactionManagement", async accounts => {
         "L1 mapped address doesn't match given."
       );
     })
+    it("set a new userManagement & TokenManagement address and check it", async () => {
+      let instance = await TransactionManagement.deployed()
+      let usrMgmt = await UserManagement.deployed()
+      let tknMgmt = await TokenManagement.deployed()
+      
+      if(secondUserManagerAddr == ''){
+        //assign new usermanagement and re-run above tests
+        await usrMgmt.setAdministrator(instance.address)
+        secondUserManagerAddr = usrMgmt.address
+        await tknMgmt.setAdministrator(instance.address)
+        secondTokenManagerAddr = tknMgmt.address
+      }else{
+console.log('here')
+        await usrMgmt.unsetAdministrator(await usrMgmt.getTransactionManagerAddress())
+        secondUserManagerAddr = ethers.Wallet.createRandom().address
+console.log('here1')
+        await tknMgmt.unsetAdministrator(await tknMgmt.getTransactionManagerAddress())
+        secondTokenManagerAddr = ethers.Wallet.createRandom().address
+      }
+console.log('herex')
+      await instance.changeUserManagementAddress(secondUserManagerAddr) 
+      await instance.changeTokenManagementAddress(secondTokenManagerAddr) 
+      let userMgmtTokenAddress = await instance.getUserManagementAddress.call()
+      assert.equal(
+        userMgmtTokenAddress,
+        secondUserManagerAddr,
+        "changeUserManagementAddress failed with secondUserManagerAddr as input"
+      )
+    })
+  }
+  
   /*it("ravepool activation & distribution", async () => {
     let userManagementInstance = await UserManagement.deployed()
     let TransactionManagementInstance = await TransactionManagement.deployed()
