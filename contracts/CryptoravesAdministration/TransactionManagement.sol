@@ -56,8 +56,6 @@ contract TransactionManagement is AdministrationContract {
 
     function changeTokenManagementAddress(address _newAddr) public onlyAdmin {
         _tokenManagementContractAddress = _newAddr;
-        TokenManagement _tknMgmt = TokenManagement(_tokenManagementContractAddress);
-        _tknMgmt.setAdministrator(address(this));
         emit TokenManagementAddressChange(_newAddr);
     } 
     
@@ -67,8 +65,6 @@ contract TransactionManagement is AdministrationContract {
 
     function changeUserManagementAddress(address _newAddr) public onlyAdmin {
         _userManagementContractAddress = _newAddr;
-        UserManagement _usrMgmt = UserManagement(_userManagementContractAddress);
-        _usrMgmt.setAdministrator(address(this));
         emit UserManagementAddressChange(_newAddr); 
     } 
     
