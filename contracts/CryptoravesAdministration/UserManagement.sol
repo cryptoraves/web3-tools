@@ -23,6 +23,7 @@ contract UserManagement is AdministrationContract {
     event NewUser(uint256 _userId, address _address, string imageUrl);
     event HandleChange(uint256 _userId, string _handle);
     event ImageChange(uint256 _userId, string imageUrl);
+    event ErrorHandle(string functionName, address addrAttempted, bytes reason);
     
     //maps platform user id to User object
     mapping(uint256 => User) public users;
@@ -152,7 +153,7 @@ contract UserManagement is AdministrationContract {
             try TransactionManagement(_administratorList[i]).testForTransactionManagementAddressUniquely() {
                 return _administratorList[i];
             } catch (bytes memory reason) {
-                reason;
+                emit ErrorHandle('_findTransactionManagementAddress', _administratorList[i], reason);
             }
         }
         
