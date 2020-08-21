@@ -24,7 +24,6 @@ contract TransactionManagement is AdministrationContract {
     constructor(string memory _uri, address _tokenManagementAddr, address _userManagementAddr) public {
         
         //default administrators include parent contract and its owner
-        setAdministrator(msg.sender);
         setAdministrator(tx.origin);
         
         //launch child contracts if no address arguments specified
@@ -57,6 +56,8 @@ contract TransactionManagement is AdministrationContract {
 
     function changeTokenManagementAddress(address _newAddr) public onlyAdmin {
         _tokenManagementContractAddress = _newAddr;
+        TokenManagement _tknMgmt = TokenManagement(_tokenManagementContractAddress);
+        _tknMgmt.setAdministrator(address(this));
         emit TokenManagementAddressChange(_newAddr);
     } 
     
@@ -66,6 +67,8 @@ contract TransactionManagement is AdministrationContract {
 
     function changeUserManagementAddress(address _newAddr) public onlyAdmin {
         _userManagementContractAddress = _newAddr;
+        UserManagement _usrMgmt = UserManagement(_userManagementContractAddress);
+        _usrMgmt.setAdministrator(address(this));
         emit UserManagementAddressChange(_newAddr); 
     } 
     
