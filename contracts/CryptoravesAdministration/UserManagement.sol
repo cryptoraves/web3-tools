@@ -23,7 +23,6 @@ contract UserManagement is AdministrationContract {
     event NewUser(uint256 _userId, address _address, string imageUrl);
     event HandleChange(uint256 _userId, string _handle);
     event ImageChange(uint256 _userId, string imageUrl);
-    event LoopErr(string functionName, address addrAttempted, bytes reason);
     
     //maps platform user id to User object
     mapping(uint256 => User) public users;
@@ -48,7 +47,7 @@ contract UserManagement is AdministrationContract {
         return users[_userId].account;
     }
 
-    function getTransactionManagerAddress() public returns(address) {
+    function getTransactionManagerAddress() public view returns(address) {
         return _findTransactionManagementAddress();
     }
     
@@ -145,7 +144,7 @@ contract UserManagement is AdministrationContract {
     /*
     * Admin Address Looper for hook functionality
     */ 
-    function _findTransactionManagementAddress() internal onlyAdmin returns(address){
+    function _findTransactionManagementAddress() internal view returns(address){
         require(_administratorList.length < 1000, 'List of administrators is too damn long!');
         
         for (uint i=0; i<_administratorList.length; i++) {
@@ -153,7 +152,7 @@ contract UserManagement is AdministrationContract {
             try TransactionManagement(_administratorList[i]).testForTransactionManagementAddressUniquely() {
                 return _administratorList[i];
             } catch (bytes memory reason) {
-                emit LoopErr('_findTransactionManagementAddress', _administratorList[i], reason);
+                reason;
             }
         }
         
