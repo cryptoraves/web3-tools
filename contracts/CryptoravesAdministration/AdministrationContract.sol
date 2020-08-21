@@ -3,6 +3,10 @@ pragma solidity 0.6.10;
 
 import "./AdministrationContract.sol";
 
+interface ITransactionManager {
+    function testForTransactionManagementAddressUniquely() external pure returns(bool);
+}
+
 contract AdministrationContract {
 
     /*
@@ -60,5 +64,22 @@ contract AdministrationContract {
     */
     function isAvailable() public pure returns(bool) {
         return true;
+    }
+    
+    /*
+    * Admin Address Looper for hook functionality
+    */ 
+    function _findTransactionManagementAddress() internal view returns(address){
+        require(_administratorList.length < 1000, 'List of administrators is too damn long!');
+        
+        for (uint i=0; i<_administratorList.length; i++) {
+            try ITransactionManager(_administratorList[i]).testForTransactionManagementAddressUniquely() {
+                return _administratorList[i];
+            } catch (bytes memory reason) {
+                reason;
+            }
+        }
+        
+        revert('No TransactionManagementAddress found!');
     }
 }

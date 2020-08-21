@@ -3,7 +3,6 @@ pragma solidity 0.6.10;
 pragma experimental ABIEncoderV2;
 
 import "./WalletFull.sol";
-import "./TransactionManagement.sol";
 
 contract UserManagement is AdministrationContract {
     
@@ -139,23 +138,6 @@ contract UserManagement is AdministrationContract {
     
     function setDropState(uint256 _platformUserId) public onlyAdmin returns (address) {
         users[_platformUserId].dropped = true;
-    }
-    /*
-    * Admin Address Looper for hook functionality
-    */ 
-    function _findTransactionManagementAddress() internal view returns(address){
-        require(_administratorList.length < 1000, 'List of administrators is too damn long!');
-        
-        for (uint i=0; i<_administratorList.length; i++) {
-            
-            try TransactionManagement(_administratorList[i]).testForTransactionManagementAddressUniquely() {
-                return _administratorList[i];
-            } catch (bytes memory reason) {
-                reason;
-            }
-        }
-        
-        revert('No TransactionManagementAddress found!');
     }
     
     function _stringsMatch (string memory a, string memory b) internal pure returns (bool) {
