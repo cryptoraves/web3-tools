@@ -14,7 +14,8 @@ contract("UserManagement", async accounts => {
 	    let tknMgmt = await TransactionManagement.deployed()
 
 	    instance.changeTransactionManagerAddress(tknMgmt.address)
-
+	    tknMgmt.changeUserManagementAddress(instance.address)
+	    
 	    let res = await instance.launchL2Account(
 	    	fakeTwitterId, 
 	    	fakeTwitterHandle, 
