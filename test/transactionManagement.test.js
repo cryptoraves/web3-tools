@@ -166,16 +166,11 @@ contract("TransactionManagement", async accounts => {
         await tknMgmt.setAdministrator(instance.address)
         secondTokenManagerAddr = tknMgmt.address
       }else{
-        
-console.log(await usrMgmt.getTransactionManagerAddress())        
-console.log('here')
         await usrMgmt.unsetAdministrator(await usrMgmt.getTransactionManagerAddress())
         secondUserManagerAddr = ethers.Wallet.createRandom().address
-console.log('here1')
         await tknMgmt.unsetAdministrator(await tknMgmt.getTransactionManagerAddress())
         secondTokenManagerAddr = ethers.Wallet.createRandom().address
       }
-console.log('herex')
       await instance.changeUserManagementAddress(secondUserManagerAddr) 
       await instance.changeTokenManagementAddress(secondTokenManagerAddr) 
       let userMgmtTokenAddress = await instance.getUserManagementAddress.call()
