@@ -180,6 +180,7 @@ contract TransactionManagement is AdministrationContract {
         _userManagement.setDropState(_platformUserId);
         
         return _userAddress;
+
     }
 
     function getTokenIdFromPlatformId(uint256 _platformId) public view returns(uint256) {

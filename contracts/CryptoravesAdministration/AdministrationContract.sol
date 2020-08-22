@@ -17,6 +17,7 @@ contract AdministrationContract {
     
     event NewAdministrator(address indexed _newAdminAddr, address indexed _fromContractAddr);
     event RemovedAdministrator(address indexed _oldAdminAddr, address indexed _fromContractAddr);
+    event ErrorHandled(string reason);
     
     constructor() public {
         //default validator is set to sender
@@ -73,13 +74,28 @@ contract AdministrationContract {
         require(_administratorList.length < 1000, 'List of administrators is too damn long!');
         
         for (uint i=0; i<_administratorList.length; i++) {
-            try ITransactionManager(_administratorList[i]).testForTransactionManagementAddressUniquely() {
-                return _administratorList[i];
-            } catch (bytes memory reason) {
-                reason;
+            //first, ensure _administrator is set to true 
+            if(_administrators[_administratorList[i]]){
+                //check if address is a contract
+                if( isContract(_administratorList[i])){
+                    //first instantiate existing contract
+                    ITransactionManager iTxnMgmt = ITransactionManager(_administratorList[i]);    
+                    //then try to run its function
+                    try iTxnMgmt.testForTransactionManagementAddressUniquely() {
+                        return _administratorList[i];
+                    } catch {}
+                }
             }
         }
         
         revert('No TransactionManagementAddress found!');
+    }
+    //for checking if address is a contract or not
+    function isContract(address _addr) private view returns (bool){
+      uint32 size;
+      assembly {
+        size := extcodesize(_addr)
+      }
+      return (size > 0);
     }
 }

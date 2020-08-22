@@ -158,7 +158,7 @@ contract("TransactionManagement", async accounts => {
       let instance = await TransactionManagement.deployed()
       let usrMgmt = await UserManagement.deployed()
       let tknMgmt = await TokenManagement.deployed()
-      
+
       if(secondUserManagerAddr == ''){
         //assign new usermanagement and re-run above tests
         await usrMgmt.setAdministrator(instance.address)
@@ -166,6 +166,8 @@ contract("TransactionManagement", async accounts => {
         await tknMgmt.setAdministrator(instance.address)
         secondTokenManagerAddr = tknMgmt.address
       }else{
+        
+console.log(await usrMgmt.getTransactionManagerAddress())        
 console.log('here')
         await usrMgmt.unsetAdministrator(await usrMgmt.getTransactionManagerAddress())
         secondUserManagerAddr = ethers.Wallet.createRandom().address
