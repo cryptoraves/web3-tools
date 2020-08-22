@@ -225,6 +225,29 @@ contract("TokenManagement", async accounts => {
   	assert.isOk(await instanceTokenManagement.isManagedToken(erc721Instance.address))
   	assert.isOk(await instanceTokenManagement.isManagedToken(erc20Instance.address))
   })
+  it("get totalSupply() of ERC20 & 721", async() => {
+      let instanceTokenManagement = await TokenManagement.deployed()
+      let erc20Instance = await ERC20Full.deployed()
+      let erc721Instance = await ERC721Full.deployed()
+
+      let tokenId1155 = await instanceTokenManagement.getManagedTokenIdByAddress(erc20Instance.address)
+      let erc1155TotSupply = await instanceTokenManagement.getTotalSupply(tokenId1155)
+      let erc20TotSupply = await erc20Instance.totalSupply()
+      assert.equal(
+        erc1155TotSupply.toString(),
+        erc20TotSupply.toString(),
+        "ERC20 Total supply doesn't match"
+      )
+      tokenId1155 = await instanceTokenManagement.getManagedTokenIdByAddress(erc721Instance.address)
+      erc1155TotSupply = await instanceTokenManagement.getTotalSupply(tokenId1155)
+      let erc721TotSupply = await erc721Instance.totalSupply()
+      assert.equal(
+        erc1155TotSupply.toString(),
+        erc721TotSupply.toString(),
+        "ERC721 Total supply doesn't match"
+      )
+
+  })
   it("get managed token id by address", async () => {
   	let instanceTokenManagement = await TokenManagement.deployed()
   	let erc721Instance = await ERC721Full.deployed()
