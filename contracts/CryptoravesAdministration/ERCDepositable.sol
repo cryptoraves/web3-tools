@@ -69,5 +69,5 @@ interface IERCuni is IERC20 {
     //adding erc721 function for minimilaization of inhereitances
     function safeTransferFrom(address from, address to, uint256 tokenId) external;
     function symbol() external view returns(string memory);
-    function totalSupply() external view returns (uint256);
+    function totalSupply() external view override returns (uint256);
 }

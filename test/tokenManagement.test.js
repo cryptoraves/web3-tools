@@ -45,9 +45,10 @@ contract("TokenManagement", async accounts => {
 		initialEthBalance
 	).toString()
 
-    let res = await instanceTokenManagement.depositERC20(
+    let res = await instanceTokenManagement.deposit(
     	formatttedWeiAmt, 
     	zeroAddr,
+      20, //indicates ERC20
     	{
     		from: accounts[0],
     		value: formatttedWeiAmt
@@ -135,9 +136,10 @@ contract("TokenManagement", async accounts => {
     	instanceTokenManagement.address,
     	ethers.utils.parseUnits('987654321',18)
     )
-    await instanceTokenManagement.depositERC20(
+    await instanceTokenManagement.deposit(
     	ethers.utils.parseUnits('987654321',18), 
-    	erc20Instance.address
+    	erc20Instance.address,
+      20 //indicates ERC20
     )
     let tokenId1155 = await instanceTokenManagement.getManagedTokenIdByAddress(erc20Instance.address)
 
@@ -177,9 +179,10 @@ contract("TokenManagement", async accounts => {
     	instanceTokenManagement.address,
     	0
     )
-    await instanceTokenManagement.depositERC721(
+    await instanceTokenManagement.deposit(
     	0,
-    	erc721Instance.address
+    	erc721Instance.address,
+      721 //indicates ERC721
     )
     let tokenId1155 = await instanceTokenManagement.getManagedTokenIdByAddress(erc721Instance.address)
     let instanceCryptoravesToken = await CryptoravesToken.at(
