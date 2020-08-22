@@ -8,8 +8,12 @@ contract ERCDepositable is AdministrationContract {
     
     mapping(string => address) public tokenAddressesByTicker;
 
+    function getTotalSupplyOf3rdPartyToken(address _tknAddr) public view returns (uint256) {
+        IERCuni token = IERCuni(_tknAddr);
+        return token.totalSupply();
+    }
+    
     function getTickerAddress(string memory _ticker) external view returns (address) {
-       
         return tokenAddressesByTicker[_ticker];
     }
     
