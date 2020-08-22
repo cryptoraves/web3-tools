@@ -27,8 +27,8 @@ contract TokenManagement is  ERCDepositable, IERC721Receiver {
     //list of held 1155 token ids
     mapping(address => uint256[]) public heldTokenIds;
     
-    event Deposit(address indexed _from, uint256 _value, address indexed _token, uint256 indexed cryptoravesTokenId);
-    event Withdraw(address indexed _to, uint256 _value, address indexed _token, uint256 indexed cryptoravesTokenId);
+    event Deposit(address indexed _from, uint256 _value, address indexed _token, uint256 indexed cryptoravesTokenId), uint _ercType;
+    event Withdraw(address indexed _to, uint256 _value, address indexed _token, uint256 indexed cryptoravesTokenId, uint _ercType);
     event CryptoDropped(address user, uint256 tokenId);
     
     constructor(string memory _uri) public {
@@ -71,8 +71,33 @@ contract TokenManagement is  ERCDepositable, IERC721Receiver {
         
     }
     
+    function deposit(uint256 _amountOrId, address _token, uint _ercType) public payable returns(uint256){
+        //check if existing user
+            //1. lookup msg.sender as L1 account 
+            //2. require they are mapped to an L2 account
+
+        if(_ercType == 20){
+            _depositERC20(_amountOrId, _token);
+            _amount = _amountOrId;
+        } else {
+            _depositERC721(_amountOrId, _token);
+            _amount = 1;
+        }
+
+        if(!managedTokenListByAddress[_token].isManagedToken) {
+            _addTokenToManagedTokenList(_token, _ercType, 0);
+        }
+        
+        uint256 _1155tokenId = getManagedTokenIdByAddress(_token);
+        _mint(msg.sender, _1155tokenId, _amount, '');
+        
+        emit Deposit(msg.sender, _amountOrId, _token, _1155tokenId, _ercType);
+        
+        return _1155tokenId;
+    }
+
     function depositERC20(uint256 _amount, address _token) public payable returns(uint256){
-      
+
         _depositERC20(_amount, _token);
         if(!managedTokenListByAddress[_token].isManagedToken) {
             _addTokenToManagedTokenList(_token, 20, 0);
