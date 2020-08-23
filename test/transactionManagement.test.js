@@ -147,7 +147,7 @@ contract("TransactionManagement", async accounts => {
         res,
         "Issue checking L1 Mapped address. Random address should now be assigned but isn't."
       );
-      res = await userManagementInstance.getL1AddressMapped(addr)
+      res = await userManagementInstance.getLayerOneAccount(addr)
       assert.equal(
         res,
         randoAddr,
