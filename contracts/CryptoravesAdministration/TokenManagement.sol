@@ -3,7 +3,7 @@ pragma solidity 0.6.10;
 
 import "./ERCDepositable.sol";
 import "./CryptoravesToken.sol";
-import "https://github.com/OpenZeppelin/openzeppelin-contracts/contracts/token/ERC721/IERC721Receiver.sol";
+import "/home/cartosys/www/openzeppelin-contracts/contracts/token/ERC721/IERC721Receiver.sol";
 
 contract TokenManagement is  ERCDepositable, IERC721Receiver {
     
