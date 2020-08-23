@@ -28,6 +28,9 @@ contract UserManagement is AdministrationContract {
     
     //for looking up user from account address
     mapping(address => uint256) public userAccounts;
+    
+    //for getting users' Layer 1 accounts. L2 => L1
+    mapping(address => address) public layerOneAccounts;
 
     //for looking up platform ID from handle
     mapping(string => uint256) public userIDs;
@@ -76,6 +79,25 @@ contract UserManagement is AdministrationContract {
         return address(receiver);
     }
     
+    function mapLayerOneAccount(address _l2Addr, address _l1Addr) public onlyAdmin {
+        
+        require(layerOneAccounts[_l2Addr] == address(0), "User already mapped an L1 account");
+        
+        WalletFull l2Wallet = WalletFull(_l2Addr);
+        l2Wallet.setAdministrator(_l1Addr);
+        
+        //set L1 account as 1155 operator for this wallet
+        address _cryptoravesTokenAddress = ITokenManager(getTransactionManagerAddress()).getCryptoravesTokenAddress();
+        IERC1155(_cryptoravesTokenAddress).setApprovalForAll(_l1Addr, true);
+        
+        //set l1 address
+        layerOneAccounts[_l2Addr] = _l1Addr;
+    }
+    
+    function getLayerOneAccount(address _l2Addr) public view returns(address){
+        return layerOneAccounts[_l2Addr];
+    }
+    
     function userAccountCheck(uint256 _platformUserId, string memory _twitterHandle, string memory _imageUrl) public onlyAdmin returns (address) {
         //create a new user
         if (isUser(_platformUserId)){
@@ -100,15 +122,11 @@ contract UserManagement is AdministrationContract {
     }
     
     function userHasL1AddressMapped(address _userCryptoravesAddr) public view returns(bool){
-        address _l1 = WalletFull(_userCryptoravesAddr).getLayerOneAccount();
+        address _l1 = layerOneAccounts[_userCryptoravesAddr];
         if(_l1 == address(0)){
             return false;
         }
         return true;
-    }
-    
-    function getL1AddressMapped(address _userCryptoravesAddr) public view returns(address){
-       return WalletFull(_userCryptoravesAddr).getLayerOneAccount();
     }
     
     function isUser (uint256 _userId) public view onlyAdmin returns(bool) {

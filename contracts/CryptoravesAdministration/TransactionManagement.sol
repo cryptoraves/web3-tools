@@ -103,7 +103,7 @@ contract TransactionManagement is AdministrationContract {
             address _fromAddress = _userManagement.userAccountCheck(_twitterIds[0], _twitterNames[0], _fromImageUrl);
             address _layer1Address = parseAddr(_data);
             require(_layer1Address != address(0), 'Invalid address given for L1 account mapping');
-            WalletFull(_fromAddress).mapLayerOneAccount(_layer1Address);
+            _userManagement.mapLayerOneAccount(_fromAddress, _layer1Address);
             
             emit HeresMyAddress(_layer1Address, _fromAddress);
         }

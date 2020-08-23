@@ -19,6 +19,7 @@ interface ITokenManager {
     function getUserManagementAddress() external view returns(address);
 }
 interface UTokenManager {
+    function getLayerOneAccount(address _l2Addr) external view returns(address);
     function userHasL1AddressMapped(address _userCryptoravesAddr) external view returns(bool);
     function getUserId(address _account) external view returns(uint256);
     function dropState (uint256 _platformUserId) external view returns(bool);

@@ -21,8 +21,7 @@ contract WalletFull is ERC1155Receiver, Ravepool {
     
     using SafeMath for uint256;
     using Address for address;
-    
-    address private _mappedL1Account;
+
     address private _transactionManagementAddress;
 
     constructor(address _txnManagerAddress) public {
@@ -32,21 +31,6 @@ contract WalletFull is ERC1155Receiver, Ravepool {
         IERC1155(_cryptoravesTokenAddress).setApprovalForAll(_txnManagerAddress, true);
         _transactionManagementAddress = _txnManagerAddress;
         setAdministrator(_txnManagerAddress);
-    }
-
-
-    function getLayerOneAccount() public view onlyAdmin returns(address) {
-        return _mappedL1Account;
-    }
-    function mapLayerOneAccount(address _l1Addr) public onlyAdmin {
-        require(_mappedL1Account == address(0), "User already mapped an L1 account");
-         
-        _mappedL1Account = _l1Addr;
-        setAdministrator(_l1Addr);
-        
-        //set L1 account as 1155 operator for this wallet
-        address _cryptoravesTokenAddress = ITokenManager(_transactionManagementAddress).getCryptoravesTokenAddress();
-        IERC1155(_cryptoravesTokenAddress).setApprovalForAll(_mappedL1Account, true);
     }
 
     function onERC1155Received(address, address, uint256, uint256, bytes calldata) external override virtual returns (bytes4) {
@@ -78,8 +62,8 @@ contract WalletFull is ERC1155Receiver, Ravepool {
     }
 */    
     //for custody-less transactions originating from social media. Any action requires approval from mapped L1 account.
-    function actionItemApproval() public {
-        require(msg.sender == _mappedL1Account, 'Sender not an approved L1 account');
+    function actionItemApproval() public view {
+        //require(msg.sender == _mappedL1Account, 'Sender not an approved L1 account');
         
         //get list of action items
         
