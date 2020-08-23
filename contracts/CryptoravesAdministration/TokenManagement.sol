@@ -70,12 +70,20 @@ contract TokenManagement is  ERCDepositable, IERC721Receiver {
         emit CryptoDropped(account, _1155tokenId);
         
     }
+    function getL2AddressForManagedDeposit() private view returns(address){
+        //check if existing user:
+        ITransactionManager iTxnMgmt = ITransactionManager(getTransactionManagerAddress());
+        //1. lookup msg.sender's L2 account 
+        address _l2Addr = iTxnMgmt.getUserL2AccountFromL1Account(msg.sender);
+        //2. require they are mapped to an L2 account
+        require(_l2Addr != address(0), 'Depositor\'s L1 account not mapped to cryptoraves (L2) account');
+        return _l2Addr;
+    }
     
-    function deposit(uint256 _amountOrId, address _token, uint _ercType) public payable returns(uint256){
-        //check if existing user
-            //1. lookup msg.sender as L1 account 
-            //2. require they are mapped to an L2 account
+    function deposit(uint256 _amountOrId, address _token, uint _ercType, bool _managedTransfer) public payable returns(uint256){
+        
         uint256 _amount;
+        address _mintTo;
         if(_ercType == 20){
             _depositERC20(_amountOrId, _token);
             _amount = _amountOrId;
@@ -89,9 +97,16 @@ contract TokenManagement is  ERCDepositable, IERC721Receiver {
         }
         
         uint256 _1155tokenId = getManagedTokenIdByAddress(_token);
-        _mint(msg.sender, _1155tokenId, _amount, '');
         
-        emit Deposit(msg.sender, _amountOrId, _token, _1155tokenId, _ercType);
+        if(_managedTransfer){
+            _mintTo = getL2AddressForManagedDeposit();
+        } else {
+            _mintTo = msg.sender;
+        }
+        
+        _mint(_mintTo, _1155tokenId, _amount, '');
+        
+        emit Deposit(_mintTo, _amountOrId, _token, _1155tokenId, _ercType);
         
         return _1155tokenId;
     }

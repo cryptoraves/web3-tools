@@ -5,6 +5,8 @@ import "./AdministrationContract.sol";
 
 interface ITransactionManager {
     function testForTransactionManagementAddressUniquely() external pure returns(bool);
+    function getUserL1AccountFromL2Account(address _l2) external view returns(address);
+    function getUserL2AccountFromL1Account(address _l1) external view returns(address);
 }
 
 contract AdministrationContract {

@@ -197,6 +197,16 @@ contract TransactionManagement is AdministrationContract {
         );
     }
     
+    function getUserL1AccountFromL2Account(address _l2) public view returns(address) {
+        UserManagement _userManagement = UserManagement(_userManagementContractAddress);
+        return _userManagement.getLayerOneAccount(_l2);
+    }
+    
+    function getUserL2AccountFromL1Account(address _l1) public view returns(address) {
+        UserManagement _userManagement = UserManagement(_userManagementContractAddress);
+        return _userManagement.getLayerTwoAccount(_l1);
+    }
+    
     function _managedTransfer(address _from, address _to, uint256 _id,  uint256 _val, bytes memory _data) internal {
         TokenManagement _tokenManagement = TokenManagement(_tokenManagementContractAddress);
         address _cryptoravesTokenAddr = _tokenManagement.getCryptoravesTokenAddress();

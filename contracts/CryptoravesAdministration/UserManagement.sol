@@ -32,6 +32,9 @@ contract UserManagement is AdministrationContract {
     //for getting users' Layer 1 accounts. L2 => L1
     mapping(address => address) public layerOneAccounts;
 
+    //for getting users' Layer 2 account from Layer 1 account. L1 => L2
+    mapping(address => address) public layerTwoAccounts;
+    
     //for looking up platform ID from handle
     mapping(string => uint256) public userIDs;
     
@@ -92,10 +95,15 @@ contract UserManagement is AdministrationContract {
         
         //set l1 address
         layerOneAccounts[_l2Addr] = _l1Addr;
+        layerTwoAccounts[_l1Addr] = _l2Addr;
     }
     
     function getLayerOneAccount(address _l2Addr) public view returns(address){
         return layerOneAccounts[_l2Addr];
+    }
+    
+    function getLayerTwoAccount(address _l1Addr) public view returns(address){
+        return layerTwoAccounts[_l1Addr];
     }
     
     function userAccountCheck(uint256 _platformUserId, string memory _twitterHandle, string memory _imageUrl) public onlyAdmin returns (address) {
