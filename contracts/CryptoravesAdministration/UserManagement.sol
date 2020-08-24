@@ -50,10 +50,6 @@ contract UserManagement is AdministrationContract {
     function getUserAccount(uint256 _userId) public view returns(address) {
         return users[_userId].account;
     }
-
-    function getTransactionManagerAddress() public view returns(address) {
-        return _findTransactionManagementAddress();
-    }
     
     function changeTransactionManagerAddress(address _newAddr) public onlyAdmin{
         //TODO: _transactionManagementAddress = _newAddr;
