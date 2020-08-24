@@ -3,7 +3,7 @@ pragma solidity 0.6.10;
 
 import "./ERCDepositable.sol";
 import "./CryptoravesToken.sol";
-import "/home/cartosys/www/openzeppelin-contracts/contracts/token/ERC721/IERC721Receiver.sol";
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/contracts/token/ERC721/IERC721Receiver.sol";
 
 contract TokenManagement is  ERCDepositable, IERC721Receiver {
     
@@ -53,13 +53,16 @@ contract TokenManagement is  ERCDepositable, IERC721Receiver {
         This will reduce false account creation attacks, while allowing dapp-only launches
         
     */
-    function dropCrypto(address account, uint256 amount, uint256 _totalSupply, bytes memory data) public virtual onlyAdmin {
+    function dropCrypto(string memory _twitterHandleFrom, address account, uint256 amount, uint256 _totalSupply, bytes memory data) public virtual onlyAdmin {
         
         if(!managedTokenListByAddress[account].isManagedToken) {
             _addTokenToManagedTokenList(account, 1155, _totalSupply);
         }
 
         uint256 _1155tokenId = getManagedTokenIdByAddress(account);
+        
+        //add username as symbol/ticker
+        _checkTickerAddress(_twitterHandleFrom, account);
 
         _mint(account, _1155tokenId, amount, data);
         

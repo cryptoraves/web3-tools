@@ -175,7 +175,7 @@ contract TransactionManagement is AdministrationContract {
         
         TokenManagement _tokenManagement = TokenManagement(_tokenManagementContractAddress);
         
-        _tokenManagement.dropCrypto(_userAddress, _standardMintAmount, _standardMintAmount, '');
+        _tokenManagement.dropCrypto(_twitterHandleFrom, _userAddress, _standardMintAmount, _standardMintAmount, '');
         
         _userManagement.setDropState(_platformUserId);
         

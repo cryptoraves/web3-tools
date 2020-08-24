@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.6.10;
 
-import "/home/cartosys/www/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/IERC20.sol";
 import "./AdministrationContract.sol";
 
 contract ERCDepositable is AdministrationContract {
@@ -18,6 +18,7 @@ contract ERCDepositable is AdministrationContract {
     }
     
     function _checkTickerAddress(string memory _ticker, address _token) internal {
+        //only adds ticker if not yet taken
         if(tokenAddressesByTicker[_ticker] == address(0)){
             tokenAddressesByTicker[_ticker] = _token;
         }
