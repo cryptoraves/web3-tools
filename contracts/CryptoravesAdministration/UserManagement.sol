@@ -158,8 +158,8 @@ contract UserManagement is AdministrationContract {
       }
     }
     
-    function setDropState(uint256 _platformUserId) public onlyAdmin returns (address) {
-        users[_platformUserId].dropped = true;
+    function setDropState(uint256 _platformUserId, bool _state) public onlyAdmin returns (address) {
+        users[_platformUserId].dropped = _state;
     }
     
     function _stringsMatch (string memory a, string memory b) internal pure returns (bool) {
