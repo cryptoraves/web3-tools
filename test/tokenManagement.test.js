@@ -222,29 +222,27 @@ contract("TokenManagement", async accounts => {
     )
   })
   it("checks symbols of ERC20/721", async () => {
-    let instanceTokenManagement = await TokenManagement.deployed()
+    let tokenManagementInstance = await TokenManagement.deployed()
     let erc721Instance = await ERC721Full.deployed()
     let erc20Instance = await ERC20Full.deployed()
 
     let symbol = await tokenManagementInstance.getSymbol(
       await tokenManagementInstance.getManagedTokenIdByAddress(erc20Instance.address)
     )
-
     assert.equal(
       symbol,
-      'TKX'
+      'TKX',
       'ERC20 symbol does not match'
     )
     symbol = await tokenManagementInstance.getSymbol(
       await tokenManagementInstance.getManagedTokenIdByAddress(erc721Instance.address)
     )
-
     assert.equal(
       symbol,
-      'TKY'
+      'TKY',
       'ERC721 symbol does not match'
     )
-  }
+  })
   it("checks if both ERC20/721 token addresses are managed by contract", async () => {
   	let instanceTokenManagement = await TokenManagement.deployed()
   	let erc721Instance = await ERC721Full.deployed()
