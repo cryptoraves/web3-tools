@@ -18,7 +18,7 @@ contract("TokenManagement", async accounts => {
     let amount = ethers.utils.parseUnits('1000000000',18).toString()
 
     res = await instanceTokenManagement.dropCrypto(
-      'fakeUser1'
+      'fakeUser1',
       accounts[0],
       amount,
       amount,
