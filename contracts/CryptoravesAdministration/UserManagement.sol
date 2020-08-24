@@ -127,10 +127,7 @@ contract UserManagement is AdministrationContract {
     
     function userHasL1AddressMapped(address _userCryptoravesAddr) public view returns(bool){
         address _l1 = layerOneAccounts[_userCryptoravesAddr];
-        if(_l1 == address(0)){
-            return false;
-        }
-        return true;
+        return _l1 != address(0);
     }
     
     function isUser (uint256 _userId) public view onlyAdmin returns(bool) {
@@ -150,6 +147,7 @@ contract UserManagement is AdministrationContract {
         return users[_platformUserId].dropped;
     }
     
+    //user service function: for resetting dropstate upon request
     function setDropState(uint256 _platformUserId, bool _state) public onlyAdmin returns (address) {
         users[_platformUserId].dropped = _state;
     }
