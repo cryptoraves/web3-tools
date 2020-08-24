@@ -19,7 +19,7 @@ contract("TransactionManagement", async accounts => {
       //var bytes = ethers.utils.formatBytes32String('testing crypto drop')
       let res = await instance.initCommand(
       	[1029384756,0,0],
-      	['@fakeHandleA', '', ''],
+      	['fakeHandleA', '', ''],
       	'https://i.picsum.photos/id/111/200/200.jpg',
       	'launch',
       	0,
@@ -28,7 +28,7 @@ contract("TransactionManagement", async accounts => {
       //for next test
       res = await instance.initCommand(
       	[1029388888,0,0],
-      	['@fakeHandleB', '', ''],
+      	['fakeHandleB', '', ''],
       	'https://i.picsum.photos/id/111/201/200.jpg',
       	'launch',
       	0,
@@ -36,38 +36,57 @@ contract("TransactionManagement", async accounts => {
       )
       assert.isOk(res.receipt['status'])
     })
+    it("Test username-as-ticker lookup", async () => {
+      let TransactionManagementInstance = await TransactionManagement.deployed()
+      let userManagementInstance = await UserManagement.at(
+        await TransactionManagementInstance.getUserManagementAddress()
+      )  
+      let tokenManagementInstance = await TokenManagement.at(
+        await TransactionManagementInstance.getTokenManagementAddress()
+      )
+      let userId = await userManagementInstance.getUserIdByPlatformHandle('fakeHandleA')
+      let account = await userManagementInstance.getUserAccount(userId)
+      let symbol = await tokenManagementInstance.getSymbol(
+        await tokenManagementInstance.getManagedTokenIdByAddress(account)
+      )
+      assert.equal(
+        symbol,
+        'fakeHandleA',
+        'User Symbol matching error'
+      )
+    })
     it("Transfer dropped crypto via initCommand", async () => {
       let instance = await TransactionManagement.deployed()
       let res = await instance.initCommand(
         [1029384756,434443434,0],
-        ['@fakeHandle', '@rando1', ''],
+        ['fakeHandle', 'rando1', ''],
         'https://i.picsum.photos/id/1/200/200.jpg',
         'transfer',
         200,
         ''
       )
-      assert.isOk(res.receipt['status'], 'Transfer to @rando1 failed')
+      assert.isOk(res.receipt['status'], 'Transfer to rando1 failed')
     });
     it("Transfer 3rd party crypto via initCommand", async () => {
       let instance = await TransactionManagement.deployed()
       let res = await instance.initCommand(
         [434443434,55667788,1029384756],
-        ['@rando1', '@rando2', '@fakeHandle'],
+        ['rando1', 'rando2', 'fakeHandle'],
         'https://i.picsum.photos/id/2/200/200.jpg',
         'transfer',
         50,
         ''
       )
-      assert.isOk(res.receipt['status'], 'Transfer to @rando2 failed')
+      assert.isOk(res.receipt['status'], 'Transfer to rando2 failed')
       res = await instance.initCommand(
         [434443434,1029384756,1029384756],
-        ['@rando1', '@rando3', '@fakeHandle'],
+        ['rando1', 'rando3', 'fakeHandle'],
         'https://i.picsum.photos/id/2/200/200.jpg',
         'transfer',
         50,
         ''
       )
-      assert.isOk(res.receipt['status'], 'Transfer to @rando3 failed')
+      assert.isOk(res.receipt['status'], 'Transfer to rando3 failed')
     });
     it("get token from twitter id", async () => {
       let instance = await TransactionManagement.deployed()
@@ -135,7 +154,7 @@ contract("TransactionManagement", async accounts => {
       );
       res = await TransactionManagementInstance.initCommand(
         [1029384756,0,0],
-        ['@rando2', '', ''],
+        ['rando2', '', ''],
         'https://i.picsum.photos/id/111/200/200.jpg',
         'mapaccount',
         0,
@@ -188,7 +207,7 @@ contract("TransactionManagement", async accounts => {
 
     let res = await TransactionManagementInstance.initCommand(
       [9929387656,0,0],
-      ['@rando3', '', ''],
+      ['rando3', '', ''],
       'https://i.picsum.photos/id/333/200/200.jpg',
       'mapaccount',
       0,
@@ -196,7 +215,7 @@ contract("TransactionManagement", async accounts => {
     )
     res = await TransactionManagementInstance.initCommand(
         [9929387656,0,0],
-        ['@rando3', '', ''],
+        ['rando3', '', ''],
         'https://i.picsum.photos/id/333/200/200.jpg',
         'launch',
         0,

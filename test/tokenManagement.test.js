@@ -18,6 +18,7 @@ contract("TokenManagement", async accounts => {
     let amount = ethers.utils.parseUnits('1000000000',18).toString()
 
     res = await instanceTokenManagement.dropCrypto(
+      'fakeUser1'
       accounts[0],
       amount,
       amount,
@@ -220,6 +221,30 @@ contract("TokenManagement", async accounts => {
     	'ERC721 balance does not match after deposit'
     )
   })
+  it("checks symbols of ERC20/721", async () => {
+    let instanceTokenManagement = await TokenManagement.deployed()
+    let erc721Instance = await ERC721Full.deployed()
+    let erc20Instance = await ERC20Full.deployed()
+
+    let symbol = await tokenManagementInstance.getSymbol(
+      await tokenManagementInstance.getManagedTokenIdByAddress(erc20Instance.address)
+    )
+
+    assert.equal(
+      symbol,
+      'TKX'
+      'ERC20 symbol does not match'
+    )
+    symbol = await tokenManagementInstance.getSymbol(
+      await tokenManagementInstance.getManagedTokenIdByAddress(erc721Instance.address)
+    )
+
+    assert.equal(
+      symbol,
+      'TKY'
+      'ERC721 symbol does not match'
+    )
+  }
   it("checks if both ERC20/721 token addresses are managed by contract", async () => {
   	let instanceTokenManagement = await TokenManagement.deployed()
   	let erc721Instance = await ERC721Full.deployed()
