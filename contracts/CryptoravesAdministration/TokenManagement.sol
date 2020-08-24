@@ -38,10 +38,6 @@ contract TokenManagement is  ERCDepositable, IERC721Receiver {
         _cryptoravesTokenAddr = address(newCryptoravesToken);
     }
     
-    function getTransactionManagerAddress() public view returns(address) {
-        return _findTransactionManagementAddress();
-    }
-    
     function getCryptoravesTokenAddress() public view returns(address) {
         return _cryptoravesTokenAddr;
     }
@@ -95,7 +91,6 @@ contract TokenManagement is  ERCDepositable, IERC721Receiver {
         if(!managedTokenListByAddress[_token].isManagedToken) {
             _addTokenToManagedTokenList(_token, _ercType, 0);
         }
-        
         
         if(_token != address(0)){ //clause for ETH
             managedTokenListByAddress[_token].totalSupply = getTotalSupplyOf3rdPartyToken(_token);

@@ -72,7 +72,7 @@ contract AdministrationContract {
     /*
     * Admin Address Looper for hook functionality
     */ 
-    function _findTransactionManagementAddress() internal view returns(address){
+    function getTransactionManagerAddress() public view returns(address) {
         require(_administratorList.length < 1000, 'List of administrators is too damn long!');
         
         for (uint i=0; i<_administratorList.length; i++) {
