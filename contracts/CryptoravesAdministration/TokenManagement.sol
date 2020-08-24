@@ -3,7 +3,7 @@ pragma solidity 0.6.10;
 
 import "./ERCDepositable.sol";
 import "./CryptoravesToken.sol";
-import "/home/cartosys/www/openzeppelin-contracts/contracts/token/ERC721/IERC721Receiver.sol";
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/contracts/token/ERC721/IERC721Receiver.sol";
 
 contract TokenManagement is  ERCDepositable, IERC721Receiver {
     
@@ -145,6 +145,11 @@ contract TokenManagement is  ERCDepositable, IERC721Receiver {
     function getTotalSupply(uint256 _tokenId) public view  returns(uint256){
         address _tokenAddr = tokenListById[_tokenId];
         return managedTokenListByAddress[_tokenAddr].totalSupply;
+    }
+    
+    function getSymbol(uint256 _tokenId) public view  returns(string memory){
+        address _tokenAddr = tokenListById[_tokenId];
+        return managedTokenListByAddress[_tokenAddr].symbol;
     }
     
     function subtractFromTotalSupply(uint256 _tokenId, uint256 _amount) public onlyAdmin {
