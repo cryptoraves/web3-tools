@@ -134,11 +134,7 @@ contract UserManagement is AdministrationContract {
     }
     
     function isUser (uint256 _userId) public view onlyAdmin returns(bool) {
-      if (users[_userId].isUser) {
-          return true;
-      } else {
-          return false;
-      }
+      return users[_userId].isUser;
     }
 
     function getUser (uint256 _userId) public view onlyAdmin returns(User memory) {
@@ -150,12 +146,8 @@ contract UserManagement is AdministrationContract {
     }
     
     function dropState (uint256 _platformUserId) public view returns(bool) {
-      // can we pull from a Chainlink mapping?
-      if (users[_platformUserId].dropped) {
-          return true;
-      } else {
-          return false;
-      }
+        // can we pull from a Chainlink mapping?
+        return users[_platformUserId].dropped;
     }
     
     function setDropState(uint256 _platformUserId, bool _state) public onlyAdmin returns (address) {
