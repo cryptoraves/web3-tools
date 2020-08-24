@@ -3,7 +3,7 @@ pragma solidity 0.6.10;
 
 import "./ERCDepositable.sol";
 import "./CryptoravesToken.sol";
-import "/home/cartosys/www/openzeppelin-contracts/contracts/token/ERC721/IERC721Receiver.sol";
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/contracts/token/ERC721/IERC721Receiver.sol";
 
 contract TokenManagement is  ERCDepositable, IERC721Receiver {
     
@@ -21,6 +21,7 @@ contract TokenManagement is  ERCDepositable, IERC721Receiver {
         bool isManagedToken;
         uint ercType;
         uint256 totalSupply;
+        string symbol;
     }
     mapping(address => ManagedToken) public managedTokenListByAddress;
     
@@ -61,10 +62,12 @@ contract TokenManagement is  ERCDepositable, IERC721Receiver {
 
         uint256 _1155tokenId = getManagedTokenIdByAddress(account);
         
-        //add username as symbol/ticker
+        //add username as symbol
         _checkTickerAddress(_twitterHandleFrom, account);
 
         _mint(account, _1155tokenId, amount, data);
+        
+        managedTokenListByAddress[account].symbol = _twitterHandleFrom;
         
         emit CryptoDropped(account, _1155tokenId);
         
@@ -177,7 +180,11 @@ contract TokenManagement is  ERCDepositable, IERC721Receiver {
             //need clause for ETH
             if(address(0) != _token){
                 _mngTkn.totalSupply = getTotalSupplyOf3rdPartyToken(_token);
+                _mngTkn.symbol = getSymbolOf3rdPartyToken(_token);
             }
+        } else {
+            //assign symbol of erc1155
+            
         }
         
         managedTokenListByAddress[_token] = _mngTkn;

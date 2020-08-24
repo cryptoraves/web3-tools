@@ -1,26 +1,31 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.6.10;
 
-import "/home/cartosys/www/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/IERC20.sol";
 import "./AdministrationContract.sol";
 
 contract ERCDepositable is AdministrationContract {
     
-    mapping(string => address) public tokenAddressesByTicker;
+    mapping(string => address) public tokenAddressesBySymbol;
 
     function getTotalSupplyOf3rdPartyToken(address _tknAddr) public view returns (uint256) {
         IERCuni token = IERCuni(_tknAddr);
         return token.totalSupply();
     }
     
+    function getSymbolOf3rdPartyToken(address _tknAddr) public view returns (string memory) {
+        IERCuni token = IERCuni(_tknAddr);
+        return token.symbol();
+    }
+    
     function getTickerAddress(string memory _ticker) external view returns (address) {
-        return tokenAddressesByTicker[_ticker];
+        return tokenAddressesBySymbol[_ticker];
     }
     
     function _checkTickerAddress(string memory _ticker, address _token) internal {
         //only adds ticker if not yet taken
-        if(tokenAddressesByTicker[_ticker] == address(0)){
-            tokenAddressesByTicker[_ticker] = _token;
+        if(tokenAddressesBySymbol[_ticker] == address(0)){
+            tokenAddressesBySymbol[_ticker] = _token;
         }
     }
     
