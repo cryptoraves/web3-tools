@@ -58,6 +58,7 @@ contract ValidatorInterfaceContract is AdministrationContract {
             "transfer" =  token transfer
     * @param _value amount or id of token to transfer
     * @param _data bytes value for ERC721 & 1155 txns
+    * @param _platform social media platform id. 1=Twitter
     */ 
     function validateCommand(
         uint256[] memory _twitterIds,
@@ -65,12 +66,13 @@ contract ValidatorInterfaceContract is AdministrationContract {
         string memory _fromImageUrl,
         string memory _txnType, 
         uint256 _value,
-        string memory _data
+        string memory _data,
+        uint _platform
     ) public onlyAdmin {
         
         TransactionManagement transactionManager = TransactionManagement(_transactionManager);
         
-        transactionManager.initCommand(_twitterIds, _twitterNames, _fromImageUrl, _txnType, _value, _data);
+        transactionManager.initCommand(_twitterIds, _twitterNames, _fromImageUrl, _txnType, _value, _data, _platform);
         /*
         *  Consider using the Token Manager Contract to host view functions for validating.
         *  Also see if view functions can return a function type that can then be executed 

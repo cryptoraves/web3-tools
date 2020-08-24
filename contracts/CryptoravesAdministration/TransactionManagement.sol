@@ -81,6 +81,7 @@ contract TransactionManagement is AdministrationContract {
             "launch" = new toke n launch
             "transfer" =  token transfer
     * @param _value amount or id of token to transfer
+    * @param _platform social media platform id. 1=Twitter
     */ 
         
     function initCommand(
@@ -89,7 +90,8 @@ contract TransactionManagement is AdministrationContract {
         string memory _fromImageUrl,
         string memory _txnType, 
         uint256 _value,
-        string memory _data
+        string memory _data,
+        uint _platform
     ) onlyAdmin public returns(bool){
         
         //launch criteria
