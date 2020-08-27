@@ -4,6 +4,7 @@ const ethers = require('ethers')
 
 const TransactionManagement = artifacts.require("TransactionManagement");
 const TokenManagement = artifacts.require("TokenManagement")
+const CryptoravesToken = artifacts.require("CryptoravesToken")
 let userAccount
 let fakeTwitterId = 1230456987
 let fakeTwitterHandle = '@fakeHandleC'
@@ -99,7 +100,7 @@ contract("UserManagement", async accounts => {
 	      	''
 	    )
 	    //2. transfer some
-	    let res = await instance.initCommand(
+	    res = await TransactionManagementInstance.initCommand(
 			[fakeUserId,fakeUserId2,0],
 			['dropStateTester', 'rando1', ''],
 			'https://i.picsum.photos/id/428928374/200/200.jpg',
@@ -112,7 +113,7 @@ contract("UserManagement", async accounts => {
 		await instance.setDropState(fakeUserId, false)
 
 		//4. Drop again
-		let res = await TransactionManagementInstance.initCommand(
+		res = await TransactionManagementInstance.initCommand(
 	      	[fakeUserId,0,0],
 	      	['dropStateTesterReborn', '', ''],
 	      	'https://i.picsum.photos/id/428928374222/200/200.jpg',
@@ -121,7 +122,7 @@ contract("UserManagement", async accounts => {
 	      	''
 	    )
 		//5. transfer some again
-	    let res = await instance.initCommand(
+	    res = await TransactionManagementInstance.initCommand(
 			[fakeUserId,fakeUserId2,0],
 			['dropStateTesterReborn', 'rando1', ''],
 			'https://i.picsum.photos/id/428928374222/200/200.jpg',
@@ -129,28 +130,25 @@ contract("UserManagement", async accounts => {
 			222222222,
 			''
 		)
-
 	    //6. check new balance.
 	    let instanceTokenManagement = await TokenManagement.at(
         	await TransactionManagementInstance.getTokenManagementAddress()
     	)
-	    let wait CryptoravesToken.at(
+	    let instanceCryptoravesToken = await CryptoravesToken.at(
 	    	await instanceTokenManagement.getCryptoravesTokenAddress()
 	    )
-
 	    let user = await instance.getUser(fakeUserId)
 	    let tokenId1155 = await instanceTokenManagement.getManagedTokenIdByAddress(
 	    	user.account
 	    )
-
 	    user = await instance.getUser(fakeUserId2)
     	let balance = await instanceCryptoravesToken.balanceOf(user.account, tokenId1155)
+    	console.log(balance.toString())
 	    assert.equal(
 	    	balance,
 	    	222222222,
 	    	'Reset crypto drop failed. Resulting balance does not match'
 	    )
-
 	})
 
 
@@ -161,7 +159,10 @@ contract("UserManagement", async accounts => {
 
   //keep at bottom
   it("verify sender is admin", async () => {
-    let instance = await UserManagement.deployed()
+  	let txnMgmt = await TransactionManagement.deployed()
+    let instance = await UserManagement.at(
+	    await txnMgmt.getUserManagementAddress()
+	)
     let isValidator = await instance.isAdministrator.call()
     assert.isOk(
       isValidator,
@@ -169,7 +170,10 @@ contract("UserManagement", async accounts => {
     );
   });
   it("revert since different sender is not admin", async () => {
-    let instance = await UserManagement.deployed()
+  	let txnMgmt = await TransactionManagement.deployed()
+    let instance = await UserManagement.at(
+	    await txnMgmt.getUserManagementAddress()
+	)
     let isValidator
     try{
       isValidator = await instance.isAdministrator.call({from: ethers.Wallet.createRandom().address})
@@ -180,7 +184,10 @@ contract("UserManagement", async accounts => {
     }
   });
   it("set a new administrator and check it", async () => {
-    let instance = await UserManagement.deployed()
+  	let txnMgmt = await TransactionManagement.deployed()
+    let instance = await UserManagement.at(
+	    await txnMgmt.getUserManagementAddress()
+	)
 
     let wallet = ethers.Wallet.createRandom()
 
@@ -192,7 +199,10 @@ contract("UserManagement", async accounts => {
     );
   });
   it("should UNSET a new administrator and check it", async () => {
-    let instance = await UserManagement.deployed()
+  	let txnMgmt = await TransactionManagement.deployed()
+    let instance = await UserManagement.at(
+	    await txnMgmt.getUserManagementAddress()
+	)
 
     let wallet = ethers.Wallet.createRandom()
     
