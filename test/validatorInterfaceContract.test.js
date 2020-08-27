@@ -17,49 +17,41 @@ contract("ValidatorInterfaceContract", async accounts => {
   for (var i = 0; i < 2; i++) {  
     it("Drop crypto", async () => {
       let instance = await ValidatorInterfaceContract.deployed()
-  	var bytes = ethers.utils.formatBytes32String('')
+      var bytes = ethers.utils.formatBytes32String('')
       let res = await instance.validateCommand(
       	[primaryUserId,0,0],
       	['@fakeHandle', '', ''],
-      	'https://i.picsum.photos/id/1/200/200.jpg',
-      	'launch',
-      	0,
-      	bytes
+      	['twitter','https://i.picsum.photos/id/1/200/200.jpg','launch', bytes],
+      	0
       )
       assert.isOk(res);
     });
     it("Transfer dropped crypto", async () => {
       let instance = await ValidatorInterfaceContract.deployed()
-  	var bytes = ethers.utils.formatBytes32String('')
+  	  var bytes = ethers.utils.formatBytes32String('')
       let res = await instance.validateCommand(
       	[primaryUserId,434443434,0],
       	['@fakeHandle', '@rando1', ''],
-      	'https://i.picsum.photos/id/1/200/200.jpg',
-      	'transfer',
-      	200,
-      	bytes
+      	['twitter','https://i.picsum.photos/id/1/200/200.jpg','transfer', bytes],
+      	200
       )
       assert.isOk(res.receipt['status']);
     });
     it("Transfer 3rd party crypto", async () => {
       let instance = await ValidatorInterfaceContract.deployed()
-  	var bytes = ethers.utils.formatBytes32String('')
+      var bytes = ethers.utils.formatBytes32String('')
       let res = await instance.validateCommand(
       	[434443434,55667788,0],
       	['@rando1', '@rando2', ''],
-      	'https://i.picsum.photos/id/2/200/200.jpg',
-      	'transfer',
-      	50,
-      	bytes
+      	['twitter','https://i.picsum.photos/id/2/200/200.jpg','transfer', bytes],
+      	50
       )
       assert.isOk(res.receipt['status']);
       res = await instance.validateCommand(
       	[434443434,primaryUserId,0],
       	['@rando1', '@rando2', ''],
-      	'https://i.picsum.photos/id/2/200/200.jpg',
-      	'transfer',
-      	50,
-      	bytes
+      	['twitter','https://i.picsum.photos/id/2/200/200.jpg','transfer', bytes],
+        50
       )
       assert.isOk(res.receipt['status']);
     });
@@ -97,8 +89,8 @@ contract("ValidatorInterfaceContract", async accounts => {
 
         amounts[i] = ethers.utils.parseUnits(rInt,18)
         let uri = 'https://i.picsum.photos/id/'+ids[i].toString()+'/200/200.jpg'
-        await instance.validateCommand([ids[i],0,0], ['@rando'+ids[i].toString(), '', ''], uri, 'launch', 0, bytes)
-        await instance.validateCommand([ids[i],primaryUserId,0], ['@rando'+ids[i].toString(), '@fakeHandle', ''], uri, 'transfer', amounts[i], bytes)
+        await instance.validateCommand([ids[i],0,0], ['@rando'+ids[i].toString(), '', ''], ['twitter',uri,'launch', bytes], 0)
+        await instance.validateCommand([ids[i],primaryUserId,0], ['@rando'+ids[i].toString(), '@fakeHandle', ''], ['twitter',uri,'transfer', bytes], amounts[i])
       }
       let primaryUserAccount = await instanceUserManagement.getUserAccount(primaryUserId)
       let heldIds = await instanceTokenManagement.getHeldTokenIds(

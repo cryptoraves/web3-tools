@@ -20,19 +20,15 @@ contract("TransactionManagement", async accounts => {
       let res = await instance.initCommand(
       	[1029384756,0,0],
       	['fakeHandleA', '', ''],
-      	'https://i.picsum.photos/id/111/200/200.jpg',
-      	'launch',
-      	0,
-      	'testing crypto drop'
+      	['twitter','https://i.picsum.photos/id/111/200/200.jpg','launch','testing crypto drop'],
+      	0
       )
       //for next test
       res = await instance.initCommand(
       	[1029388888,0,0],
       	['fakeHandleB', '', ''],
-      	'https://i.picsum.photos/id/111/201/200.jpg',
-      	'launch',
-      	0,
-      	'testing crypto drop'
+      	['twitter','https://i.picsum.photos/id/112/200/200.jpg','launch','testing crypto drop'],
+      	0
       )
       assert.isOk(res.receipt['status'])
     })
@@ -60,10 +56,8 @@ contract("TransactionManagement", async accounts => {
       let res = await instance.initCommand(
         [1029384756,434443434,0],
         ['fakeHandle', 'rando1', ''],
-        'https://i.picsum.photos/id/1/200/200.jpg',
-        'transfer',
-        200,
-        ''
+        ['twitter','https://i.picsum.photos/id/1/200/200.jpg','transfer',''],
+        200
       )
       assert.isOk(res.receipt['status'], 'Transfer to rando1 failed')
     });
@@ -72,19 +66,15 @@ contract("TransactionManagement", async accounts => {
       let res = await instance.initCommand(
         [434443434,55667788,1029384756],
         ['rando1', 'rando2', 'fakeHandle'],
-        'https://i.picsum.photos/id/2/200/200.jpg',
-        'transfer',
-        50,
-        ''
+        ['twitter','https://i.picsum.photos/id/2/200/200.jpg','transfer',''],
+        50
       )
       assert.isOk(res.receipt['status'], 'Transfer to rando2 failed')
       res = await instance.initCommand(
         [434443434,1029384756,1029384756],
         ['rando1', 'rando3', 'fakeHandle'],
-        'https://i.picsum.photos/id/2/200/200.jpg',
-        'transfer',
-        50,
-        ''
+        ['twitter','https://i.picsum.photos/id/2/200/200.jpg','transfer',''],
+        50
       )
       assert.isOk(res.receipt['status'], 'Transfer to rando3 failed')
     });
@@ -155,10 +145,8 @@ contract("TransactionManagement", async accounts => {
       res = await TransactionManagementInstance.initCommand(
         [1029384756,0,0],
         ['rando2', '', ''],
-        'https://i.picsum.photos/id/111/200/200.jpg',
-        'mapaccount',
-        0,
-        randoAddr
+        ['twitter','https://i.picsum.photos/id/111/200/200.jpg','mapaccount',randoAddr],
+        0
       )
       res = await userManagementInstance.getUser(1029384756);
       res = await userManagementInstance.userHasL1AddressMapped(addr)

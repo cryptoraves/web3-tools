@@ -72,36 +72,47 @@ contract TransactionManagement is AdministrationContract {
         TokenManagement _tokenManagement = TokenManagement(_tokenManagementContractAddress);
         return _tokenManagement.getCryptoravesTokenAddress();
     } 
-     /*
+        
+    /*
     * check incoming parsed Tweet data for valid command
     * @param _twitterIds [0] = twitterIdFrom, [1] = twitterIdTo, [2] = twitterIdThirdParty
     * @param _twitterNames [0] = twitterHandleFrom, [1] = twitterHandleTo, [2] = thirdPartyName
-    * @param _fromImgUrl The Twitter img of initiating user
-    * @param _txnType lstring indicating type of transaction:
-            "launch" = new toke n launch
-            "transfer" =  token transfer
+    * @param 
     * @param _value amount or id of token to transfer
+    * @param _metaData: 
+        [0] = _platformName:
+            "twitter"
+            "instagram
+            etc
+        [1] = _txnType lstring indicating type of transaction:
+                "launch" = new toke n launch
+                "transfer" =  token transfer
+        [2] = _fromImgUrl The Twitter img of initiating user
+        [3] = _data bytes value for ERC721 & 1155 txns
     */ 
-        
     function initCommand(
         uint256[] memory _twitterIds,
         string[] memory _twitterNames,
-        string memory _fromImageUrl,
-        string memory _txnType, 
         uint256 _value,
-        string memory _data
+        string[] memory _metaData
     ) onlyAdmin public returns(bool){
+        /* reference
+        string memory _platformName = _metaData[0];
+        string memory _txnType = _metaData[1];
+        string memory _fromImageUrl = _metaData[2];
+        string memory _data = _metaData[3];
+        */
         
         //launch criteria
-        if(keccak256(bytes(_txnType)) == keccak256(bytes("launch"))){
-            _initCryptoDrop(_twitterIds[0], _twitterNames[0], _fromImageUrl);
+        if(keccak256(bytes(_metaData[1])) == keccak256(bytes("launch"))){
+            _initCryptoDrop(_twitterIds[0], _twitterNames[0], _metaData[2]);
         }
         
         //map layer 1 account
-        if(keccak256(bytes(_txnType)) == keccak256(bytes("mapaccount"))){
+        if(keccak256(bytes(_metaData[1])) == keccak256(bytes("mapaccount"))){
             UserManagement _userManagement = UserManagement(_userManagementContractAddress);
-            address _fromAddress = _userManagement.userAccountCheck(_twitterIds[0], _twitterNames[0], _fromImageUrl);
-            address _layer1Address = parseAddr(_data);
+            address _fromAddress = _userManagement.userAccountCheck(_twitterIds[0], _twitterNames[0], _metaData[2]);
+            address _layer1Address = parseAddr(_metaData[3]);
             require(_layer1Address != address(0), 'Invalid address given for L1 account mapping');
             _userManagement.mapLayerOneAccount(_fromAddress, _layer1Address);
             
@@ -109,14 +120,14 @@ contract TransactionManagement is AdministrationContract {
         }
         
         //transfers
-        if(keccak256(bytes(_txnType)) == keccak256(bytes("transfer"))){
+        if(keccak256(bytes(_metaData[1])) == keccak256(bytes("transfer"))){
             
             UserManagement _userManagement = UserManagement(_userManagementContractAddress);
             
             require(_userManagement.isUser(_twitterIds[0]), 'Initiating Twitter user is not a Cryptoraves user');
             
             //get addresses
-            address _fromAddress = _userManagement.userAccountCheck(_twitterIds[0], _twitterNames[0], _fromImageUrl);
+            address _fromAddress = _userManagement.userAccountCheck(_twitterIds[0], _twitterNames[0], _metaData[2]);
             address _toAddress = _userManagement.userAccountCheck(_twitterIds[1], _twitterNames[1], '');
             
             uint256 _tokenId;
@@ -159,7 +170,7 @@ contract TransactionManagement is AdministrationContract {
                 
             }
             
-            _managedTransfer(_fromAddress, _toAddress, _tokenId, _value, _stringToBytes(_data));
+            _managedTransfer(_fromAddress, _toAddress, _tokenId, _value, _stringToBytes(_metaData[3]));
         }
     }
     

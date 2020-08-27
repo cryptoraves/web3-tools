@@ -50,27 +50,31 @@ contract ValidatorInterfaceContract is AdministrationContract {
     
     /*
     * check incoming parsed Tweet data for valid command
-    * @param _twitterIds [1] = twitterIdFrom, [2] = twitterIdTo, [3] = twitterIdThirdParty
-    * @param _twitterNames [1] = twitterHandleFrom, [2] = twitterHandleTo, [3] = thirdPartyName
-    * @param _fromImgUrl The Twitter img of initiating user
-    * @param _txnType lstring indicating type of transaction:
-            "launch" = new toke n launch
-            "transfer" =  token transfer
+    * @param _twitterIds [0] = twitterIdFrom, [1] = twitterIdTo, [2] = twitterIdThirdParty
+    * @param _twitterNames [0] = twitterHandleFrom, [1] = twitterHandleTo, [2] = thirdPartyName
+    * @param 
     * @param _value amount or id of token to transfer
-    * @param _data bytes value for ERC721 & 1155 txns
+    * @param _metaData: 
+        [0] = _platformName:
+            "twitter"
+            "instagram
+            etc
+        [1] = _txnType lstring indicating type of transaction:
+                "launch" = new toke n launch
+                "transfer" =  token transfer
+        [2] = _fromImgUrl The Twitter img of initiating user
+        [3] = _data bytes value for ERC721 & 1155 txns
     */ 
     function validateCommand(
         uint256[] memory _twitterIds,
         string[] memory _twitterNames,
-        string memory _fromImageUrl,
-        string memory _txnType, 
         uint256 _value,
-        string memory _data
+        string[] memory _metaData
     ) public onlyAdmin {
         
         TransactionManagement transactionManager = TransactionManagement(_transactionManager);
         
-        transactionManager.initCommand(_twitterIds, _twitterNames, _fromImageUrl, _txnType, _value, _data);
+        transactionManager.initCommand(_twitterIds, _twitterNames, _value, _metaData);
         /*
         *  Consider using the Token Manager Contract to host view functions for validating.
         *  Also see if view functions can return a function type that can then be executed 
