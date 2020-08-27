@@ -21,14 +21,14 @@ contract("TransactionManagement", async accounts => {
       	[1029384756,0,0],
       	['fakeHandleA', '', ''],
         0,
-      	['twitter','https://i.picsum.photos/id/111/200/200.jpg','launch','testing crypto drop'],
+      	['twitter','launch','https://i.picsum.photos/id/111/200/200.jpg','testing crypto drop'],
       )
       //for next test
       res = await instance.initCommand(
       	[1029388888,0,0],
       	['fakeHandleB', '', ''],
         0,
-      	['twitter','https://i.picsum.photos/id/112/200/200.jpg','launch','testing crypto drop']
+      	['twitter','launch','https://i.picsum.photos/id/112/200/200.jpg','testing crypto drop']
       )
       assert.isOk(res.receipt['status'])
     })
@@ -57,7 +57,7 @@ contract("TransactionManagement", async accounts => {
         [1029384756,434443434,0],
         ['fakeHandle', 'rando1', ''],
         200,
-        ['twitter','https://i.picsum.photos/id/1/200/200.jpg','transfer',''],
+        ['twitter','transfer','https://i.picsum.photos/id/1/200/200.jpg',''],
       )
       assert.isOk(res.receipt['status'], 'Transfer to rando1 failed')
     });
@@ -67,14 +67,14 @@ contract("TransactionManagement", async accounts => {
         [434443434,55667788,1029384756],
         ['rando1', 'rando2', 'fakeHandle'],
         50,
-        ['twitter','https://i.picsum.photos/id/2/200/200.jpg','transfer','']
+        ['twitter','transfer','https://i.picsum.photos/id/2/200/200.jpg','']
       )
       assert.isOk(res.receipt['status'], 'Transfer to rando2 failed')
       res = await instance.initCommand(
         [434443434,1029384756,1029384756],
         ['rando1', 'rando3', 'fakeHandle'],
         50,
-        ['twitter','https://i.picsum.photos/id/2/200/200.jpg','transfer','']
+        ['twitter','transfer','https://i.picsum.photos/id/2/200/200.jpg','']
       )
       assert.isOk(res.receipt['status'], 'Transfer to rando3 failed')
     });
@@ -146,7 +146,7 @@ contract("TransactionManagement", async accounts => {
         [1029384756,0,0],
         ['rando2', '', ''],
         0,
-        ['twitter','https://i.picsum.photos/id/111/200/200.jpg','mapaccount',randoAddr]
+        ['twitter','mapaccount','https://i.picsum.photos/id/111/200/200.jpg',randoAddr]
       )
       res = await userManagementInstance.getUser(1029384756);
       res = await userManagementInstance.userHasL1AddressMapped(addr)
