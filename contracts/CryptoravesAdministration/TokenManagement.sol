@@ -22,6 +22,7 @@ contract TokenManagement is  ERCDepositable, IERC721Receiver {
         uint ercType;
         uint256 totalSupply;
         string symbol;
+        string emoji;
     }
     mapping(address => ManagedToken) public managedTokenListByAddress;
     
@@ -150,6 +151,14 @@ contract TokenManagement is  ERCDepositable, IERC721Receiver {
     function getSymbol(uint256 _tokenId) public view  returns(string memory){
         address _tokenAddr = tokenListById[_tokenId];
         return managedTokenListByAddress[_tokenAddr].symbol;
+    }
+    function setEmoji(uint256 _tokenId, string memory _emoji) public onlyAdmin {
+        address _tokenAddr = tokenListById[_tokenId];
+        managedTokenListByAddress[_tokenAddr].emoji = _emoji;
+    }
+    function getEmoji(uint256 _tokenId) public view  returns(string memory){
+        address _tokenAddr = tokenListById[_tokenId];
+        return managedTokenListByAddress[_tokenAddr].emoji;
     }
     
     function subtractFromTotalSupply(uint256 _tokenId, uint256 _amount) public onlyAdmin {

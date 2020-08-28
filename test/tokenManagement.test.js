@@ -243,6 +243,30 @@ contract("TokenManagement", async accounts => {
       'ERC721 symbol does not match'
     )
   })
+  it("set and get emoji for a token", async () => {
+    let tokenManagementInstance = await TokenManagement.deployed()
+    let erc721Instance = await ERC721Full.deployed()
+    let erc20Instance = await ERC20Full.deployed()
+    let emoji = '🤯'
+    let addr = await tokenManagementInstance.getManagedTokenIdByAddress(erc20Instance.address)
+    let tokenId = await tokenManagementInstance.getManagedTokenIdByAddress(addr)
+    await tokenManagementInstance.setEmoji(
+      tokenId,
+      emoji
+    )
+
+    let res = await tokenManagementInstance.getEmoji(
+      tokenId,
+      emoji
+    )
+    console.log(emoji)
+    console.log(res)
+    asser.equal(
+      emoji,
+      res,
+      'emoji scheme issue. Result doesn\'t match'
+    )
+  })
   it("checks if both ERC20/721 token addresses are managed by contract", async () => {
   	let instanceTokenManagement = await TokenManagement.deployed()
   	let erc721Instance = await ERC721Full.deployed()
