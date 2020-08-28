@@ -271,8 +271,6 @@ contract("TokenManagement", async accounts => {
     let newUri = 'data:application/json;charset=utf-8;base64,ew0KCSJuYW1lIjogIkFzc2V0IE5hbWUiLA0KCSJkZXNjcmlwdGlvbiI6ICJMb3JlbSBpcHN1bS4uLiIsDQoJImltYWdlIjogImh0dHBzOi8vczMuYW1hem9uYXdzLmNvbS95b3VyLWJ1Y2tldC9pbWFnZXMve2lkfS5wbmciLA0KCSJwcm9wZXJ0aWVzIjogew0KCQkic2ltcGxlX3Byb3BlcnR5IjogImV4YW1wbGUgdmFsdWUiLA0KCQkicmljaF9wcm9wZXJ0eSI6IHsNCgkJCSJuYW1lIjogIk5hbWUiLA0KCQkJInZhbHVlIjogIjEyMyIsDQoJCQkiZGlzcGxheV92YWx1ZSI6ICIxMjMgRXhhbXBsZSBWYWx1ZSIsDQoJCQkiY2xhc3MiOiAiZW1waGFzaXMiLA0KCQkJImNzcyI6IHsNCgkJCQkiY29sb3IiOiAiI2ZmZmZmZiIsDQoJCQkJImZvbnQtd2VpZ2h0IjogImJvbGQiLA0KCQkJCSJ0ZXh0LWRlY29yYXRpb24iOiAidW5kZXJsaW5lIg0KCQkJfQ0KCQl9LA0KCQkiYXJyYXlfcHJvcGVydHkiOiB7DQoJCQkibmFtZSI6ICJOYW1lIiwNCgkJCSJ2YWx1ZSI6IFsxLDIsMyw0XSwNCgkJCSJjbGFzcyI6ICJlbXBoYXNpcyINCgkJfQ0KCX0NCn0='
     await instanceCryptoravesToken.setUri(newUri)
     let uri = instanceCryptoravesToken.uri()
-console.log(uri)
-console.log(newUri)
     assert.equal(
       uri,
       newUri,
