@@ -248,20 +248,15 @@ contract("TokenManagement", async accounts => {
     let erc721Instance = await ERC721Full.deployed()
     let erc20Instance = await ERC20Full.deployed()
     let emoji = '🤯'
-    let addr = await tokenManagementInstance.getManagedTokenIdByAddress(erc20Instance.address)
-    let tokenId = await tokenManagementInstance.getManagedTokenIdByAddress(addr)
+    let tokenId = await tokenManagementInstance.getManagedTokenIdByAddress(erc20Instance.address) 
     await tokenManagementInstance.setEmoji(
       tokenId,
       emoji
     )
-
     let res = await tokenManagementInstance.getEmoji(
-      tokenId,
-      emoji
+      tokenId
     )
-    console.log(emoji)
-    console.log(res)
-    asser.equal(
+    assert.equal(
       emoji,
       res,
       'emoji scheme issue. Result doesn\'t match'
