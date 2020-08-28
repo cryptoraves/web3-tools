@@ -134,12 +134,12 @@ contract("ValidatorInterfaceContract", async accounts => {
         secondTokenManagerAddr = ethers.Wallet.createRandom().address
       }
 
-      let res = await instance.changeTransactionManagementAddress(secondTokenManagerAddr) 
+      let res = await instance.setTransactionManagementAddress(secondTokenManagerAddr) 
       let transactionManagerAddr = await instance.getTransactionManagementAddress()
       assert.equal(
         transactionManagerAddr,
         secondTokenManagerAddr,
-        "changeTokenManager failed with random wallet.address as input"
+        "setTransactionManagementAddress failed with random wallet.address as input"
       );
     });
   }

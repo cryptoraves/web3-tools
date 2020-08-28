@@ -38,10 +38,10 @@ contract ValidatorInterfaceContract is AdministrationContract {
     }
 
     /*
-    * Change token manager address
+    * set token manager address
     * @param newTransactionManager is the address of new Token Manager
     */
-    function changeTransactionManagementAddress(address newTransactionManager) public onlyAdmin {
+    function setTransactionManagementAddress(address newTransactionManager) public onlyAdmin {
         
         require(_transactionManager != newTransactionManager);
         _transactionManager = newTransactionManager;

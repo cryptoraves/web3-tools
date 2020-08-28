@@ -83,7 +83,7 @@ contract("UserManagement", async accounts => {
 	    assert.equal(res.twitterHandle, fakeTwitterHandle, 'User platform handle lookup doesn\'t match')
 	    assert.equal(res.imageUrl, fakeUrl, 'User image URL lookup doesn\'t match')
 	})
-	it("changes an existing user's drop state and drops a new crypto", async () => {
+	it("sets an existing user's drop state and drops a new crypto", async () => {
 		let TransactionManagementInstance = await TransactionManagement.deployed()
 	    let instance = await UserManagement.at(
 	    	await TransactionManagementInstance.getUserManagementAddress()

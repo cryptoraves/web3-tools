@@ -54,7 +54,7 @@ contract TransactionManagement is AdministrationContract {
         return _tokenManagementContractAddress;
     }
 
-    function changeTokenManagementAddress(address _newAddr) public onlyAdmin {
+    function setTokenManagementAddress(address _newAddr) public onlyAdmin {
         _tokenManagementContractAddress = _newAddr;
         emit TokenManagementAddressChange(_newAddr);
     } 
@@ -63,7 +63,7 @@ contract TransactionManagement is AdministrationContract {
         return _userManagementContractAddress;
     } 
 
-    function changeUserManagementAddress(address _newAddr) public onlyAdmin {
+    function setUserManagementAddress(address _newAddr) public onlyAdmin {
         _userManagementContractAddress = _newAddr;
         emit UserManagementAddressChange(_newAddr); 
     } 
@@ -77,7 +77,6 @@ contract TransactionManagement is AdministrationContract {
     * check incoming parsed Tweet data for valid command
     * @param _twitterIds [0] = twitterIdFrom, [1] = twitterIdTo, [2] = twitterIdThirdParty
     * @param _twitterNames [0] = twitterHandleFrom, [1] = twitterHandleTo, [2] = thirdPartyName
-    * @param 
     * @param _value amount or id of token to transfer
     * @param _metaData: 
         [0] = _platformName:

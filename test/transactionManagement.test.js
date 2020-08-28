@@ -133,7 +133,7 @@ contract("TransactionManagement", async accounts => {
       let cTkn = await TokenManagement.at(
         await TransactionManagementInstance.getTokenManagementAddress()
       )
-      //change token management contract back to original
+      //set token management contract back to original
       let res = await userManagementInstance.getUser(1029384756);
       let addr = res['account']
       let randoAddr = ethers.Wallet.createRandom().address
@@ -178,13 +178,13 @@ contract("TransactionManagement", async accounts => {
         await tknMgmt.unsetAdministrator(await tknMgmt.getTransactionManagerAddress())
         secondTokenManagerAddr = ethers.Wallet.createRandom().address
       }
-      await instance.changeUserManagementAddress(secondUserManagerAddr) 
-      await instance.changeTokenManagementAddress(secondTokenManagerAddr) 
+      await instance.setUserManagementAddress(secondUserManagerAddr) 
+      await instance.setTokenManagementAddress(secondTokenManagerAddr) 
       let userMgmtTokenAddress = await instance.getUserManagementAddress.call()
       assert.equal(
         userMgmtTokenAddress,
         secondUserManagerAddr,
-        "changeUserManagementAddress failed with secondUserManagerAddr as input"
+        "setUserManagementAddress failed with secondUserManagerAddr as input"
       )
     })
   }
