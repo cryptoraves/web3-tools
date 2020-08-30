@@ -357,22 +357,22 @@ contract("TokenManagement", async accounts => {
 
     assert.equal(
       await instanceTokenManagement.symbolAndEmojiLookupTable('TKX'),
-      2,
+      '2',
       'ERC20 symbol reverse lookup failed'
     )
     assert.equal(
       await instanceTokenManagement.symbolAndEmojiLookupTable('TKY'),
-      3,
+      '3',
       'ERC721 symbol reverse lookup failed'
     )
     assert.equal(
       await instanceTokenManagement.symbolAndEmojiLookupTable('ETH'),
-      0,
+      '0',
       'ETH symbol reverse lookup failed'
     )
     assert.equal(
       await instanceTokenManagement.symbolAndEmojiLookupTable(emoji),
-      2,
+      '2',
       'ERC20 Emoji reverse lookup failed'
     )
   })
