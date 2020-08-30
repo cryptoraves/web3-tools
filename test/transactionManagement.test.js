@@ -3,6 +3,7 @@ const WalletFull = artifacts.require("WalletFull")
 const ethers = require('ethers')
 
 const UserManagement = artifacts.require("UserManagement")
+const CryptoravesToken = artifacts.require("CryptoravesToken")
 let secondUserManagerAddr = ''
 let secondTokenManagerAddr = ''
 const TokenManagement = artifacts.require("TokenManagement")
@@ -213,7 +214,7 @@ contract("TransactionManagement", async accounts => {
       )
       user = await userManagementInstance.getUser(fakeUserId2)
       let balance = await instanceCryptoravesToken.balanceOf(user.account, tokenId1155)
-      console.log(balance.toString())
+      
       assert.equal(
         balance,
         222222222,
