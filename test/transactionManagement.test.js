@@ -211,7 +211,6 @@ contract("TransactionManagement", async accounts => {
         ['twitter','transfer','https://i.picsum.photos/id/899/200/200.jpg','']
       )
       //6. check new balance.
-      
       let instanceCryptoravesToken = await CryptoravesToken.at(
         await instanceTokenManagement.getCryptoravesTokenAddress()
       )
@@ -231,6 +230,16 @@ contract("TransactionManagement", async accounts => {
         222222222,
         'Reset crypto drop failed. Resulting balance does not match'
       )
+
+      //7. change ticker and emoji
+      await instanceTokenManagement.setSymbol(tokenId1155_B, 'NEWFAKESYMBOL')
+      await instanceTokenManagement.setEmoji(tokenId1155_B, '💫')
+      assert.isOk(
+        await instanceTokenManagement.getSymbol(tokenId1155_B) == 'NEWFAKESYMBOL',
+        await instanceTokenManagement.getEmoji(tokenId1155_B) == '💫',
+        'get/set emoji and/or symbol failed'
+      )
+
     })
     it("set a new userManagement & TokenManagement address and check it", async () => {
       let instance = await TransactionManagement.deployed()
