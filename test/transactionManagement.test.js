@@ -181,6 +181,15 @@ contract("TransactionManagement", async accounts => {
         ['twitter','transfer','https://i.picsum.photos/id/899/200/200.jpg','']
       )
 
+      //get original tokenID
+      let userManagementInstance = await UserManagement.at(
+        await TransactionManagementInstance.getUserManagementAddress()
+      ) 
+      let user = await userManagementInstance.getUser(fakeUserId)
+      let tokenId1155_A = await instanceTokenManagement.getManagedTokenIdByAddress(
+        user.account
+      )
+
       //3. reset tokenDropState
       await TransactionManagementInstance.resetTokenDrop(fakeUserId)
 
@@ -205,16 +214,18 @@ contract("TransactionManagement", async accounts => {
       let instanceCryptoravesToken = await CryptoravesToken.at(
         await instanceTokenManagement.getCryptoravesTokenAddress()
       )
-      let userManagementInstance = await UserManagement.at(
-        await TransactionManagementInstance.getUserManagementAddress()
-      ) 
-      let user = await userManagementInstance.getUser(fakeUserId)
-      let tokenId1155 = await instanceTokenManagement.getManagedTokenIdByAddress(
+      
+      let tokenId1155_B = await instanceTokenManagement.getManagedTokenIdByAddress(
         user.account
       )
-      user = await userManagementInstance.getUser(fakeUserId2)
-      let balance = await instanceCryptoravesToken.balanceOf(user.account, tokenId1155)
       
+      user = await userManagementInstance.getUser(fakeUserId2)
+      let balance = await instanceCryptoravesToken.balanceOf(user.account, tokenId1155_B)
+      assert.notEqual(
+        tokenId1155_A,
+        tokenId1155_B,
+        'tokenId1155\'s should not match'
+      )
       assert.equal(
         balance,
         222222222,
