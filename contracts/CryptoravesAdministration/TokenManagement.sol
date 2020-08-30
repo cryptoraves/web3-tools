@@ -4,7 +4,7 @@ pragma experimental ABIEncoderV2;
 
 import "./ERCDepositable.sol";
 import "./CryptoravesToken.sol";
-import "/home/cartosys/www/openzeppelin-contracts/contracts/token/ERC721/IERC721Receiver.sol";
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/contracts/token/ERC721/IERC721Receiver.sol";
 
 contract TokenManagement is  ERCDepositable, IERC721Receiver {
     
@@ -161,15 +161,21 @@ contract TokenManagement is  ERCDepositable, IERC721Receiver {
         address _tokenAddr = tokenListById[_tokenId];
         return managedTokenListByAddress[_tokenAddr].symbol;
     }
-    function setEmoji(uint256 _tokenId, string memory _emoji) public onlyAdmin {
+    function setSymbol(uint256 _tokenId, string memory _symbol) public onlyAdmin {
         address _tokenAddr = tokenListById[_tokenId];
-        managedTokenListByAddress[_tokenAddr].emoji = _emoji;
-        symbolAndEmojiLookupTable[_emoji] = _tokenId;
+        managedTokenListByAddress[_tokenAddr].symbol = _symbol;
+        symbolAndEmojiLookupTable[_symbol] = _tokenId;
     }
     function getEmoji(uint256 _tokenId) public view  returns(string memory){
         address _tokenAddr = tokenListById[_tokenId];
         return managedTokenListByAddress[_tokenAddr].emoji;
     }
+    function setEmoji(uint256 _tokenId, string memory _emoji) public onlyAdmin {
+        address _tokenAddr = tokenListById[_tokenId];
+        managedTokenListByAddress[_tokenAddr].emoji = _emoji;
+        symbolAndEmojiLookupTable[_emoji] = _tokenId;
+    }
+    
     
     function subtractFromTotalSupply(uint256 _tokenId, uint256 _amount) public onlyAdmin {
         address _tokenAddr = tokenListById[_tokenId];
