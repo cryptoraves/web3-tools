@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.6.10;
+pragma experimental ABIEncoderV2;
 
 import "./ERCDepositable.sol";
 import "./CryptoravesToken.sol";
-import "/home/cartosys/www/openzeppelin-contracts/contracts/token/ERC721/IERC721Receiver.sol";
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/contracts/token/ERC721/IERC721Receiver.sol";
 
 contract TokenManagement is  ERCDepositable, IERC721Receiver {
     
@@ -25,7 +26,10 @@ contract TokenManagement is  ERCDepositable, IERC721Receiver {
         string emoji;
     }
     mapping(address => ManagedToken) public managedTokenListByAddress;
-    
+
+    //find tokenId by symbol or emoji
+    mapping(string => uint256) public symbolAndEmojiLookupTable;
+
     //list of held 1155 token ids
     mapping(address => uint256[]) public heldTokenIds;
     
@@ -44,7 +48,7 @@ contract TokenManagement is  ERCDepositable, IERC721Receiver {
         return _cryptoravesTokenAddr;
     }
     
-    function changeCryptoravesTokenAddress(address newAddr) public onlyAdmin {
+    function setCryptoravesTokenAddress(address newAddr) public onlyAdmin {
         _cryptoravesTokenAddr = newAddr;
     }
 
@@ -69,6 +73,7 @@ contract TokenManagement is  ERCDepositable, IERC721Receiver {
         _mint(account, _1155tokenId, amount, data);
         
         managedTokenListByAddress[account].symbol = _twitterHandleFrom;
+        symbolAndEmojiLookupTable[_twitterHandleFrom] = _1155tokenId;
         
         emit CryptoDropped(account, _1155tokenId);
         
@@ -101,6 +106,10 @@ contract TokenManagement is  ERCDepositable, IERC721Receiver {
         
         if(_token != address(0)){ //clause for ETH
             managedTokenListByAddress[_token].totalSupply = getTotalSupplyOf3rdPartyToken(_token);
+        } else {
+            if (!_stringsMatch(managedTokenListByAddress[_token].symbol , 'ETH')) {
+                managedTokenListByAddress[_token].symbol = 'ETH';
+            }
         }
         
         uint256 _1155tokenId = getManagedTokenIdByAddress(_token);
@@ -155,6 +164,7 @@ contract TokenManagement is  ERCDepositable, IERC721Receiver {
     function setEmoji(uint256 _tokenId, string memory _emoji) public onlyAdmin {
         address _tokenAddr = tokenListById[_tokenId];
         managedTokenListByAddress[_tokenAddr].emoji = _emoji;
+        symbolAndEmojiLookupTable[_emoji] = _tokenId;
     }
     function getEmoji(uint256 _tokenId) public view  returns(string memory){
         address _tokenAddr = tokenListById[_tokenId];
@@ -194,10 +204,13 @@ contract TokenManagement is  ERCDepositable, IERC721Receiver {
             //need clause for ETH
             if(address(0) != _token){
                 _mngTkn.totalSupply = getTotalSupplyOf3rdPartyToken(_token);
-                _mngTkn.symbol = getSymbolOf3rdPartyToken(_token);
+                string memory symbol = getSymbolOf3rdPartyToken(_token);
+                _mngTkn.symbol = symbol;
+                symbolAndEmojiLookupTable[symbol] = _mngTkn.managedTokenId;
             }
         } else {
             //assign symbol of erc1155
+            
             
         }
         

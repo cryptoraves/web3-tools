@@ -51,7 +51,7 @@ contract UserManagement is AdministrationContract {
         return users[_userId].account;
     }
     
-    function changeTransactionManagerAddress(address _newAddr) public onlyAdmin{
+    function setTransactionManagerAddress(address _newAddr) public onlyAdmin{
         //TODO: _transactionManagementAddress = _newAddr;
     }
     
@@ -150,9 +150,5 @@ contract UserManagement is AdministrationContract {
     //user service function: for resetting dropstate upon request
     function setDropState(uint256 _platformUserId, bool _state) public onlyAdmin returns (address) {
         users[_platformUserId].dropped = _state;
-    }
-    
-    function _stringsMatch (string memory a, string memory b) internal pure returns (bool) {
-        return (keccak256(abi.encodePacked((a))) == keccak256(abi.encodePacked((b))) );
     }
 }

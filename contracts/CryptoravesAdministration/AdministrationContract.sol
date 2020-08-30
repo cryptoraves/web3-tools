@@ -100,4 +100,7 @@ contract AdministrationContract {
       }
       return (size > 0);
     }
+    function _stringsMatch (string memory a, string memory b) internal pure returns (bool) {
+        return (keccak256(abi.encodePacked((a))) == keccak256(abi.encodePacked((b))) );
+    }
 }

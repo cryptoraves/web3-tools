@@ -2,7 +2,7 @@
 pragma solidity 0.6.10;
 
 import "./AdministrationContract.sol";
-import "/home/cartosys/www/openzeppelin-contracts/contracts/token/ERC1155/ERC1155.sol";
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC1155/ERC1155.sol";
 
 contract CryptoravesToken is ERC1155, AdministrationContract {
     
