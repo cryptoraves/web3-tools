@@ -17,7 +17,7 @@ contract("TransactionManagement", async accounts => {
     it("Drop crypto with initCommand", async () => {
       let instance = await TransactionManagement.deployed()
 
-      //var bytes = ethers.utils.formatBytes32String('testing crypto drop')
+      //test hybrid launch & map feature
       let res = await instance.initCommand(
       	[1029384756,0,0],
       	['fakeHandleA', '', ''],
