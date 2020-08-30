@@ -234,9 +234,11 @@ contract("TransactionManagement", async accounts => {
       //7. change ticker and emoji
       await instanceTokenManagement.setSymbol(tokenId1155_B, 'NEWFAKESYMBOL')
       await instanceTokenManagement.setEmoji(tokenId1155_B, '💫')
+      let _sym1 = await instanceTokenManagement.getSymbol(tokenId1155_B)
+      let _emoj1 = await instanceTokenManagement.getEmoji(tokenId1155_B)
       assert.isOk(
-        await instanceTokenManagement.getSymbol(tokenId1155_B) == 'NEWFAKESYMBOL',
-        await instanceTokenManagement.getEmoji(tokenId1155_B) == '💫',
+        _sym1 == 'NEWFAKESYMBOL',
+       _emoj1 == '💫',
         'get/set emoji and/or symbol failed'
       )
 
