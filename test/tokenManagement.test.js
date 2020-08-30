@@ -8,6 +8,8 @@ const ethers = require('ethers')
 
 let primary_tokenId1155 = 12345
 
+let emoji = '🤯'
+
 contract("TokenManagement", async accounts => {
   it("Drop 1 billion to admin", async () => {
     let instanceTokenManagement = await TokenManagement.deployed()
@@ -247,7 +249,7 @@ contract("TokenManagement", async accounts => {
     let tokenManagementInstance = await TokenManagement.deployed()
     let erc721Instance = await ERC721Full.deployed()
     let erc20Instance = await ERC20Full.deployed()
-    let emoji = '🤯'
+    
     let tokenId = await tokenManagementInstance.getManagedTokenIdByAddress(erc20Instance.address) 
     await tokenManagementInstance.setEmoji(
       tokenId,
@@ -350,4 +352,12 @@ contract("TokenManagement", async accounts => {
   	)
   })
 
+  it("check emojis and symbol reverse-lookup", async () => {
+    let instanceTokenManagement = await TokenManagement.deployed()
+
+    console.log(await instanceTokenManagement.symbolAndEmojiLookupTable('TKX'))
+    console.log(await instanceTokenManagement.symbolAndEmojiLookupTable('TKY'))
+    console.log(await instanceTokenManagement.symbolAndEmojiLookupTable('ETH'))
+    console.log(await instanceTokenManagement.symbolAndEmojiLookupTable(emoji))
+  })
 })  
