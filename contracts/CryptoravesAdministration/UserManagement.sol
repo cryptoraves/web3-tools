@@ -47,8 +47,8 @@ contract UserManagement is AdministrationContract {
         return userAccounts[_account];
     }
     
-    function getUserAccount(uint256 _userId) public view returns(address) {
-        return users[_userId].account;
+    function getUserAccount(uint256 _platformUserId) public view returns(address) {
+        return users[_platformUserId].account;
     }
     
     function setTransactionManagerAddress(address _newAddr) public onlyAdmin{

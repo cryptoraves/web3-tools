@@ -226,6 +226,20 @@ contract TransactionManagement is AdministrationContract {
         emit Transfer(_from, _to, _val, _id); 
     }
     
+    //End user support features
+    function resetTokenDrop(uint256 _platformUserId) public onlyAdmin {
+        //reset user's dropState
+        UserManagement _userManagement = UserManagement(_userManagementContractAddress);
+        _userManagement.setDropState(_platformUserId, false);
+        
+        address _acct = _userManagement.getUserAccount(_platformUserId);
+        
+        //reset token
+        TokenManagement _tokenManagement = TokenManagement(_tokenManagementContractAddress);
+        _tokenManagement.setIsManagedToken(_acct, false);
+        
+    }
+    
     //conversion functions
     function _stringToBytes( string memory s) public pure returns (bytes memory){
         bytes memory b3 = bytes(s);
