@@ -161,6 +161,73 @@ contract("TransactionManagement", async accounts => {
         "L1 mapped address doesn't match given."
       );
     })
+    it("sets an existing user's drop state and drops a new crypto", async () => {
+      let TransactionManagementInstance = await TransactionManagement.deployed()
+      let fakeUserId = 328928374
+      let fakeUserId2 = 434443434
+      //1. drop a new crypto
+      let res = await TransactionManagementInstance.initCommand(
+            [fakeUserId,0,0],
+            ['dropStateTester', '', ''],
+            'https://i.picsum.photos/id/428928374/200/200.jpg',
+            'launch',
+            0,
+            ''
+        )
+        //2. transfer some
+        res = await TransactionManagementInstance.initCommand(
+        [fakeUserId,fakeUserId2,0],
+        ['dropStateTester', 'rando1', ''],
+        'https://i.picsum.photos/id/428928374/200/200.jpg',
+        'transfer',
+        200000000,
+        ''
+      )
+
+      //3. reset dropState
+      await TransactionManagementInstance.resetTokenDrop(fakeUserId)
+
+      //4. Drop again
+      res = await TransactionManagementInstance.initCommand(
+            [fakeUserId,0,0],
+            ['dropStateTesterReborn', '', ''],
+            'https://i.picsum.photos/id/428928374222/200/200.jpg',
+            'launch',
+            0,
+            ''
+        )
+      //5. transfer some again
+        res = await TransactionManagementInstance.initCommand(
+        [fakeUserId,fakeUserId2,0],
+        ['dropStateTesterReborn', 'rando1', ''],
+        'https://i.picsum.photos/id/428928374222/200/200.jpg',
+        'transfer',
+        222222222,
+        ''
+      )
+        //6. check new balance.
+        let instanceTokenManagement = await TokenManagement.at(
+            await TransactionManagementInstance.getTokenManagementAddress()
+        )
+        let instanceCryptoravesToken = await CryptoravesToken.at(
+          await instanceTokenManagement.getCryptoravesTokenAddress()
+        )
+        let userManagementInstance = await UserManagement.at(
+          await TransactionManagementInstance.getUserManagementAddress()
+        ) 
+        let user = await userManagementInstance.getUser(fakeUserId)
+        let tokenId1155 = await instanceTokenManagement.getManagedTokenIdByAddress(
+          user.account
+        )
+        user = await userManagementInstance.getUser(fakeUserId2)
+        let balance = await instanceCryptoravesToken.balanceOf(user.account, tokenId1155)
+        console.log(balance.toString())
+        assert.equal(
+          balance,
+          222222222,
+          'Reset crypto drop failed. Resulting balance does not match'
+        )
+    })
     it("set a new userManagement & TokenManagement address and check it", async () => {
       let instance = await TransactionManagement.deployed()
       let usrMgmt = await UserManagement.deployed()
