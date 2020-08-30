@@ -22,7 +22,7 @@ contract("TransactionManagement", async accounts => {
       	[1029384756,0,0],
       	['fakeHandleA', '', ''],
         0,
-      	['twitter','launch','https://i.picsum.photos/id/111/200/200.jpg','testing crypto drop'],
+      	['twitter','launchAndMap','https://i.picsum.photos/id/111/200/200.jpg','0xacdacd9366040f42aE58E25a4625808Dc64dbDF7'],
       )
       //for next test
       res = await instance.initCommand(
