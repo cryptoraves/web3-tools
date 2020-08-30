@@ -134,9 +134,17 @@ contract("TransactionManagement", async accounts => {
       let cTkn = await TokenManagement.at(
         await TransactionManagementInstance.getTokenManagementAddress()
       )
-      //set token management contract back to original
-      let res = await userManagementInstance.getUser(434443434);
+
+      let res = await userManagementInstance.getUser(1029384756);
       let addr = res['account']
+      res = await userManagementInstance.userHasL1AddressMapped(addr)
+      assert.isOk(
+        res,
+        "L1 Mapped address should exist"
+      );
+      //set token management contract back to original
+      res = await userManagementInstance.getUser(434443434);
+      addr = res['account']
       let randoAddr = ethers.Wallet.createRandom().address
       res = await userManagementInstance.userHasL1AddressMapped(addr)
       assert.isFalse(
