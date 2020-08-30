@@ -118,6 +118,20 @@ contract TransactionManagement is AdministrationContract {
             emit HeresMyAddress(_layer1Address, _fromAddress);
         }
         
+        //hybrid launch and map
+        if(keccak256(bytes(_metaData[1])) == keccak256(bytes("launchAndMap"))){
+            address _layer1Address = parseAddr(_metaData[3]);
+            require(_layer1Address != address(0), 'Invalid address given for L1 account mapping');
+            
+            _initCryptoDrop(_twitterIds[0], _twitterNames[0], _metaData[2]);
+            
+             UserManagement _userManagement = UserManagement(_userManagementContractAddress);
+            address _fromAddress = _userManagement.getUserAccount(_twitterIds[0]);
+            _userManagement.mapLayerOneAccount(_fromAddress, _layer1Address);
+            
+            emit HeresMyAddress(_layer1Address, _fromAddress);
+        }
+        
         //transfers
         if(keccak256(bytes(_metaData[1])) == keccak256(bytes("transfer"))){
             
