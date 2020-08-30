@@ -167,21 +167,17 @@ contract("TransactionManagement", async accounts => {
       let fakeUserId2 = 434443434
       //1. drop a new crypto
       let res = await TransactionManagementInstance.initCommand(
-            [fakeUserId,0,0],
-            ['dropStateTester', '', ''],
-            'https://i.picsum.photos/id/428928374/200/200.jpg',
-            'launch',
-            0,
-            ''
-        )
-        //2. transfer some
-        res = await TransactionManagementInstance.initCommand(
+          [fakeUserId,0,0],
+          ['dropStateTester', '', ''],
+          0,
+          ['twitter','launch','https://i.picsum.photos/id/898/200/200.jpg',''],
+      )
+      //2. transfer some
+      res = await TransactionManagementInstance.initCommand(
         [fakeUserId,fakeUserId2,0],
         ['dropStateTester', 'rando1', ''],
-        'https://i.picsum.photos/id/428928374/200/200.jpg',
-        'transfer',
         200000000,
-        ''
+        ['twitter','transfer','https://i.picsum.photos/id/899/200/200.jpg','']
       )
 
       //3. reset tokenDropState
@@ -191,19 +187,15 @@ contract("TransactionManagement", async accounts => {
       res = await TransactionManagementInstance.initCommand(
           [fakeUserId,0,0],
           ['dropStateTesterReborn', '', ''],
-          'https://i.picsum.photos/id/428928374222/200/200.jpg',
-          'launch',
           0,
-          ''
+          ['twitter','launch','https://i.picsum.photos/id/899/200/200.jpg','']
       )
       //5. transfer some again
       res = await TransactionManagementInstance.initCommand(
         [fakeUserId,fakeUserId2,0],
         ['dropStateTesterReborn', 'rando1', ''],
-        'https://i.picsum.photos/id/428928374222/200/200.jpg',
-        'transfer',
         222222222,
-        ''
+        ['twitter','transfer','https://i.picsum.photos/id/899/200/200.jpg','']
       )
       //6. check new balance.
       let instanceTokenManagement = await TokenManagement.at(
