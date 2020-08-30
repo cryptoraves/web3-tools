@@ -182,6 +182,9 @@ contract("TransactionManagement", async accounts => {
       )
 
       //get original tokenID
+      let instanceTokenManagement = await TokenManagement.at(
+          await TransactionManagementInstance.getTokenManagementAddress()
+      )
       let userManagementInstance = await UserManagement.at(
         await TransactionManagementInstance.getUserManagementAddress()
       ) 
@@ -208,9 +211,7 @@ contract("TransactionManagement", async accounts => {
         ['twitter','transfer','https://i.picsum.photos/id/899/200/200.jpg','']
       )
       //6. check new balance.
-      let instanceTokenManagement = await TokenManagement.at(
-          await TransactionManagementInstance.getTokenManagementAddress()
-      )
+      
       let instanceCryptoravesToken = await CryptoravesToken.at(
         await instanceTokenManagement.getCryptoravesTokenAddress()
       )
@@ -218,7 +219,6 @@ contract("TransactionManagement", async accounts => {
       let tokenId1155_B = await instanceTokenManagement.getManagedTokenIdByAddress(
         user.account
       )
-      
       user = await userManagementInstance.getUser(fakeUserId2)
       let balance = await instanceCryptoravesToken.balanceOf(user.account, tokenId1155_B)
       assert.notEqual(
