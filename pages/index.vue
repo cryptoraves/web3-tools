@@ -10,6 +10,13 @@
       <div class="links">
         
         <a
+          @click="gofeature('Administrators')"
+          target="_blank"
+          class="button--green"
+        >
+          Adminstrator Tools
+        </a>
+        <a
           @click="go3Box(ethereumAddress)"
           target="_blank"
           class="button--green"
