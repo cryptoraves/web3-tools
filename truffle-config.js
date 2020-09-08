@@ -80,7 +80,7 @@ module.exports = {
         ChainID: 346750 
       },
       maticTest: {
-        provider: () => new HDWalletProvider(mnemonic, `https://rpc-mumbai.matic.today`),
+        provider: () => new HDWalletProvider(privateKey, `https://rpc-mumbai.matic.today`),
         network_id: 80001,
         confirmations: 2,
         timeoutBlocks: 200,
