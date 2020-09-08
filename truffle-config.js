@@ -69,13 +69,7 @@ module.exports = {
         gas: 5500000,        // Ropsten has a lower block limit than mainnet
         confirmations: 2,    // # of confs to wait between deployments. (default: 0)
         timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
-        skipDryRun: true,     // Skip dry run before migrations? (default: false for public nets )
-        solc: {
-          optimizer: {
-            enabled: true,
-            runs: 200
-          }
-        }
+        skipDryRun: true     // Skip dry run before migrations? (default: false for public nets )
      },
 
       skaleTest: {
@@ -84,26 +78,14 @@ module.exports = {
         gas: 40000000,
         network_id: "*",
         timeout: 100000,
-        ChainID: 346750,
-        solc: {
-          optimizer: {
-            enabled: true,
-            runs: 200
-          }
-        }
+        ChainID: 346750
       },
       maticTest: {
         provider: () => new HDWalletProvider(privateKey, `https://rpc-mumbai.matic.today`),
         network_id: 80001,
         confirmations: 2,
         timeoutBlocks: 200,
-        skipDryRun: true,
-        solc: {
-          optimizer: {
-            enabled: true,
-            runs: 200
-          }
-        }
+        skipDryRun: true
       },
     // Useful for private networks
     // private: {
@@ -125,7 +107,7 @@ module.exports = {
        docker: false,        // Use "0.5.1" you've installed locally with docker (default: false)
        settings: {          // See the solidity docs for advice about optimization and evmVersion
         optimizer: {
-          enabled: false,
+          enabled: true,
           runs: 200
         },
         //evmVersion: "byzantium"
