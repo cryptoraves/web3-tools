@@ -79,6 +79,13 @@ module.exports = {
         timeout: 100000,
         ChainID: 346750 
       },
+      maticTest: {
+        provider: () => new HDWalletProvider(mnemonic, `https://rpc-mumbai.matic.today`),
+        network_id: 80001,
+        confirmations: 2,
+        timeoutBlocks: 200,
+        skipDryRun: true
+      },
     // Useful for private networks
     // private: {
       // provider: () => new HDWalletProvider(mnemonic, `https://network.io`),
