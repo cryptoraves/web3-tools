@@ -83,7 +83,7 @@ module.exports = {
       maticTest: {
         provider: () => new HDWalletProvider(privateKey, `https://rpc-mumbai.matic.today`),
         network_id: 80001,
-        confirmations: 2,
+        confirmations: 10,
         timeoutBlocks: 200,
         skipDryRun: true
       },
