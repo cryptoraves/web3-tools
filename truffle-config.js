@@ -84,7 +84,13 @@ module.exports = {
         gas: 40000000,
         network_id: "*",
         timeout: 100000,
-        ChainID: 346750 
+        ChainID: 346750,
+        solc: {
+          optimizer: {
+            enabled: true,
+            runs: 200
+          }
+        }
       },
       maticTest: {
         provider: () => new HDWalletProvider(privateKey, `https://rpc-mumbai.matic.today`),
