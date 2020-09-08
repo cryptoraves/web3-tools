@@ -21,6 +21,7 @@
 const HDWalletProvider = require('@truffle/hdwallet-provider');
 const fs = require('fs');
 const privateKey = fs.readFileSync(".prvkey").toString().trim();
+const infuraKey = fs.readFileSync(".infuraKey").toString().trim();
 //const fs = require('fs');
 //const mnemonic = fs.readFileSync(".secret").toString().trim();
 //const infuraKey = fs.readFileSync(".infuraKey").toString().trim();
@@ -63,7 +64,7 @@ module.exports = {
     // Useful for deploying to a public network.
     // NB: It's important to wrap the provider as a function.
      rinkeby: {
-       provider: () => new HDWalletProvider(privateKey, `https://rinkeby.infura.io/v3/YOUR-PROJECT-ID`),
+       provider: () => new HDWalletProvider(privateKey, `https://rinkeby.infura.io/v3/`+infuraKey),
        network_id: 4,       // Ropsten's id
        gas: 5500000,        // Ropsten has a lower block limit than mainnet
        confirmations: 2,    // # of confs to wait between deployments. (default: 0)
