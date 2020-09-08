@@ -72,6 +72,27 @@ module.exports = {
        skipDryRun: true     // Skip dry run before migrations? (default: false for public nets )
      },
 
+      skaleTest: {
+        provider: () => new HDWalletProvider(privateKey, 'https://dev-testnet-v1-1.skalelabs.com'),
+        gasPrice: 0,
+        gas: 40000000,
+        network_id: "*",
+        timeout: 100000,
+        ChainID: 346750
+      },
+      maticTest: {
+        provider: () => new HDWalletProvider(privateKey, `https://rpc-mumbai.matic.today`),
+        network_id: 80001,
+        confirmations: 2,
+        timeoutBlocks: 200,
+        skipDryRun: true
+      },
+    // Useful for private networks
+    // private: {
+      // provider: () => new HDWalletProvider(mnemonic, `https://network.io`),
+      // network_id: 2111,   // This network is yours, in the cloud.
+      // production: true    // Treats this network as if it was a public net. (default: false)
+    // }
   },
 
   // Set default mocha options here, use special reporters etc.
@@ -86,7 +107,7 @@ module.exports = {
        docker: false,        // Use "0.5.1" you've installed locally with docker (default: false)
        settings: {          // See the solidity docs for advice about optimization and evmVersion
         optimizer: {
-          enabled: true
+          enabled: true,
           runs: 200
         },
         //evmVersion: "byzantium"
