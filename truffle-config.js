@@ -63,7 +63,7 @@ module.exports = {
     // Useful for deploying to a public network.
     // NB: It's important to wrap the provider as a function.
      rinkeby: {
-       provider: () => new HDWalletProvider(mnemonic, `https://rinkeby.infura.io/v3/YOUR-PROJECT-ID`),
+       provider: () => new HDWalletProvider(privateKey, `https://rinkeby.infura.io/v3/YOUR-PROJECT-ID`),
        network_id: 4,       // Ropsten's id
        gas: 5500000,        // Ropsten has a lower block limit than mainnet
        confirmations: 2,    // # of confs to wait between deployments. (default: 0)
