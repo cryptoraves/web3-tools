@@ -3,6 +3,9 @@ const TransactionManagement = artifacts.require('TransactionManagement')
 const imgUrl = 'https://i.picsum.photos/id/99/200/200.jpg'
 const originAddr = '0x0000000000000000000000000000000000000000'
 
+const size = Buffer.byteLength(TransactionManagement.deployedBytecode, 'utf8') / 2;
+console.log(size)
+
 module.exports = function (deployer) {
   
   deployer.then(async () => {
