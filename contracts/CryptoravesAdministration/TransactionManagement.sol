@@ -2,18 +2,13 @@
 pragma solidity 0.6.10;
 pragma experimental ABIEncoderV2;
 
-import "./TokenManagement.sol";
-import "./UserManagement.sol";
+import "./TxnManagementPublicViewsLibrary.sol";
 
 //can manage tokens for any Cryptoraves-native address
-contract TransactionManagement is AdministrationContract {
+contract TransactionManagement is AdministrationContract, TxnManagementPublicViewsLibrary {
     
     using SafeMath for uint256;
     using Address for address;
-    
-    address private _tokenManagementContractAddress;
-    address private _userManagementContractAddress;
-    uint256 private _standardMintAmount = 1000000000000000000000000000; //18-decimal adjusted standard amount (1 billion)
     
     event Transfer(address indexed _from, address indexed _to, uint256 _value, uint256 _tokenId);
     
@@ -45,33 +40,17 @@ contract TransactionManagement is AdministrationContract {
             _userManagementContractAddress = address(_userManagement);
         }
     }
-    //unique function for identifying this contract
-    function testForTransactionManagementAddressUniquely() public pure returns(bool){
-        return true;
-    }
     
-    function getTokenManagementAddress() public view returns(address) {
-        return _tokenManagementContractAddress;
-    }
 
     function setTokenManagementAddress(address _newAddr) public onlyAdmin {
         _tokenManagementContractAddress = _newAddr;
         emit TokenManagementAddressChange(_newAddr);
     } 
     
-    function getUserManagementAddress() public view returns(address){
-        return _userManagementContractAddress;
-    } 
-
     function setUserManagementAddress(address _newAddr) public onlyAdmin {
         _userManagementContractAddress = _newAddr;
         emit UserManagementAddressChange(_newAddr); 
-    } 
-    
-    function getCryptoravesTokenAddress() public view returns(address){
-        TokenManagement _tokenManagement = TokenManagement(_tokenManagementContractAddress);
-        return _tokenManagement.getCryptoravesTokenAddress();
-    } 
+    }
         
     /*
     * check incoming parsed Tweet data for valid command
@@ -206,31 +185,7 @@ contract TransactionManagement is AdministrationContract {
         return _userAddress;
 
     }
-
-    function getTokenIdFromPlatformId(uint256 _platformId) public view returns(uint256) {
         
-        UserManagement _userManagement = UserManagement(_userManagementContractAddress);
-        TokenManagement _tokenManagement = TokenManagement(_tokenManagementContractAddress);
-        
-        address _userAccount = _userManagement.getUserAccount(_platformId);
-
-        require(_userAccount != address(0), 'User account does not exist');
-
-        return _tokenManagement.getManagedTokenIdByAddress(
-            _userAccount
-        );
-    }
-    
-    function getUserL1AccountFromL2Account(address _l2) public view returns(address) {
-        UserManagement _userManagement = UserManagement(_userManagementContractAddress);
-        return _userManagement.getLayerOneAccount(_l2);
-    }
-    
-    function getUserL2AccountFromL1Account(address _l1) public view returns(address) {
-        UserManagement _userManagement = UserManagement(_userManagementContractAddress);
-        return _userManagement.getLayerTwoAccount(_l1);
-    }
-    
     function _managedTransfer(address _from, address _to, uint256 _id,  uint256 _val, bytes memory _data) internal {
         TokenManagement _tokenManagement = TokenManagement(_tokenManagementContractAddress);
         address _cryptoravesTokenAddr = _tokenManagement.getCryptoravesTokenAddress();
@@ -252,39 +207,5 @@ contract TransactionManagement is AdministrationContract {
         TokenManagement _tokenManagement = TokenManagement(_tokenManagementContractAddress);
         _tokenManagement.setIsManagedToken(_acct, false);
         
-    }
-    
-    //conversion functions
-    function _stringToBytes( string memory s) public pure returns (bytes memory){
-        bytes memory b3 = bytes(s);
-        return b3;
-    }
-    
-    function parseAddr(string memory _a) public pure returns (address _parsedAddress) {
-        bytes memory tmp = bytes(_a);
-        uint160 iaddr = 0;
-        uint160 b1;
-        uint160 b2;
-        for (uint i = 2; i < 2 + 2 * 20; i += 2) {
-            iaddr *= 256;
-            b1 = uint160(uint8(tmp[i]));
-            b2 = uint160(uint8(tmp[i + 1]));
-            if ((b1 >= 97) && (b1 <= 102)) {
-                b1 -= 87;
-            } else if ((b1 >= 65) && (b1 <= 70)) {
-                b1 -= 55;
-            } else if ((b1 >= 48) && (b1 <= 57)) {
-                b1 -= 48;
-            }
-            if ((b2 >= 97) && (b2 <= 102)) {
-                b2 -= 87;
-            } else if ((b2 >= 65) && (b2 <= 70)) {
-                b2 -= 55;
-            } else if ((b2 >= 48) && (b2 <= 57)) {
-                b2 -= 48;
-            }
-            iaddr += (b1 * 16 + b2);
-        }
-        return address(iaddr);
     }
 }

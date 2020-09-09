@@ -63,14 +63,14 @@ module.exports = {
 
     // Useful for deploying to a public network.
     // NB: It's important to wrap the provider as a function.
-     rinkeby: {
+      rinkeby: {
        provider: () => new HDWalletProvider(privateKey, 'https://rinkeby.infura.io/v3/'+infuraKey),
        network_id: 4,       // Ropsten's id
        gas: 5500000,        // Ropsten has a lower block limit than mainnet
        confirmations: 2,    // # of confs to wait between deployments. (default: 0)
        timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
        skipDryRun: true     // Skip dry run before migrations? (default: false for public nets )
-     },
+      },
 
       skaleTest: {
         provider: () => new HDWalletProvider(privateKey, 'https://dev-testnet-v1-1.skalelabs.com'),
@@ -83,7 +83,7 @@ module.exports = {
       maticTest: {
         provider: () => new HDWalletProvider(privateKey, `https://rpc-mumbai.matic.today`),
         network_id: 80001,
-        confirmations: 10,
+        confirmations: 2,
         timeoutBlocks: 200,
         skipDryRun: true
       },
