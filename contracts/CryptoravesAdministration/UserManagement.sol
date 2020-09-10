@@ -106,16 +106,16 @@ contract UserManagement is AdministrationContract {
         //create a new user
         if (isUser(_platformUserId)){
             //check if handle has changed
-            if(!_stringsMatch(_twitterHandle, users[_platformUserId].twitterHandle)){
+            if(!AdminToolsLibrary._stringsMatch(_twitterHandle, users[_platformUserId].twitterHandle)){
                 //update user handle if no match
                 users[_platformUserId].twitterHandle = _twitterHandle;
                 userIDs[_twitterHandle] = _platformUserId;
                 emit HandleChange(_platformUserId, _twitterHandle);
             }
             //check if imageUrl has changed
-            if(!_stringsMatch(_imageUrl, users[_platformUserId].imageUrl)){
+            if(!AdminToolsLibrary._stringsMatch(_imageUrl, users[_platformUserId].imageUrl)){
                 //make sure imageUrl isn't empty
-                if(!_stringsMatch(_imageUrl, '')){
+                if(!AdminToolsLibrary._stringsMatch(_imageUrl, '')){
                     users[_platformUserId].imageUrl = _imageUrl;
                 }
             }

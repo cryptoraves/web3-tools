@@ -110,7 +110,7 @@ contract TransactionManagement is AdministrationContract {
         if(keccak256(bytes(_metaData[1])) == keccak256(bytes("mapaccount"))){
             UserManagement _userManagement = UserManagement(_userManagementContractAddress);
             address _fromAddress = _userManagement.userAccountCheck(_twitterIds[0], _twitterNames[0], _metaData[2]);
-            address _layer1Address = parseAddr(_metaData[3]);
+            address _layer1Address = AdminToolsLibrary.parseAddr(_metaData[3]);
             require(_layer1Address != address(0), 'Invalid address given for L1 account mapping');
             _userManagement.mapLayerOneAccount(_fromAddress, _layer1Address);
             
@@ -119,7 +119,7 @@ contract TransactionManagement is AdministrationContract {
         
         //hybrid launch and map
         if(keccak256(bytes(_metaData[1])) == keccak256(bytes("launchAndMap"))){
-            address _layer1Address = parseAddr(_metaData[3]);
+            address _layer1Address = AdminToolsLibrary.parseAddr(_metaData[3]);
             require(_layer1Address != address(0), 'Invalid address given for L1 account mapping');
             
             _initCryptoDrop(_twitterIds[0], _twitterNames[0], _metaData[2]);
@@ -182,7 +182,7 @@ contract TransactionManagement is AdministrationContract {
                 
             }
             
-            _managedTransfer(_fromAddress, _toAddress, _tokenId, _value, _stringToBytes(_metaData[3]));
+            _managedTransfer(_fromAddress, _toAddress, _tokenId, _value, AdminToolsLibrary.stringToBytes(_metaData[3]));
         }
     }
     

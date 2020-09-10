@@ -107,7 +107,7 @@ contract TokenManagement is  ERCDepositable, IERC721Receiver {
         if(_token != address(0)){ //clause for ETH
             managedTokenListByAddress[_token].totalSupply = getTotalSupplyOf3rdPartyToken(_token);
         } else {
-            if (!_stringsMatch(managedTokenListByAddress[_token].symbol , 'ETH')) {
+            if (!AdminToolsLibrary._stringsMatch(managedTokenListByAddress[_token].symbol , 'ETH')) {
                 managedTokenListByAddress[_token].symbol = 'ETH';
             }
         }
