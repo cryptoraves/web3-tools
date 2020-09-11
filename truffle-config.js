@@ -71,6 +71,13 @@ module.exports = {
        timeoutBlocks: 400,  // # of blocks before a deployment times out  (minimum/default: 50)
        skipDryRun: false     // Skip dry run before migrations? (default: false for public nets )
       },
+      goerli: {
+       provider: () => new HDWalletProvider(privateKey, 'https://goerli.infura.io/v3/'+infuraKey),
+       network_id: 4,       // Ropsten's id
+       gas: 5500000,        // Ropsten has a lower block limit than mainnet
+       confirmations: 2,    // # of confs to wait between deployments. (default: 0)
+       timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
+      },
 
       skaleTest: {
         provider: () => new HDWalletProvider(privateKey, 'https://dev-testnet-v1-1.skalelabs.com'),
