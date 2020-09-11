@@ -9,8 +9,8 @@ let secondTokenManagerAddr = ''
 const TokenManagement = artifacts.require("TokenManagement")
 
 //reserve objects
-let usrMgmt
-let tknMgmt
+let usrMgmt2
+let tknMgmt2
 
 contract("TransactionManagement", async accounts => {
       
@@ -258,17 +258,17 @@ contract("TransactionManagement", async accounts => {
       let instance = await TransactionManagement.deployed()
 
       if(secondUserManagerAddr == ''){
-        usrMgmt = await UserManagement.new()
-        tknMgmt = await TokenManagement.new('http://fake.uri.com')
+        usrMgmt2 = await UserManagement.new()
+        tknMgmt2 = await TokenManagement.new('http://fake.uri.com')
         //assign new usermanagement and re-run above tests
-        await usrMgmt.setAdministrator(instance.address)
-        secondUserManagerAddr = usrMgmt.address
-        await tknMgmt.setAdministrator(instance.address)
-        secondTokenManagerAddr = tknMgmt.address
+        await usrMgmt2.setAdministrator(instance.address)
+        secondUserManagerAddr = usrMgmt2.address
+        await tknMgmt2.setAdministrator(instance.address)
+        secondTokenManagerAddr = tknMgmt2.address
       }else{
-        await usrMgmt.unsetAdministrator(await usrMgmt.getTransactionManagerAddress())
+        await usrMgmt2.unsetAdministrator(await usrMgmt2.getTransactionManagerAddress())
         secondUserManagerAddr = ethers.Wallet.createRandom().address
-        await tknMgmt.unsetAdministrator(await tknMgmt.getTransactionManagerAddress())
+        await tknMgmt2.unsetAdministrator(await tknMgmt2.getTransactionManagerAddress())
         secondTokenManagerAddr = ethers.Wallet.createRandom().address
       }
       await instance.setUserManagementAddress(secondUserManagerAddr) 
