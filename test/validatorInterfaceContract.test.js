@@ -11,6 +11,11 @@ let ids = []
 let amounts = []
 let primaryUserId = 38845343252
 
+//placeholder global obj
+let txnMgmt2
+let usrMgmt2
+let tknMgmt2
+
 contract("ValidatorInterfaceContract", async accounts => {
   
   //for iterateing through second token contract assignment
@@ -127,9 +132,16 @@ contract("ValidatorInterfaceContract", async accounts => {
       let instance = await ValidatorInterfaceContract.deployed()
 
       if(secondTokenManagerAddr==''){
-        let txnMgmt = await TransactionManagement.deployed()
-        await txnMgmt.setAdministrator(instance.address)
-        secondTokenManagerAddr = txnMgmt.address
+        tknMgmt2 = await TokenManagement.new('http://fake.uri2.com')
+        usrMgmt2 = await UserManagement.new()
+
+        txnMgmt2 = await TransactionManagement.new(tknMgmt2.address, usrMgmt2.address)
+        await txnMgmt2.setAdministrator(instance.address)
+
+        await usrMgmt2.setAdministrator(txnMgmt2.address)
+        await tknMgmt2.setAdministrator(txnMgmt2.address)
+        
+        secondTokenManagerAddr = txnMgmt2.address
       }else{
         secondTokenManagerAddr = ethers.Wallet.createRandom().address
       }
