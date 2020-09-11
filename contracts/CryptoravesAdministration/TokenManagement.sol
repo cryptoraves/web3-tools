@@ -4,7 +4,7 @@ pragma experimental ABIEncoderV2;
 
 import "./ERCDepositable.sol";
 import "./CryptoravesToken.sol";
-import "/home/cartosys/www/openzeppelin-contracts/contracts/token/ERC721/IERC721Receiver.sol";
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/contracts/token/ERC721/IERC721Receiver.sol";
 
 contract TokenManagement is  ERCDepositable, IERC721Receiver {
     
@@ -38,8 +38,8 @@ contract TokenManagement is  ERCDepositable, IERC721Receiver {
     event CryptoDropped(address user, uint256 tokenId);
     
     constructor(string memory _uri) public {
-        //default managers include parent contract and ValidatorInterfaceContract Owner
-        setAdministrator(tx.origin);
+        
+        setAdministrator(msg.sender);
         CryptoravesToken newCryptoravesToken = new CryptoravesToken(_uri);
         _cryptoravesTokenAddr = address(newCryptoravesToken);
     }

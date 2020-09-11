@@ -20,10 +20,9 @@ contract TransactionManagement is AdministrationContract {
     event UserManagementAddressChange(address _newContractAddr);
     event HeresMyAddress(address _layer1Address, address _walletContractAddress);
 
-    constructor(address _validatorInterfaceAddress, address _tokenManagementAddr, address _userManagementAddr) public {
+    constructor(address _tokenManagementAddr, address _userManagementAddr) public {
         
-        //default administrators include parent contract and its owner
-        setAdministrator(_validatorInterfaceAddress);
+        //default administrator
         setAdministrator(msg.sender);
                 
         setTokenManagementAddress(_tokenManagementAddr);
