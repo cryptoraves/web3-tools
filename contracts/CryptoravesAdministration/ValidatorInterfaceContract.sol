@@ -2,15 +2,12 @@
 pragma solidity 0.6.10;
 pragma experimental ABIEncoderV2;
 
-import "./TransactionManagement.sol";
+import "AdministrationContract.sol";
 
 /*  
     Oracle data corridor. Oracle address(es) must be set as administrator.
 */
 contract ValidatorInterfaceContract is AdministrationContract {
-    
-    using SafeMath for uint256;
-    using Address for address;
 
     //token manager contract address
     address private _transactionManager;
@@ -18,15 +15,13 @@ contract ValidatorInterfaceContract is AdministrationContract {
     event NewTransactionManager(address indexed _managementAddr);
     
     //owner is administrator ("validator") by default. Can later revoke self by unsetValidator()
-    constructor(string memory _uri, address _legacyTransactionManagementAddr, address _legacyUserManagementAddr) public {
+    constructor(address _txnManager) public {
 
-        //launch token Manager
-        TransactionManagement _txnManager = new TransactionManagement(_uri, _legacyTransactionManagementAddr, _legacyUserManagementAddr);
-         
+        //asssign sender as admin
+        setAdministrator(msg.sender);
+
         //set default token manager address
-        _transactionManager = address(_txnManager);
-        
-        emit NewTransactionManager(_transactionManager);
+        setTransactionManagementAddress(_txnManager);
     }
     
     
@@ -72,7 +67,7 @@ contract ValidatorInterfaceContract is AdministrationContract {
         string[] memory _metaData
     ) public onlyAdmin {
         
-        TransactionManagement transactionManager = TransactionManagement(_transactionManager);
+        ITransactionManager transactionManager = ITransactionManager(_transactionManager);
         
         transactionManager.initCommand(_twitterIds, _twitterNames, _value, _metaData);
         /*

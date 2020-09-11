@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.6.10;
 
-import "/home/cartosys/www/openzeppelin-contracts/contracts/token/ERC1155/ERC1155Burnable.sol";
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC1155/ERC1155Burnable.sol";
 import "./AdministrationContract.sol";
 
 interface CryptoravesTokenManager {
@@ -14,16 +14,7 @@ interface CryptoravesTokenManager {
     function getTotalSupply(uint256) external view returns(uint256);
     function subtractFromTotalSupply(uint256 _tokenId, uint256 _amount) external;
 }
-interface ITokenManager {
-    function getCryptoravesTokenAddress() external view returns(address);
-    function getUserManagementAddress() external view returns(address);
-}
-interface UTokenManager {
-    function getLayerOneAccount(address _l2Addr) external view returns(address);
-    function userHasL1AddressMapped(address _userCryptoravesAddr) external view returns(bool);
-    function getUserId(address _account) external view returns(uint256);
-    function dropState (uint256 _platformUserId) external view returns(bool);
-}
+
 
 contract Ravepool is AdministrationContract {
     
@@ -50,15 +41,15 @@ contract Ravepool is AdministrationContract {
         address _userTokenManager = ITokenManager(_tokenManager).getUserManagementAddress();
         
         //require crypto already dropped by user
-        uint256 _userIdToCheck = UTokenManager(_userTokenManager).getUserId(address(this));
+        uint256 _userIdToCheck = IUserManager(_userTokenManager).getUserId(address(this));
         require(
-            UTokenManager(_userTokenManager).dropState(_userIdToCheck),
+            IUserManager(_userTokenManager).dropState(_userIdToCheck),
             'User has not yet dropped their cryptoraves personal token.'
         );
         
         //require layer 1 address be mapped by user 
         require(
-            UTokenManager(_userTokenManager).userHasL1AddressMapped(address(this)),
+            IUserManager(_userTokenManager).userHasL1AddressMapped(address(this)),
             'User has not yet Mapped an L1 address to their cryptoraves address.'
         );
         

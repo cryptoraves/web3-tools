@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.6.10;
 
-import "/home/cartosys/www/openzeppelin-contracts/contracts/token/ERC1155/ERC1155Burnable.sol";
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC1155/ERC1155Burnable.sol";
 import "./AdministrationContract.sol";
 
 abstract contract ERC1155Receiver is ERC165, IERC1155Receiver, AdministrationContract {
@@ -17,10 +17,7 @@ interface IERC1155Mintable {
     function mint() external view returns(address);
     function getUserManagementAddress() external view returns(address);
 }
-interface ITokenManager {
-    function getCryptoravesTokenAddress() external view returns(address);
-    function getUserManagementAddress() external view returns(address);
-}
+
 contract WalletFull is ERC1155Receiver {
     
     using SafeMath for uint256;

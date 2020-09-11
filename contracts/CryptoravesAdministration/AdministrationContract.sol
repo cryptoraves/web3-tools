@@ -1,12 +1,37 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.6.10;
+pragma experimental ABIEncoderV2;
 
 import "./AdminToolsLibrary.sol";
 
 interface ITransactionManager {
+    function initCommand(uint256[] memory, string[] memory, uint256, string[] memory) external returns(bool);
     function testForTransactionManagementAddressUniquely() external pure returns(bool);
-    function getUserL1AccountFromL2Account(address _l2) external view returns(address);
-    function getUserL2AccountFromL1Account(address _l1) external view returns(address);
+    function getUserL1AccountFromL2Account(address) external view returns(address);
+    function getUserL2AccountFromL1Account(address) external view returns(address);
+}
+
+interface ITokenManager {
+    function getCryptoravesTokenAddress() external view returns(address);
+    function getUserManagementAddress() external view returns(address);
+    function getTickerAddress(string memory) external view returns(address);
+    function getManagedTokenIdByAddress(address) external view returns(uint256);
+    function dropCrypto(string memory, address, uint256, uint256, bytes memory) external;
+    function _checkHeldToken(address, uint256) external;
+    function setIsManagedToken(address, bool) external;
+}
+
+interface IUserManager {
+    function getLayerOneAccount(address) external view returns(address);
+    function getLayerTwoAccount(address) external view returns(address);
+    function userHasL1AddressMapped(address) external view returns(bool);
+    function getUserId(address) external view returns(uint256);
+    function dropState (uint256) external view returns(bool);
+    function userAccountCheck(uint256, string memory, string memory) external returns(address);
+    function mapLayerOneAccount(address, address) external;
+    function getUserAccount(uint256) external view returns(address);
+    function isUser (uint256) external view  returns(bool);
+    function setDropState(uint256, bool) external returns (address);
 }
 
 contract AdministrationContract {

@@ -2,14 +2,14 @@
 pragma solidity 0.6.10;
 pragma experimental ABIEncoderV2;
 
-import "./TokenManagement.sol";
-import "./UserManagement.sol";
+import "AdministrationContract.sol";
+
+interface IERC1155 {
+    function safeTransferFrom(address from, address to, uint256 id, uint256 amount, bytes memory data) external;
+}
 
 //can manage tokens for any Cryptoraves-native address
 contract TransactionManagement is AdministrationContract {
-    
-    using SafeMath for uint256;
-    using Address for address;
     
     address private _tokenManagementContractAddress;
     address private _userManagementContractAddress;
@@ -20,29 +20,14 @@ contract TransactionManagement is AdministrationContract {
     event UserManagementAddressChange(address _newContractAddr);
     event HeresMyAddress(address _layer1Address, address _walletContractAddress);
 
-    constructor(string memory _uri, address _tokenManagementAddr, address _userManagementAddr) public {
+    constructor(address _validatorInterfaceAddress, address _tokenManagementAddr, address _userManagementAddr) public {
         
         //default administrators include parent contract and its owner
-        setAdministrator(tx.origin);
-        
-        //launch child contracts if no address arguments specified
-        if (_tokenManagementAddr == address(0)){
-            //launch new Cryptoraves Token contract
-            TokenManagement _tokenManagement = new TokenManagement(_uri);
-            _tokenManagementContractAddress = address(_tokenManagement);
-        } else {
-            TokenManagement _tokenManagement = TokenManagement(_tokenManagementContractAddress);
-            _tokenManagementContractAddress = address(_tokenManagement);
-        }
-        
-        if (_userManagementAddr == address(0)){
-            //launch new user management contract contract
-            UserManagement _userManagement = new UserManagement();
-            _userManagementContractAddress = address(_userManagement);
-        } else {
-            UserManagement _userManagement = UserManagement(_userManagementAddr);
-            _userManagementContractAddress = address(_userManagement);
-        }
+        setAdministrator(_validatorInterfaceAddress);
+        setAdministrator(msg.sender);
+                
+        setTokenManagementAddress(_tokenManagementAddr);
+        setUserManagementAddress(_userManagementAddr);
     }
     //unique function for identifying this contract
     function testForTransactionManagementAddressUniquely() public pure returns(bool){
@@ -68,7 +53,7 @@ contract TransactionManagement is AdministrationContract {
     } 
     
     function getCryptoravesTokenAddress() public view returns(address){
-        TokenManagement _tokenManagement = TokenManagement(_tokenManagementContractAddress);
+        ITokenManager _tokenManagement = ITokenManager(_tokenManagementContractAddress);
         return _tokenManagement.getCryptoravesTokenAddress();
     } 
         
@@ -108,7 +93,7 @@ contract TransactionManagement is AdministrationContract {
         
         //map layer 1 account
         if(keccak256(bytes(_metaData[1])) == keccak256(bytes("mapaccount"))){
-            UserManagement _userManagement = UserManagement(_userManagementContractAddress);
+            IUserManager _userManagement = IUserManager(_userManagementContractAddress);
             address _fromAddress = _userManagement.userAccountCheck(_twitterIds[0], _twitterNames[0], _metaData[2]);
             address _layer1Address = AdminToolsLibrary.parseAddr(_metaData[3]);
             require(_layer1Address != address(0), 'Invalid address given for L1 account mapping');
@@ -124,7 +109,7 @@ contract TransactionManagement is AdministrationContract {
             
             _initCryptoDrop(_twitterIds[0], _twitterNames[0], _metaData[2]);
             
-             UserManagement _userManagement = UserManagement(_userManagementContractAddress);
+             IUserManager _userManagement = IUserManager(_userManagementContractAddress);
             address _fromAddress = _userManagement.getUserAccount(_twitterIds[0]);
             _userManagement.mapLayerOneAccount(_fromAddress, _layer1Address);
             
@@ -134,7 +119,7 @@ contract TransactionManagement is AdministrationContract {
         //transfers
         if(keccak256(bytes(_metaData[1])) == keccak256(bytes("transfer"))){
             
-            UserManagement _userManagement = UserManagement(_userManagementContractAddress);
+            IUserManager _userManagement = IUserManager(_userManagementContractAddress);
             
             require(_userManagement.isUser(_twitterIds[0]), 'Initiating Twitter user is not a Cryptoraves user');
             
@@ -145,7 +130,7 @@ contract TransactionManagement is AdministrationContract {
             uint256 _tokenId;
             address _userAccount;
             
-            TokenManagement _tokenManagement = TokenManagement(_tokenManagementContractAddress);
+            ITokenManager _tokenManagement = ITokenManager(_tokenManagementContractAddress);
             
             //transfer type check
             if(_twitterIds[2] == 0){
@@ -188,7 +173,7 @@ contract TransactionManagement is AdministrationContract {
     
     function _initCryptoDrop(uint256 _platformUserId, string memory _twitterHandleFrom, string memory _imageUrl) internal returns(address) {
         
-        UserManagement _userManagement = UserManagement(_userManagementContractAddress);
+        IUserManager _userManagement = IUserManager(_userManagementContractAddress);
         
         //check if user already dropped
         require(!_userManagement.dropState(_platformUserId), 'User already dropped their crypto.');
@@ -196,7 +181,7 @@ contract TransactionManagement is AdministrationContract {
         //init account
         address _userAddress = _userManagement.userAccountCheck(_platformUserId,_twitterHandleFrom,_imageUrl);
         
-        TokenManagement _tokenManagement = TokenManagement(_tokenManagementContractAddress);
+        ITokenManager _tokenManagement = ITokenManager(_tokenManagementContractAddress);
         
         _tokenManagement.dropCrypto(_twitterHandleFrom, _userAddress, _standardMintAmount, _standardMintAmount, '');
         
@@ -208,8 +193,8 @@ contract TransactionManagement is AdministrationContract {
 
     function getTokenIdFromPlatformId(uint256 _platformId) public view returns(uint256) {
         
-        UserManagement _userManagement = UserManagement(_userManagementContractAddress);
-        TokenManagement _tokenManagement = TokenManagement(_tokenManagementContractAddress);
+        IUserManager _userManagement = IUserManager(_userManagementContractAddress);
+        ITokenManager _tokenManagement = ITokenManager(_tokenManagementContractAddress);
         
         address _userAccount = _userManagement.getUserAccount(_platformId);
 
@@ -221,17 +206,17 @@ contract TransactionManagement is AdministrationContract {
     }
     
     function getUserL1AccountFromL2Account(address _l2) public view returns(address) {
-        UserManagement _userManagement = UserManagement(_userManagementContractAddress);
+        IUserManager _userManagement = IUserManager(_userManagementContractAddress);
         return _userManagement.getLayerOneAccount(_l2);
     }
     
     function getUserL2AccountFromL1Account(address _l1) public view returns(address) {
-        UserManagement _userManagement = UserManagement(_userManagementContractAddress);
+        IUserManager _userManagement = IUserManager(_userManagementContractAddress);
         return _userManagement.getLayerTwoAccount(_l1);
     }
     
     function _managedTransfer(address _from, address _to, uint256 _id,  uint256 _val, bytes memory _data) internal {
-        TokenManagement _tokenManagement = TokenManagement(_tokenManagementContractAddress);
+        ITokenManager _tokenManagement = ITokenManager(_tokenManagementContractAddress);
         address _cryptoravesTokenAddr = _tokenManagement.getCryptoravesTokenAddress();
         IERC1155(_cryptoravesTokenAddr).safeTransferFrom(_from, _to, _id, _val, _data);
         _tokenManagement._checkHeldToken(_to, _id);
@@ -242,13 +227,13 @@ contract TransactionManagement is AdministrationContract {
     //End user support features
     function resetTokenDrop(uint256 _platformUserId) public onlyAdmin {
         //reset user's dropState
-        UserManagement _userManagement = UserManagement(_userManagementContractAddress);
+        IUserManager _userManagement = IUserManager(_userManagementContractAddress);
         _userManagement.setDropState(_platformUserId, false);
         
         address _acct = _userManagement.getUserAccount(_platformUserId);
         
         //reset token
-        TokenManagement _tokenManagement = TokenManagement(_tokenManagementContractAddress);
+        ITokenManager _tokenManagement = ITokenManager(_tokenManagementContractAddress);
         _tokenManagement.setIsManagedToken(_acct, false);
         
     }
