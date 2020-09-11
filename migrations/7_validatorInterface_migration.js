@@ -1,8 +1,7 @@
 const ValidatorInterfaceContract = artifacts.require('ValidatorInterfaceContract')
 const AdminToolsLibrary = artifacts.require('AdminToolsLibrary')
 
-const imgUrl = 'https://i.picsum.photos/id/99/200/200.jpg'
-const originAddr = '0x0000000000000000000000000000000000000000'
+const TransactionManagement = artifacts.require('TransactionManagement')
 
 module.exports = function (deployer) {
   
@@ -10,9 +9,14 @@ module.exports = function (deployer) {
   	
   	await deployer.deploy(AdminToolsLibrary)
   	await deployer.link(AdminToolsLibrary, ValidatorInterfaceContract)
-    await deployer.deploy(ValidatorInterfaceContract, imgUrl, originAddr, originAddr)
+
+  	const transactionMgmtInstance = await TransactionManagement.deployed() 
+    await deployer.deploy(ValidatorInterfaceContract, transactionMgmtInstance.address)
     const instance = await ValidatorInterfaceContract.deployed()
-        
+    
+    //set admins
+    await transactionMgmtInstance.setAdministrator(instance.address)
+
     console.log('\n*************************************************************************\n')
     console.log('ValidatorInterfaceContract Address: '+instance.address)
     console.log('\n*************************************************************************\n')
