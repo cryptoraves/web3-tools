@@ -67,7 +67,7 @@ module.exports = {
        provider: () => new HDWalletProvider(privateKey, 'https://rinkeby.infura.io/v3/'+infuraKey),
        network_id: 4,       // Ropsten's id
        gas: 5500000,        // Ropsten has a lower block limit than mainnet
-       confirmations: 1,    // # of confs to wait between deployments. (default: 0)
+       confirmations: 2,    // # of confs to wait between deployments. (default: 0)
        timeoutBlocks: 400,  // # of blocks before a deployment times out  (minimum/default: 50)
        skipDryRun: false     // Skip dry run before migrations? (default: false for public nets )
       },
@@ -78,12 +78,12 @@ module.exports = {
         gas: 40000000,
         network_id: "*",
         timeout: 100000,
-        ChainID: 346750
+        ChainID: 54173
       },
       maticTest: {
         provider: () => new HDWalletProvider(privateKey, `https://rpc-mumbai.matic.today`),
         network_id: 80001,
-        confirmations: 1,
+        confirmations: 2,
         timeoutBlocks: 400
       },
     // Useful for private networks
