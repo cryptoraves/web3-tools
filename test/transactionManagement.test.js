@@ -8,6 +8,9 @@ let secondUserManagerAddr = ''
 let secondTokenManagerAddr = ''
 const TokenManagement = artifacts.require("TokenManagement")
 
+//reserve objects
+let usrMgmt
+let tknMgmt
 
 contract("TransactionManagement", async accounts => {
       
@@ -253,10 +256,10 @@ contract("TransactionManagement", async accounts => {
     })
     it("set a new userManagement & TokenManagement address and check it", async () => {
       let instance = await TransactionManagement.deployed()
-      let usrMgmt = await UserManagement.deployed()
-      let tknMgmt = await TokenManagement.deployed()
 
       if(secondUserManagerAddr == ''){
+        usrMgmt = await UserManagement.new()
+        tknMgmt = await TokenManagement.new('http://fake.uri.com')
         //assign new usermanagement and re-run above tests
         await usrMgmt.setAdministrator(instance.address)
         secondUserManagerAddr = usrMgmt.address
