@@ -2,7 +2,7 @@
 pragma solidity 0.6.10;
 pragma experimental ABIEncoderV2;
 
-import "AdministrationContract.sol";
+import "./AdministrationContract.sol";
 
 /*  
     Oracle data corridor. Oracle address(es) must be set as administrator.
