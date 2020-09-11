@@ -90,7 +90,7 @@ contract("UserManagement", async accounts => {
     let instance = await UserManagement.at(
 	    await txnMgmt.getUserManagementAddress()
 	)
-    let isValidator = await instance.isAdministrator.call()
+    let isValidator = await instance.isAdministrator(accounts[0])
     assert.isOk(
       isValidator,
       "isValidator failed with main address as msg.sender"
@@ -103,7 +103,7 @@ contract("UserManagement", async accounts => {
 	)
     let isValidator
     try{
-      isValidator = await instance.isAdministrator.call({from: ethers.Wallet.createRandom().address})
+      isValidator = await instance.isAdministrator(ethers.Wallet.createRandom().address)
       assert.isOk(!isValidator, "isAdmin failing. revert")
     }catch(e){
       //reverts as predicted
@@ -119,7 +119,7 @@ contract("UserManagement", async accounts => {
     let wallet = ethers.Wallet.createRandom()
 
     let res = await instance.setAdministrator(wallet.address) 
-    let isValidator = await instance.isAdministrator.call({ from: wallet.address })
+    let isValidator = await instance.isAdministrator(wallet.address)
     assert.isOk(
       isValidator,
       "isValidator failed with random wallet.address as msg.sender"
@@ -138,7 +138,7 @@ contract("UserManagement", async accounts => {
     res = await instance.unsetAdministrator(wallet.address) 
     
     try{
-      isValidator = await instance.isAdministrator.call({ from: wallet.address })
+      isValidator = await instance.isAdministrator(wallet.address)
       assert.isOk(!isValidator, "unsetValidator failing. Should revert")
     }catch(e){
       //reverts as predicted

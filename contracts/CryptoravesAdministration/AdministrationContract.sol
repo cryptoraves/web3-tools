@@ -64,8 +64,8 @@ contract AdministrationContract {
     /*
     * Return admin flag of sender
     */
-    function isAdministrator() public view returns(bool) {
-        return _administrators[msg.sender];
+    function isAdministrator(address _addr) public view returns(bool) {
+        return _administrators[_addr];
     }
     
     /*
