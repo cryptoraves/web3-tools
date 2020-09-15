@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.6.10;
 
-import "/home/cartosys/www/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/IERC20.sol";
 import "./AdministrationContract.sol";
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/contracts/token/ERC721/IERC721Receiver.sol";
 
-contract ERCDepositable is AdministrationContract {
+contract ERCDepositable is IERC721Receiver, AdministrationContract {
     
     mapping(string => address) public tokenAddressesBySymbol;
 
@@ -72,6 +73,11 @@ contract ERCDepositable is AdministrationContract {
         IERCuni token = IERCuni(_tokenAddr);
         token.safeTransferFrom(address(this), msg.sender, _tokenId);
         
+    }
+        
+    //required for use with safeTransfer in ERC721
+    function onERC721Received(address, address, uint256, bytes memory) public virtual override returns (bytes4) {
+        return this.onERC721Received.selector;
     }
 }
 

@@ -4,9 +4,8 @@ pragma experimental ABIEncoderV2;
 
 import "./ERCDepositable.sol";
 import "./CryptoravesToken.sol";
-import "/home/cartosys/www/openzeppelin-contracts/contracts/token/ERC721/IERC721Receiver.sol";
 
-contract TokenManagement is  ERCDepositable, IERC721Receiver {
+contract TokenManagement is  ERCDepositable {
     
     using SafeMath for uint256;
     using Address for address;
@@ -286,10 +285,5 @@ contract TokenManagement is  ERCDepositable, IERC721Receiver {
             _accounts,
             heldTokenIds[_addr]
         );
-    }
-    
-    //required for use with safeTransfer in ERC721
-    function onERC721Received(address, address, uint256, bytes memory) public virtual override returns (bytes4) {
-        return this.onERC721Received.selector;
     }
 }
