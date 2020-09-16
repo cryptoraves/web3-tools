@@ -80,7 +80,7 @@ module.exports = {
       },
 
       skaleTest: {
-        provider: () => new HDWalletProvider(privateKey, 'https://dev-testnet-v1-1.skalelabs.com'),
+        provider: () => new HDWalletProvider(privateKey, 'https://dev-testnet-v1-0.skalelabs.com'),
         gasPrice: 0,
         gas: 40000000,
         network_id: "*",
