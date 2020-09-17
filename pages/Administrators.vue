@@ -1,6 +1,12 @@
 <template>
   <div class="container">
     <div>
+      <div class="highlight">
+        <h2 class="subtitle">
+          Network: {{ this.networkType }} 
+        </h2>
+      </div>
+      <br><br><br>
       <h1 class="title">
         Admin Functions
       </h1>
@@ -12,7 +18,7 @@
         <a
           target="_blank" 
           @click="goEtherscan(ethereumAddress)">
-          Wallet Address: {{ this.ethereumAddress }}
+          Your Wallet Address: {{ this.ethereumAddress }}
         </a>
         <br>Fake Twitter ID: {{ this.twitterId }}
         <div
@@ -26,7 +32,7 @@
           </a>
         </div>
          <div
-          v-if="ValidatorContractAddress && managerContractAddress && !showLoading" 
+          v-if="ValidatorContractAddress && TokenManagementContractAddress && !showLoading" 
           class="links">
           <a
             target="_blank"
@@ -37,8 +43,8 @@
           <br>
           <a
             target="_blank"
-            @click="goEtherscan(managerContractAddress)">
-            Manager Contract Address: {{ this.managerContractAddress }}
+            @click="goEtherscan(TokenManagementContractAddress)">
+            Manager Contract Address: {{ this.TokenManagementContractAddress }}
           </a>
           <br>
           <br>
@@ -61,7 +67,7 @@
         </div>
         
         <div
-          v-if="ValidatorContractAddress && managerContractAddress && !showLoading && !minted" 
+          v-if="ValidatorContractAddress && TokenManagementContractAddress && !showLoading && !minted" 
           class="links">
           <a
             @click="dropMyCrypto()"
@@ -95,7 +101,7 @@
             alt >
         </div>
         <div 
-            v-if="ValidatorContractAddress && managerContractAddress && !showLoading && minted"
+            v-if="ValidatorContractAddress && TokenManagementContractAddress && !showLoading && minted"
             class="links">
             <br>
             <br>
@@ -140,19 +146,16 @@ export default {
   components: {},
   data() {
     return {
-      ethereumAddress: null
+      ethereumAddress: null,
+      networkType: null
     }
   },
 
   async mounted() {
-    if (localStorage.cryptoravesTokenContractAddress) this.cryptoravesTokenContractAddress = localStorage.cryptoravesTokenContractAddress
-    if (localStorage.managerContractAddress) this.managerContractAddress = localStorage.managerContractAddress
-    if (localStorage.launchedWalletAddress) this.launchedWalletAddress = localStorage.launchedWalletAddress
-    if (localStorage.managerContractMinted) this.minted = localStorage.managerContractMinted 
-    if (localStorage.managedContractRecipientAddress) this.recipientAddress = localStorage.managedContractRecipientAddress 
-    if (localStorage.ERC1155tokenId) this.tokenId = localStorage.ERC1155tokenId
-    if (localStorage.ERC1155tokenId) this.ERC1155tokenId = localStorage.ERC1155tokenId
-
+    //if (localStorage.CryptoravesTokenContractAddress) this.CryptoravesTokenContractAddress = localStorage.CryptoravesTokenContractAddress
+    if (localStorage.UserManagementContractAddress) this.UserManagementContractAddress = localStorage.UserManagementContractAddress
+    if (localStorage.TokenManagementContractAddress) this.TokenManagementContractAddress = localStorage.TokenManagementContractAddress
+    if (localStorage.TransactionManagementContractAddress) this.TransactionManagementContractAddress = localStorage.TransactionManagementContractAddress
     if (localStorage.ValidatorContractAddress) this.ValidatorContractAddress = localStorage.ValidatorContractAddress
 
     if (localStorage.twitterId) {
@@ -166,8 +169,24 @@ export default {
       this.recipientTwitterId = localStorage.recipientTwitterId = Math.round(Math.random() * 1000000000)
     }
     
+
+
+    //Prompt to launch or input deployed address if any are missing
+
+
   },
   methods: {
+
+
+    async launchUserManagementContract(){
+
+    },
+    async launchTokenManagementContract(){
+
+    },
+    async launchTransactionManagementContract(){
+
+    },
     async launchValidatorContract(){
 
       let factory = new this.ethers.ContractFactory(this.abi, this.bytecode, this.signer);
@@ -184,7 +203,7 @@ export default {
     
       this.ValidatorContractAddress = localStorage.ValidatorContractAddress = contract.address
 
-      this.managerContractAddress = localStorage.managerContractAddress = await contract.getTokenManager()
+      this.TokenManagementContractAddress = localStorage.TokenManagementContractAddress = await contract.getTokenManager()
       this.minted = localStorage.managerContractMinted = false
     },
     async dropMyCrypto(redrop=false){
@@ -211,17 +230,17 @@ export default {
 
       this.showLoading = true
       let managerContract = new this.ethers.Contract(
-        this.managerContractAddress, 
+        this.TokenManagementContractAddress, 
         [
           'function getCryptoravesTokenAddress() public view returns(address)',
           'function getUserManagementAddress() public view returns(address)'
         ],
         this.signer
       )
-      this.cryptoravesTokenContractAddress = localStorage.cryptoravesTokenContractAddress = await managerContract.getCryptoravesTokenAddress()
+      this.CryptoravesTokenContractAddress = localStorage.CryptoravesTokenContractAddress = await managerContract.getCryptoravesTokenAddress()
 
       let token1155 = new this.ethers.Contract(
-        this.cryptoravesTokenContractAddress, 
+        this.CryptoravesTokenContractAddress, 
         ['function getManagedTokenIdByAddress(address _tokenOriginAddr) public view returns(uint256)'],
         this.signer
       )
@@ -244,7 +263,7 @@ export default {
       console.log('Is Validator ',await contract.isAdministrator())
 
       let tokenManagerContract = new this.ethers.Contract(
-        this.managerContractAddress, 
+        this.TokenManagementContractAddress, 
         [
           'function getUserManagementAddress() public view returns(address)'
         ], 
@@ -295,13 +314,13 @@ export default {
         'function balanceOf(address who, uint256 tokenId) external view returns (uint256)',
       ]
 
-      let cryptoravesTokenContractAddress = new this.ethers.Contract(this.cryptoravesTokenContractAddress, abi, this.signer)
+      let CryptoravesTokenContractAddress = new this.ethers.Contract(this.CryptoravesTokenContractAddress, abi, this.signer)
 
-      let amount1 = await cryptoravesTokenContractAddress.balanceOf(this.launchedWalletAddress, this.tokenId)
+      let amount1 = await CryptoravesTokenContractAddress.balanceOf(this.launchedWalletAddress, this.tokenId)
       
       console.log('Balance #1: ', this.launchedWalletAddress, this.ethers.utils.formatUnits(amount1, this.decimals))
       if (this.recipientAddress){
-        let amount2 = await cryptoravesTokenContractAddress.balanceOf(this.recipientAddress, this.tokenId)
+        let amount2 = await CryptoravesTokenContractAddress.balanceOf(this.recipientAddress, this.tokenId)
         console.log('Balance #2: ', this.recipientAddress, this.ethers.utils.formatUnits(amount2, this.decimals))
       }
       
@@ -322,12 +341,12 @@ export default {
       this.showLoading = true
       let val = await tx.wait()
       this.showLoading = false
-      amount1 = await cryptoravesTokenContractAddress.balanceOf(this.launchedWalletAddress, this.tokenId)
+      amount1 = await CryptoravesTokenContractAddress.balanceOf(this.launchedWalletAddress, this.tokenId)
 
       abi = [
         'function getUserManagementAddress() public view returns(address)'
       ]
-      let tokenManager = new this.ethers.Contract(this.managerContractAddress, abi, this.signer)
+      let tokenManager = new this.ethers.Contract(this.TokenManagementContractAddress, abi, this.signer)
 
       let userContractAddress = await tokenManager.getUserManagementAddress()
       console.log('UserManager Address: '+userContractAddress)
@@ -342,7 +361,7 @@ export default {
       console.log(this.recipientAddress)
       console.log('Balance #1: ', this.launchedWalletAddress, this.ethers.utils.formatUnits(amount1, this.decimals))
       
-      amount1 = await cryptoravesTokenContractAddress.balanceOf(this.recipientAddress, this.tokenId)
+      amount1 = await CryptoravesTokenContractAddress.balanceOf(this.recipientAddress, this.tokenId)
       console.log('Balance #2: ', this.recipientAddress, this.ethers.utils.formatUnits(amount1, this.decimals))
     },
     resetLocalStorage(){
@@ -359,7 +378,7 @@ export default {
   },
   data() {
     return {
-      managerContractAddress: null,
+      TokenManagementContractAddress: null,
       launchedWalletAddress: null,
       recipientAddress: null,
       showLoading: false,

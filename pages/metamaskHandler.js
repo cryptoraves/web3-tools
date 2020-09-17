@@ -5,7 +5,8 @@ export default {
   components: {},
   data() {
     return {
-      ethereumAddress: null
+      ethereumAddress: null,
+      networkType: null
     }
   },
   async mounted() {
@@ -55,6 +56,7 @@ export default {
             alert('Please switch Metamask to Rinkeby Test Network')
           }
         }
+        this.networkType = await web3.eth.net.getNetworkType()
       } else {
         this.showEnableMetaMask = true
       }
