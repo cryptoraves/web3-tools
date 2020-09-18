@@ -141,6 +141,7 @@
 
 <script>
 import MetamaskHandler from "./metamaskHandler"
+import ContractHandler from "./contractHandler"
 export default {
   extends: MetamaskHandler,
   components: {},
