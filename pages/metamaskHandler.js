@@ -34,6 +34,7 @@ export default {
       } catch(e) {
         console.log(e)
       }
+
       if ([1, 4].includes(networkId)) {
         if (networkId == 4) {
           //mainnet check for live site
@@ -58,8 +59,9 @@ export default {
         }
         this.networkType = await web3.eth.net.getNetworkType()
       } else {
-        this.showEnableMetaMask = true
+        this.networkType = 'SKALE Testnet'
       }
+
       if (web3js) {
         this.web3js = web3js
         this.ethers = ethers

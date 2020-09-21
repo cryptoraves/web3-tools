@@ -148,7 +148,8 @@ export default {
   data() {
     return {
       ethereumAddress: null,
-      networkType: null
+      networkType: null,
+      abis: {}
     }
   },
 
@@ -169,18 +170,12 @@ export default {
     } else {
       this.recipientTwitterId = localStorage.recipientTwitterId = Math.round(Math.random() * 1000000000)
     }
-    
-
-
-    //Prompt to launch or input deployed address if any are missing
-
-
   },
   methods: {
 
 
     async launchUserManagementContract(){
-
+      
     },
     async launchTokenManagementContract(){
 
