@@ -1,21 +1,20 @@
 import Web3 from 'web3'
-import {fs} from 'fs'
 
 export default {
   	components: {},
 	data() {
 		return {
-		  ethereumAddress: null,
-		  networkType: null
+		  abis: {}
 		}
 	},
 	async mounted() {
-		var output = fs.readFileSync('../build/contracts/UserManagement.json')
-
-		console.log(output)
+		await loadAbis()
 	},
 	methods: {
-		async init() {
+		async loadAbis() {
+			var rawdata = fs.readFileSync('../build/contracts/UserManagement.json')
+			let abi = JSON.parse(rawdata)
+			abis[UserManagement] = abi
 		}
 	}
 }

@@ -51,10 +51,6 @@ contract UserManagement is AdministrationContract {
         return users[_platformUserId].account;
     }
     
-    function setTransactionManagerAddress(address _newAddr) public onlyAdmin{
-        //TODO: _transactionManagementAddress = _newAddr;
-    }
-    
     function launchL2Account(uint256 _userId, string memory _twitterHandleFrom, string memory _imageUrl) public onlyAdmin returns (address) {
         //launch a managed wallet
         WalletFull receiver = new WalletFull(getTransactionManagerAddress());

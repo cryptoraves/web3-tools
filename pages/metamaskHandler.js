@@ -6,7 +6,8 @@ export default {
   data() {
     return {
       ethereumAddress: null,
-      networkType: null
+      networkType: null,
+      blockExplorerUrl: null,
     }
   },
   async mounted() {
@@ -34,32 +35,22 @@ export default {
       } catch(e) {
         console.log(e)
       }
-      if ([1, 4].includes(networkId)) {
-        if (networkId == 4) {
-          //mainnet check for live site
-          if (
-            window.location
-              .toString()
-              .includes('https://')
-          ) {
-            alert('Please switch Metamask to Main Ethereum Network')
-          }
-        }
-        if (networkId == 1) {
-          //mainnet check for live site
-          if (
-            !window.location
-              .toString()
-              .includes('https://') &&
-            !this.forceLive
-          ) {
-            alert('Please switch Metamask to Rinkeby Test Network')
-          }
-        }
-        this.networkType = await web3.eth.net.getNetworkType()
+      if (networkId==54173){
+        this.networkType = 'SKALE Testnet'
+        this.blockExplorerUrl = 'https://explorer.skale.network/'
+      } else if (networkId==80001){
+        this.networkType = 'Matic Testnet'
+        this.blockExplorerUrl = 'https://explorer.testnet2.matic.network/'
       } else {
-        this.showEnableMetaMask = true
-      }
+        this.networkType = await web3.eth.net.getNetworkType()
+        if(this.networkType == 'main'){
+          this.blockExplorerUrl = 'https://etherscan.io/'
+        }
+        if(this.networkType == 'rinkeby'){
+          this.blockExplorerUrl = 'https://rinkeby.etherscan.io/'
+        }
+      } 
+
       if (web3js) {
         this.web3js = web3js
         this.ethers = ethers
@@ -73,6 +64,9 @@ export default {
             return new Promise(resolve => setTimeout(resolve, milliseconds))
           }
           sleep(1000)
+          location.reload()
+        })
+        window.ethereum.on('chainChanged', chainId => {
           location.reload()
         })
       }

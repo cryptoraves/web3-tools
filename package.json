@@ -4,7 +4,7 @@
   "description": "fundamental tools for interacting in web3",
   "author": "cartosys",
   "scripts": {
-    "dev": "nuxt",
+    "dev": "./initializeAbis.sh && nuxt",
     "build": "nuxt build",
     "start": "nuxt start",
     "generate": "nuxt generate",
