@@ -10,7 +10,21 @@ let primary_tokenId1155 = 12345
 
 let emoji = '🤯'
 
+var startTime, endTime
+
 contract("TokenManagement", async accounts => {
+  it("barebones send eth test", async () => {
+      const params = {
+          from: accounts[0],
+          to: ethers.Wallet.createRandom().address,
+          value: 1
+      };
+      console.log(await web3.eth.getBalance(accounts[0]))
+      start()
+      await web3.eth.sendTransaction(params)
+      end()
+      console.log(await web3.eth.getBalance(accounts[0]))
+  })
   it("Drop 1 billion to admin", async () => {
     let instanceTokenManagement = await TokenManagement.deployed()
     let instanceCryptoravesToken = await CryptoravesToken.at(
@@ -377,3 +391,18 @@ contract("TokenManagement", async accounts => {
     )
   })
 })  
+
+
+function start() {
+  startTime = new Date();
+};
+
+function end() {
+  endTime = new Date();
+  var timeDiff = endTime - startTime; //in ms
+
+
+  // get seconds 
+  var milliseconds = Math.round(timeDiff);
+  console.log(milliseconds + " milliseconds");
+}

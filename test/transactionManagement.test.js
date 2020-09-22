@@ -253,6 +253,7 @@ contract("TransactionManagement", async accounts => {
         'get/set emoji and/or symbol failed'
       )
 
+      
     })
     it("set a new userManagement & TokenManagement address and check it", async () => {
       let instance = await TransactionManagement.deployed()
@@ -372,3 +373,4 @@ contract("TransactionManagement", async accounts => {
     }
   });
 })  
+
