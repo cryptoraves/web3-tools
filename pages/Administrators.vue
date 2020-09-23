@@ -142,6 +142,33 @@
             Test Admin Functions
           </a>
         </div> 
+        <div
+          class="links">
+          <a
+            v-if="ValidatorContractAddress && ! ERC20FullAddress"
+            @click="launchERC20()"
+            class="button--green"
+          >
+            Launch An ERC20
+          </a>
+        </div> 
+        <div
+          v-if="ERC20FullAddress"
+          class="links">
+          <a
+              target="_blank"
+              @click="goEtherscan(ERC20FullAddress)">
+              ERC20 Contract Address: {{ this.ERC20FullAddress }}
+          </a>
+          <br>
+          <a
+            
+            @click="depositERC20()"
+            class="button--green"
+          >
+            Deposit And Send Test ERC20 Tokens
+          </a>
+        </div> 
         <div 
             v-if="UserManagementContractAddress"
             class="links">
@@ -168,7 +195,7 @@ export default {
   components: {},
   data() {
     return {
-      contractNames: ["CryptoravesToken", "TokenManagement", "TransactionManagement", "UserManagement", "ValidatorInterfaceContract"],
+      contractNames: ["CryptoravesToken", "ERC20Full", "TokenManagement", "TransactionManagement", "UserManagement", "ValidatorInterfaceContract"],
       ethereumAddress: null,
       networkType: null,
       errorMsg: null,
@@ -180,6 +207,8 @@ export default {
       CryptoravesTokenContractAddress: null,
       TransactionManagementContractAddress: null,
       ValidatorContractAddress: null,
+      ERC20FullAddress: null,
+      ERC1155tokenId: null,
       showLoading: false
     }
   },
@@ -194,6 +223,8 @@ export default {
     if (localStorage.TokenManagementContractAddress) this.TokenManagementContractAddress = localStorage.TokenManagementContractAddress
     if (localStorage.TransactionManagementContractAddress) this.TransactionManagementContractAddress = localStorage.TransactionManagementContractAddress
     if (localStorage.ValidatorContractAddress) this.ValidatorContractAddress = localStorage.ValidatorContractAddress 
+
+    if (localStorage.ERC20FullAddress) this.ERC20FullAddress = localStorage.ERC20FullAddress
   },
   methods: {
     checkAbis(){
@@ -210,15 +241,15 @@ export default {
       let contract = await factory.deploy();
       this.showLoading = true
       let tx = await contract.deployed()
-      this.showLoading = false
       this.UserManagementContractAddress = localStorage.UserManagementContractAddress = contract.address
+      this.showLoading = false
     },
     async launchTokenManagementContract(uri){
       let factory = new this.ethers.ContractFactory(abis["TokenManagement"].abi, abis["TokenManagement"].bytecode, this.signer);
       let contract = await factory.deploy(uri);
       this.showLoading = true
       let tx = await contract.deployed()
-      this.showLoading = false
+      
       this.TokenManagementContractAddress = localStorage.TokenManagementContractAddress = contract.address
       this.CryptoravesTokenContractAddress = localStorage.CryptoravesTokenContractAddress = await contract.getCryptoravesTokenAddress()
 
@@ -234,6 +265,7 @@ export default {
       ){
         console.log("Set Admin For Token Manager")
       }
+      this.showLoading = false
     },
     async launchTransactionManagementContract(_tokenManagementAddr, _userManagementAddr){
 
@@ -247,7 +279,7 @@ export default {
       contract = await factory.deploy(_tokenManagementAddr, _userManagementAddr);
       this.showLoading = true
       let tx = await contract.deployed()
-      this.showLoading = false
+      
       this.TransactionManagementContractAddress = localStorage.TransactionManagementContractAddress = contract.address
 
       //set as admin for all downstream contracts
@@ -274,6 +306,7 @@ export default {
       ){
         console.log("Set Admin For User Manager")
       }
+      this.showLoading = false
     },
     async launchValidatorContract(){
 
@@ -361,12 +394,125 @@ export default {
       console.log('Is TransactionManager an Administrator: ', await userManagerContract.isAdministrator(txnManagerAddress))
       console.log('Verify Correct TransactionManager: ', await tokenManagerContract.getTransactionManagerAddress() == txnManagerAddress && this.TransactionManagementContractAddress == txnManagerAddress)
     },
+    async launchERC20(){
+      this.showLoading = true
+      let factory = new this.ethers.ContractFactory(abis['ERC20Full'].abi, abis["ERC20Full"].bytecode, this.signer);
+      let contract = await factory.deploy(
+        this.ethereumAddress, 
+        'TestXToken', 'TSTX', '18',
+        '1000000000000000000000000000' //1 billion
+      )
+
+      let amount1 = await contract.balanceOf(this.ethereumAddress)
+      console.log('ERC20 Token Launched With Balance: ', this.ethers.utils.formatEther(amount1))
+
+      this.ERC20FullAddress = localStorage.ERC20FullAddress = contract.address
+
+      this.showLoading = false
+    },
+    async depositAndSendToken(){
+
+      let cryptoravesTokenContract = new this.ethers.Contract(this.CryptoravesTokenContractAddress, abis['CryptoravesToken'], this.signer)
+
+      let amount1 = await cryptoravesTokenContract.balanceOf(this.ethereumAddress, this.tokenId)
+      
+      console.log('Balance #1: ', this.launchedWalletAddress, this.ethers.utils.formatUnits(amount1, this.decimals))
+      if (this.recipientAddress){
+        let amount2 = await cryptoravesTokenContract.balanceOf(this.recipientAddress, this.tokenId)
+        console.log('Balance #2: ', this.recipientAddress, this.ethers.utils.formatUnits(amount2, this.decimals))
+      }
+      
+      let randomRecipientTwitterId = Math.round(Math.random() * 1000000000)
+      let twitterIds = [this.twitterId.toString(), randomRecipientTwitterId.toString(), '0']
+      let twitterNames = ['@fakeHandle', '@randomFake2', '']
+
+      let validatorContract = new this.ethers.Contract(
+        this.ValidatorContractAddress, 
+        this.abi, 
+        this.signer
+      )
+      let tx = await validatorContract.validateCommand(
+        twitterIds, twitterNames, '', false, 
+        this.ethers.utils.parseEther(this.amount.toString()), 
+        this.ethers.utils.formatBytes32String(this.data)
+      )
+      this.showLoading = true
+      let val = await tx.wait()
+      this.showLoading = false
+      amount1 = await cryptoravesTokenContract.balanceOf(this.launchedWalletAddress, this.tokenId)
+
+      abi = [
+        'function getUserManagementAddress() public view returns(address)'
+      ]
+      let tokenManager = new this.ethers.Contract(this.managerContractAddress, abi, this.signer)
+
+      let userContractAddress = await tokenManager.getUserManagementAddress()
+      console.log('UserManager Address: '+userContractAddress)
+
+      let userManagerContract = new this.ethers.Contract(
+        userContractAddress, 
+        this.userManagementABI, 
+        this.signer
+      )
+
+      this.recipientAddress = this.managedContractRecipientAddress = await userManagerContract.getUserAccount(randomRecipientTwitterId);
+      console.log(this.recipientAddress)
+      console.log('Balance #1: ', this.launchedWalletAddress, this.ethers.utils.formatUnits(amount1, this.decimals))
+      
+      amount1 = await cryptoravesTokenContractAddress.balanceOf(this.recipientAddress, this.tokenId)
+      console.log('Balance #2: ', this.recipientAddress, this.ethers.utils.formatUnits(amount1, this.decimals))
+    },
+    async depositERC20(){
+      let token = new this.ethers.Contract(this.ERC20FullAddress, abis['ERC20Full'].abi, this.signer)
+      let amount1 = await token.balanceOf(this.ethereumAddress)
+      
+      console.log('ERC20 Amount before deposit: '+this.ethers.utils.formatUnits(amount1, 18))
+
+      let tokenManagerContract = new this.ethers.Contract(
+        this.TokenManagementContractAddress, 
+        abis['TokenManagement'].abi, 
+        this.signer
+      )
+      this.showLoading = true
+
+      let randAmount = Math.round((Math.random() * 10 + Number.EPSILON) * 100) / 100
+      console.log('Random Amount: ', randAmount)
+      let appr = await token.approve(this.CryptoravesTokenContractAddress, this.ethers.utils.parseEther(randAmount.toString()));
+      await appr.wait()
+
+      let tx = await tokenManagerContract.deposit(
+        this.ethers.utils.parseEther(randAmount.toString()),
+        this.ERC20FullAddress,
+        20,
+        false
+      )
+      console.log(tx)
+      let val = await tx.wait()
+      
+      console.log('here3')
+      amount1 = await token.balanceOf(this.ethereumAddress)
+      console.log('ERC20 Amount After deposit: '+this.ethers.utils.formatUnits(amount1, 18))
+
+      this.ERC1155tokenId = localStorage.ERC1155tokenId = await tokenManagerContract.getManagedTokenIdByAddress(this.ERC20FullAddress)
+      console.log('ERC1155 Token ID: '+this.ERC1155tokenId)
+      let cryptoravesToken = new this.ethers.Contract(
+        this.CryptoravesTokenContractAddress, 
+        abis['CryptoravesToken'].abi, 
+        this.signer
+      )
+      amount1 = await cryptoravesToken.balanceOf(this.ethereumAddress, this.ERC1155tokenId)
+      console.log('ERC1155 Wrapped amount received: '+this.ethers.utils.formatUnits(amount1, 18))
+
+      this.showLoading = false
+    },
     resetLocalStorage(){
       localStorage.removeItem('UserManagementContractAddress')
       localStorage.removeItem('TokenManagementContractAddress')
       localStorage.removeItem('CryptoravesTokenContractAddress')
       localStorage.removeItem('TransactionManagementContractAddress')
       localStorage.removeItem('ValidatorContractAddress')
+      localStorage.removeItem('ERC20FullAddress')
+      localStorage.removeItem('ERC1155tokenId')
       location.reload()
     },
     goEtherscan(param){
