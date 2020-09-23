@@ -43,6 +43,11 @@ contract ValidatorInterfaceContract is AdministrationContract {
         emit NewTransactionManager(_transactionManager);
     }
     
+    function testDownstreamAdminConfiguration() public view onlyAdmin returns(bool){
+        IDownStream _downstream = IDownStream(getTransactionManagementAddress());
+        return _downstream.testDownstreamAdminConfiguration();
+    }
+    
     /*
     * check incoming parsed Tweet data for valid command
     * @param _twitterIds [0] = twitterIdFrom, [1] = twitterIdTo, [2] = twitterIdThirdParty

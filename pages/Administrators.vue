@@ -3,6 +3,7 @@
     class="container"
   >
     <div v-if="ready">
+
       <div class="highlight">
         <h2
           v-if="networkType == 'SKALE Testnet'" 
@@ -158,7 +159,7 @@
           <a
               target="_blank"
               @click="goEtherscan(ERC20FullAddress)">
-              ERC20 Contract Address: {{ this.ERC20FullAddress }}
+              Test ERC20 Contract Address: {{ this.ERC20FullAddress }}
           </a>
           <br>
           <a
@@ -166,9 +167,16 @@
             @click="depositERC20()"
             class="button--green"
           >
-            Deposit And Send Test ERC20 Tokens
+            Deposit Test ERC20 Tokens
           </a>
         </div> 
+        <div
+          v-if="showLoading"
+        >
+          <img 
+            src="../assets/gif/loading.gif" 
+            alt >
+        </div>
         <div 
             v-if="UserManagementContractAddress"
             class="links">
@@ -208,7 +216,7 @@ export default {
       TransactionManagementContractAddress: null,
       ValidatorContractAddress: null,
       ERC20FullAddress: null,
-      ERC1155tokenId: null,
+      ERC1155tokenId: 0,
       showLoading: false
     }
   },
@@ -416,10 +424,10 @@ export default {
 
       let amount1 = await cryptoravesTokenContract.balanceOf(this.ethereumAddress, this.tokenId)
       
-      console.log('Balance #1: ', this.launchedWalletAddress, this.ethers.utils.formatUnits(amount1, this.decimals))
+      console.log('Balance #1: ', this.launchedWalletAddress, this.ethers.utils.formatUnits(amount1, 18))
       if (this.recipientAddress){
         let amount2 = await cryptoravesTokenContract.balanceOf(this.recipientAddress, this.tokenId)
-        console.log('Balance #2: ', this.recipientAddress, this.ethers.utils.formatUnits(amount2, this.decimals))
+        console.log('Balance #2: ', this.recipientAddress, this.ethers.utils.formatUnits(amount2, 18))
       }
       
       let randomRecipientTwitterId = Math.round(Math.random() * 1000000000)
@@ -457,27 +465,36 @@ export default {
 
       this.recipientAddress = this.managedContractRecipientAddress = await userManagerContract.getUserAccount(randomRecipientTwitterId);
       console.log(this.recipientAddress)
-      console.log('Balance #1: ', this.launchedWalletAddress, this.ethers.utils.formatUnits(amount1, this.decimals))
+      console.log('Balance #1: ', this.launchedWalletAddress, this.ethers.utils.formatUnits(amount1, 18))
       
       amount1 = await cryptoravesTokenContractAddress.balanceOf(this.recipientAddress, this.tokenId)
-      console.log('Balance #2: ', this.recipientAddress, this.ethers.utils.formatUnits(amount1, this.decimals))
+      console.log('Balance #2: ', this.recipientAddress, this.ethers.utils.formatUnits(amount1, 18))
     },
     async depositERC20(){
       let token = new this.ethers.Contract(this.ERC20FullAddress, abis['ERC20Full'].abi, this.signer)
       let amount1 = await token.balanceOf(this.ethereumAddress)
       
-      console.log('ERC20 Amount before deposit: '+this.ethers.utils.formatUnits(amount1, 18))
+      this.showLoading = true
+
+      let cryptoravesToken = new this.ethers.Contract(
+        this.CryptoravesTokenContractAddress, 
+        abis['CryptoravesToken'].abi, 
+        this.signer
+      )
+
+      let initialBalance 
+      initialBalance = await cryptoravesToken.balanceOf(this.ethereumAddress, this.ERC1155tokenId)
+      //console.log('ERC20 Amount before deposit: '+this.ethers.utils.formatUnits(amount1, 18))
 
       let tokenManagerContract = new this.ethers.Contract(
         this.TokenManagementContractAddress, 
         abis['TokenManagement'].abi, 
         this.signer
       )
-      this.showLoading = true
 
       let randAmount = Math.round((Math.random() * 10 + Number.EPSILON) * 100) / 100
-      console.log('Random Amount: ', randAmount)
-      let appr = await token.approve(this.CryptoravesTokenContractAddress, this.ethers.utils.parseEther(randAmount.toString()));
+      //console.log('Random Amount: ', randAmount)
+      let appr = await token.approve(this.TokenManagementContractAddress, this.ethers.utils.parseEther(randAmount.toString()));
       await appr.wait()
 
       let tx = await tokenManagerContract.deposit(
@@ -486,22 +503,27 @@ export default {
         20,
         false
       )
-      console.log(tx)
+
       let val = await tx.wait()
-      
-      console.log('here3')
+
       amount1 = await token.balanceOf(this.ethereumAddress)
-      console.log('ERC20 Amount After deposit: '+this.ethers.utils.formatUnits(amount1, 18))
+      //console.log('ERC20 Amount After deposit: '+this.ethers.utils.formatUnits(amount1, 18))
 
       this.ERC1155tokenId = localStorage.ERC1155tokenId = await tokenManagerContract.getManagedTokenIdByAddress(this.ERC20FullAddress)
-      console.log('ERC1155 Token ID: '+this.ERC1155tokenId)
-      let cryptoravesToken = new this.ethers.Contract(
-        this.CryptoravesTokenContractAddress, 
-        abis['CryptoravesToken'].abi, 
-        this.signer
+      //console.log('ERC1155 Token ID: '+this.ERC1155tokenId)
+      
+      let finalBalance = await cryptoravesToken.balanceOf(this.ethereumAddress, this.ERC1155tokenId)
+      /*console.log('ERC1155 Wrapped amount received: '+this.ethers.utils.formatUnits(finalBalance, 18))
+      console.log(Math.round(this.ethers.utils.formatUnits(initialBalance, 18) * 100) / 100)
+      console.log(randAmount)
+      console.log(Math.round(this.ethers.utils.formatUnits(finalBalance, 18) * 100 ) / 100)
+      console.log(Math.round((this.ethers.utils.formatUnits(initialBalance, 18) * 1 + randAmount) * 100) / 100)
+      */
+      console.log(
+        "Deposit of Random Amount Successful: ", 
+        (Math.round((this.ethers.utils.formatUnits(initialBalance, 18) * 1 + randAmount) * 100) / 100).toString() == 
+        (Math.round(this.ethers.utils.formatUnits(finalBalance, 18) * 100 ) / 100).toString()
       )
-      amount1 = await cryptoravesToken.balanceOf(this.ethereumAddress, this.ERC1155tokenId)
-      console.log('ERC1155 Wrapped amount received: '+this.ethers.utils.formatUnits(amount1, 18))
 
       this.showLoading = false
     },

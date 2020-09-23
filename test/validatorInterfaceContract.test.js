@@ -20,6 +20,11 @@ contract("ValidatorInterfaceContract", async accounts => {
   
   //for iterateing through second token contract assignment
   for (var i = 0; i < 2; i++) {  
+    it("Test Admin Configuration", async () => {
+      let instance = await ValidatorInterfaceContract.deployed()
+      let res = await instance.testDownstreamAdminConfiguration()
+      assert.isOk(res);
+    });
     it("Drop crypto", async () => {
       let instance = await ValidatorInterfaceContract.deployed()
       var bytes = ethers.utils.formatBytes32String('')

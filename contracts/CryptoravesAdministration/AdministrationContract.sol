@@ -34,6 +34,10 @@ interface IUserManager {
     function setDropState(uint256, bool) external returns (address);
 }
 
+interface IDownStream {
+    function testDownstreamAdminConfiguration() external view returns(bool);
+}
+
 contract AdministrationContract {
 
     /*

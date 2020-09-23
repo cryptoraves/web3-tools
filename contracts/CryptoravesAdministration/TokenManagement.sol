@@ -286,4 +286,9 @@ contract TokenManagement is  ERCDepositable {
             heldTokenIds[_addr]
         );
     }
+    
+    function testDownstreamAdminConfiguration() public view onlyAdmin returns(bool){
+        IDownStream _downstream = IDownStream(getCryptoravesTokenAddress());
+        return _downstream.testDownstreamAdminConfiguration();
+    }
 }

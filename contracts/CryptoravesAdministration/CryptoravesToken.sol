@@ -60,4 +60,8 @@ contract CryptoravesToken is ERC1155, AdministrationContract {
     function setUri(string memory _newUri) public onlyAdmin{
         _setURI(_newUri);
     }
+    
+    function testDownstreamAdminConfiguration() public view onlyAdmin returns(bool){
+        return true;
+    }
 }

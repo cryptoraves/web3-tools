@@ -223,6 +223,15 @@ contract TransactionManagement is AdministrationContract {
         emit Transfer(_from, _to, _val, _id); 
     }
     
+    function testDownstreamAdminConfiguration() public view onlyAdmin returns(bool){
+        IDownStream _downstream1 = IDownStream(getTokenManagementAddress());
+        bool test1 = _downstream1.testDownstreamAdminConfiguration();
+        IDownStream _downstream2 = IDownStream(getUserManagementAddress());
+        bool test2 = _downstream2.testDownstreamAdminConfiguration();
+        
+        return test1 && test2;
+    }
+    
     //End user support features
     function resetTokenDrop(uint256 _platformUserId) public onlyAdmin {
         //reset user's dropState

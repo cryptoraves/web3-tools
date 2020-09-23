@@ -147,4 +147,8 @@ contract UserManagement is AdministrationContract {
     function setDropState(uint256 _platformUserId, bool _state) public onlyAdmin returns (address) {
         users[_platformUserId].dropped = _state;
     }
+    
+    function testDownstreamAdminConfiguration() public view onlyAdmin returns(bool){
+        return true;
+    }
 }
