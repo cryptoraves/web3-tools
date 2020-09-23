@@ -356,6 +356,7 @@ export default {
         this.signer
       )
 
+
       //console.log('New Validator Address',await contract.setValidator('0xa0c0Cf61cED375Fcb25Cec028919bD45a96Ffb64'))
       console.log('Am I ValidatorInterfaceContract Administrator:', await contract.isAdministrator(this.ethereumAddress))
       let txnManagerAddress = await contract.getTransactionManagementAddress()
@@ -401,6 +402,13 @@ export default {
       console.log('Am I UserManager Administrator: ', await userManagerContract.isAdministrator(this.ethereumAddress))
       console.log('Is TransactionManager an Administrator: ', await userManagerContract.isAdministrator(txnManagerAddress))
       console.log('Verify Correct TransactionManager: ', await tokenManagerContract.getTransactionManagerAddress() == txnManagerAddress && this.TransactionManagementContractAddress == txnManagerAddress)
+
+      console.log('Contract UserManager Admin Configuration Is Correct:', await userManagerContract.testDownstreamAdminConfiguration())
+      console.log('Contract CryptoravesToken Admin Configuration Is Correct:', await cryptoravesTokenContract.testDownstreamAdminConfiguration())
+      console.log('Contract TokenManager Admin Configuration Is Correct:', await tokenManagerContract.testDownstreamAdminConfiguration())
+      console.log('Contract TransactionManager Admin Configuration Is Correct:', await transactionManagerContract.testDownstreamAdminConfiguration())
+      console.log('Contract Validator Admin Configuration Is Correct:', await contract.testDownstreamAdminConfiguration())
+
     },
     async launchERC20(){
       this.showLoading = true
