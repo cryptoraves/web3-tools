@@ -757,7 +757,7 @@ export default {
 
       let initialBalance 
       initialBalance = await cryptoravesToken.balanceOf(this.ethereumAddress, this.ERC1155tokenId)
-      //console.log('ERC20 Amount before deposit: '+this.ethers.utils.formatUnits(amount1, 18))
+      console.log('ERC20 Amount before deposit: '+this.ethers.utils.formatUnits(amount1, 18))
 
       let tokenManagerContract = new this.ethers.Contract(
         this.TokenManagementContractAddress, 
@@ -780,18 +780,18 @@ export default {
       let val = await tx.wait()
 
       amount1 = await token.balanceOf(this.ethereumAddress)
-      //console.log('ERC20 Amount After deposit: '+this.ethers.utils.formatUnits(amount1, 18))
+      console.log('ERC20 Amount After deposit: '+this.ethers.utils.formatUnits(amount1, 18))
 
       this.ERC1155tokenId = localStorage.ERC1155tokenId = await tokenManagerContract.getManagedTokenIdByAddress(this.ERC20FullAddress)
-      //console.log('ERC1155 Token ID: '+this.ERC1155tokenId)
+      console.log('ERC1155 Token ID: '+this.ERC1155tokenId)
       
       let finalBalance = await cryptoravesToken.balanceOf(this.ethereumAddress, this.ERC1155tokenId)
-      /*console.log('ERC1155 Wrapped amount received: '+this.ethers.utils.formatUnits(finalBalance, 18))
+      console.log('ERC1155 Wrapped amount received: '+this.ethers.utils.formatUnits(finalBalance, 18))
       console.log(Math.round(this.ethers.utils.formatUnits(initialBalance, 18) * 100) / 100)
       console.log(randAmount)
       console.log(Math.round(this.ethers.utils.formatUnits(finalBalance, 18) * 100 ) / 100)
       console.log(Math.round((this.ethers.utils.formatUnits(initialBalance, 18) * 1 + randAmount) * 100) / 100)
-      */
+      
       console.log(
         "Deposit of Random Amount Successful: ", 
         (Math.round((this.ethers.utils.formatUnits(initialBalance, 18) * 1 + randAmount) * 100) / 100).toString() == 
