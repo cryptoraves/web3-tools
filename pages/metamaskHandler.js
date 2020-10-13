@@ -35,7 +35,10 @@ export default {
       } catch(e) {
         console.log(e)
       }
-      if (networkId==54173){
+      if (networkId==16){
+        this.networkType = 'SKALE Bob Testnet'
+        this.blockExplorerUrl = 'https://explorer.skale.network/'
+      } else if (networkId==54173){
         this.networkType = 'SKALE Testnet'
         this.blockExplorerUrl = 'https://explorer.skale.network/'
       } else if (networkId==80001){

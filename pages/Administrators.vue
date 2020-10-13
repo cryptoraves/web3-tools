@@ -766,10 +766,10 @@ export default {
       )
 
       let randAmount = Math.round((Math.random() * 10 + Number.EPSILON) * 100) / 100
-      //console.log('Random Amount: ', randAmount)
+      console.log('Random Amount: ', randAmount)
       let appr = await token.approve(this.TokenManagementContractAddress, this.ethers.utils.parseEther(randAmount.toString()));
       await appr.wait()
-
+      console.log('here')
       let tx = await tokenManagerContract.deposit(
         this.ethers.utils.parseEther(randAmount.toString()),
         this.ERC20FullAddress,
@@ -802,7 +802,7 @@ export default {
     },
     importContractStructureForThisNetwork(){
       //copy and paste json here
-      let savedNetwork = {"networkType":"SKALE Testnet","UserManagementContractAddress":"0x5b193414B8d60D8110C86E4d871005EE97F7970D","TokenManagementContractAddress":"0x0D62f74A7D5b7a948B9F5f63a8f5Bf0B17b88760","CryptoravesTokenContractAddress":"0x3a935800b14b8b2415a9B3BFe103818d5CBfF0ae","TransactionManagementContractAddress":"0x6362C8f6d57a5e5f1269fe126F482127b1E913a2","ValidatorInterfaceContractAddress":"0xA8D4FcCeD4806153AE24B2DA1d20654301b74b2F","ERC1155tokenId":0,"AdminToolsLibraryAddress":"0xf9cb8AA1C041E41459de4c296e55B30DB3FCe406"}
+      let savedNetwork = {"networkType":"SKALE Testnet","UserManagementContractAddress":"0x5b193414B8d60D8110C86E4d871005EE97F7970D","TokenManagementContractAddress":"0x0D62f74A7D5b7a948B9F5f63a8f5Bf0B17b88760","CryptoravesTokenContractAddress":"0x3a935800b14b8b2415a9B3BFe103818d5CBfF0ae","TransactionManagementContractAddress":"0x6362C8f6d57a5e5f1269fe126F482127b1E913a2","ValidatorInterfaceContractAddress":"0xA8D4FcCeD4806153AE24B2DA1d20654301b74b2F","ERC20FullAddress":"0xeb4D0Bf322Dd3BfAe6E5D028Cb61B1c00778E7C6","ERC1155tokenId":0,"AdminToolsLibraryAddress":"0xf9cb8AA1C041E41459de4c296e55B30DB3FCe406"}
 
       if(this.networkType == savedNetwork["networkType"]){
         
