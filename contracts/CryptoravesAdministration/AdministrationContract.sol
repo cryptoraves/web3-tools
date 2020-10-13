@@ -5,7 +5,7 @@ pragma experimental ABIEncoderV2;
 import "./AdminToolsLibrary.sol";
 
 interface ITransactionManager {
-    function initCommand(uint256[] memory, string[] memory, uint256, string[] memory) external returns(bool);
+    function initCommand(uint256[] memory, string[] memory, uint256[] memory, string[] memory) external returns(bool);
     function testForTransactionManagementAddressUniquely() external pure returns(bool);
     function getUserL1AccountFromL2Account(address) external view returns(address);
     function getUserL2AccountFromL1Account(address) external view returns(address);
@@ -19,6 +19,7 @@ interface ITokenManager {
     function dropCrypto(string memory, address, uint256, uint256, bytes memory) external;
     function _checkHeldToken(address, uint256) external;
     function setIsManagedToken(address, bool) external;
+    function adjustValueByUnits(uint256, uint256, uint256) external view returns(uint256);
 }
 
 interface IUserManager {
@@ -121,4 +122,18 @@ contract AdministrationContract {
         
         revert('No TransactionManagementAddress found!');
     }
+    /*
+    function testDownstreamAdminConfiguration(address [] memory _downstreamContracts) public view onlyAdmin returns(bool){
+        require(_downstreamContracts.length < 3, 'List of _downstreamContracts is too damn long!');
+        
+        bool _cumulativeReseult;
+        _cumulativeReseult = true;
+        if(_downstreamContracts.length > 0){
+            for (uint i=0; i<_downstreamContracts.length; i++) {
+                _cumulativeReseult = _cumulativeReseult && IDownStream(_downstreamContracts[i]).testDownstreamAdminConfiguration();
+            }
+        }
+        return _cumulativeReseult;
+        
+    }*/
 }

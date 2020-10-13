@@ -175,6 +175,23 @@ contract TokenManagement is  ERCDepositable {
         symbolAndEmojiLookupTable[_emoji] = _tokenId;
     }
     
+    //for adjusting incoming human-typed values to smart contract uint values
+    function adjustValueByUnits(uint256 _tokenId, uint256 _value, uint256 _decimalPlace) public view onlyAdmin returns(uint256){
+        address _tokenAddr = tokenListById[_tokenId];
+        ManagedToken memory _tknData = managedTokenListByAddress[_tokenAddr];
+        if(_tknData.ercType == 721){
+            require(_decimalPlace == 0, 'Attempted to send NFT with fractional value');
+            return _value;
+        }
+        if(_tknData.ercType == 20){
+            //check decimals value
+            IERCuni _token = IERCuni(_tokenAddr);
+            
+            uint256 decimals = _token.decimals() - _decimalPlace;
+            
+            return _value * 10**decimals;
+        }
+    }
     
     function subtractFromTotalSupply(uint256 _tokenId, uint256 _amount) public onlyAdmin {
         address _tokenAddr = tokenListById[_tokenId];

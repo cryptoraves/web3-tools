@@ -60,7 +60,9 @@ contract TransactionManagement is AdministrationContract {
     * check incoming parsed Tweet data for valid command
     * @param _twitterIds [0] = twitterIdFrom, [1] = twitterIdTo, [2] = twitterIdThirdParty
     * @param _twitterNames [0] = twitterHandleFrom, [1] = twitterHandleTo, [2] = thirdPartyName
-    * @param _value amount or id of token to transfer
+    * @param _values 
+        [0] amount or id of token to transfer -- integers of any decimal value. eg 1.31 = 131, 12321.989293 = 12321989293, 1000 = 1000 etc
+        [1] where the decimal place lies: 1.31 = 2, 12321.989293 = 6, 1000 = 0 etc
     * @param _metaData: 
         [0] = _platformName:
             "twitter"
@@ -75,7 +77,7 @@ contract TransactionManagement is AdministrationContract {
     function initCommand(
         uint256[] memory _twitterIds,
         string[] memory _twitterNames,
-        uint256 _value,
+        uint256[] memory _values,
         string[] memory _metaData
     ) onlyAdmin public returns(bool){
         /* reference
@@ -166,7 +168,9 @@ contract TransactionManagement is AdministrationContract {
                 
             }
             
-            _managedTransfer(_fromAddress, _toAddress, _tokenId, _value, AdminToolsLibrary.stringToBytes(_metaData[3]));
+            uint256 _adjustedValue = _adjustValueByUnits(_tokenId, _values[0], _values[1]);
+            
+            _managedTransfer(_fromAddress, _toAddress, _tokenId, _adjustedValue, AdminToolsLibrary.stringToBytes(_metaData[3]));
         }
     }
     
@@ -244,5 +248,13 @@ contract TransactionManagement is AdministrationContract {
         ITokenManager _tokenManagement = ITokenManager(_tokenManagementContractAddress);
         _tokenManagement.setIsManagedToken(_acct, false);
         
+    }
+    
+    function _adjustValueByUnits(uint256 _tokenId, uint256 _value, uint256 _decimalPlace) private returns(uint256){
+        //check if nft. if yes, return same _value
+        ITokenManager _tokenManagement = ITokenManager(_tokenManagementContractAddress);
+        return _tokenManagement.adjustValueByUnits(_tokenId, _value, _decimalPlace);
+        
+                
     }
 }

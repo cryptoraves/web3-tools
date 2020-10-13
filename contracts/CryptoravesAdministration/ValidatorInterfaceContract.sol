@@ -52,8 +52,9 @@ contract ValidatorInterfaceContract is AdministrationContract {
     * check incoming parsed Tweet data for valid command
     * @param _twitterIds [0] = twitterIdFrom, [1] = twitterIdTo, [2] = twitterIdThirdParty
     * @param _twitterNames [0] = twitterHandleFrom, [1] = twitterHandleTo, [2] = thirdPartyName
-    * @param 
-    * @param _value amount or id of token to transfer
+    * @param _values 
+        [0] amount or id of token to transfer -- integers of any decimal value. eg 1.31 = 131, 12321.989293 = 12321989293, 1000 = 1000 etc
+        [1] where the decimal place lies: 1.31 = 2, 12321.989293 = 6, 1000 = 0 etc
     * @param _metaData: 
         [0] = _platformName:
             "twitter"
@@ -68,13 +69,13 @@ contract ValidatorInterfaceContract is AdministrationContract {
     function validateCommand(
         uint256[] memory _twitterIds,
         string[] memory _twitterNames,
-        uint256 _value,
+        uint256[] memory _values,
         string[] memory _metaData
     ) public onlyAdmin {
         
         ITransactionManager transactionManager = ITransactionManager(_transactionManager);
         
-        transactionManager.initCommand(_twitterIds, _twitterNames, _value, _metaData);
+        transactionManager.initCommand(_twitterIds, _twitterNames, _values, _metaData);
         /*
         *  Consider using the Token Manager Contract to host view functions for validating.
         *  Also see if view functions can return a function type that can then be executed 

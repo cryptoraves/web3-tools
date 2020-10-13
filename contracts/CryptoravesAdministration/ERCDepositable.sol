@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.6.10;
 
-import "/home/cartosys/www/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/IERC20.sol";
 import "./AdministrationContract.sol";
-import "/home/cartosys/www/openzeppelin-contracts/contracts/token/ERC721/IERC721Receiver.sol";
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/contracts/token/ERC721/IERC721Receiver.sol";
 
 contract ERCDepositable is IERC721Receiver, AdministrationContract {
     
@@ -86,4 +86,5 @@ interface IERCuni is IERC20 {
     function safeTransferFrom(address from, address to, uint256 tokenId) external;
     function symbol() external view returns(string memory);
     function totalSupply() external view override returns (uint256);
+    function decimals() external view returns (uint8);
 }
