@@ -405,10 +405,11 @@ contract("TokenManagement", async accounts => {
       'nft decimal adjustment didn\'t work'
     )
 
+    let bn = await instanceTokenManagement.adjustValueByUnits(primary_tokenId1155, 2321, 2)
     assert.equal(
       await instanceTokenManagement.adjustValueByUnits(primary_tokenId1155, 2321, 2),
-      23.21,
-      'nft decimal adjustment dfailure didn\'t fail. What?!'
+      23210000000000000000,
+      '1155 decimal adjustment failure'
     )
   })
 })  
