@@ -390,6 +390,26 @@ contract("TokenManagement", async accounts => {
       'ERC20 Emoji reverse lookup failed'
     )
   })
+  it("check decimal handling", async () => {
+    let instanceTokenManagement = await TokenManagement.deployed()
+    let tokenId1 = await instanceTokenManagement.symbolAndEmojiLookupTable('TKX')
+    let tokenId2 = await instanceTokenManagement.symbolAndEmojiLookupTable('TKY')
+    assert.equal(
+      await instanceTokenManagement.adjustValueByUnits(tokenId1, 1234567, 3),
+      1234567000000000000000,
+      'erc20 decimal adjustment didn\'t work'
+    )
+    assert.equal(
+      await instanceTokenManagement.adjustValueByUnits(tokenId2, 2, 0),
+      2,
+      'nft decimal adjustment didn\'t work'
+    )
+
+    /*assert.throws(
+      await instanceTokenManagement.adjustValueByUnits(tokenId2, 2321, 3),
+      'nft decimal adjustment dfailure didn\'t fail. What?!'
+    )*/
+  })
 })  
 
 
