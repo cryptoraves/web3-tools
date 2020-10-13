@@ -22,6 +22,7 @@ contract TokenManagement is  ERCDepositable {
         uint ercType;
         uint256 totalSupply;
         string symbol;
+        uint256 decimals;
         string emoji;
     }
     mapping(address => ManagedToken) public managedTokenListByAddress;
@@ -192,7 +193,7 @@ contract TokenManagement is  ERCDepositable {
             return _value * 10**decimals;
         }
         
-        return _value * 10**_decimalPlace;
+        return _value * 10**(18 - _decimalPlace);
     }
     
     function subtractFromTotalSupply(uint256 _tokenId, uint256 _amount) public onlyAdmin {
