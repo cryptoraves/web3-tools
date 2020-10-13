@@ -191,6 +191,8 @@ contract TokenManagement is  ERCDepositable {
             
             return _value * 10**decimals;
         }
+        
+        return _value * 10**_decimalPlace;
     }
     
     function subtractFromTotalSupply(uint256 _tokenId, uint256 _amount) public onlyAdmin {
