@@ -24,14 +24,14 @@ contract("TransactionManagement", async accounts => {
       let res = await instance.initCommand(
       	[1029384756,0,0],
       	['fakeHandleA', '', ''],
-        0,
+        [0,0],
       	['twitter','launchAndMap','https://i.picsum.photos/id/111/200/200.jpg','0xacdacd9366040f42aE58E25a4625808Dc64dbDF7'],
       )
       //for next test
       res = await instance.initCommand(
       	[1029388888,0,0],
       	['fakeHandleB', '', ''],
-        0,
+        [0,0],
       	['twitter','launch','https://i.picsum.photos/id/112/200/200.jpg','testing crypto drop']
       )
       assert.isOk(res.receipt['status'])
@@ -60,7 +60,7 @@ contract("TransactionManagement", async accounts => {
       let res = await instance.initCommand(
         [1029384756,434443434,0],
         ['fakeHandle', 'rando1', ''],
-        200,
+        [200,0],
         ['twitter','transfer','https://i.picsum.photos/id/1/200/200.jpg',''],
       )
       assert.isOk(res.receipt['status'], 'Transfer to rando1 failed')
@@ -70,14 +70,14 @@ contract("TransactionManagement", async accounts => {
       let res = await instance.initCommand(
         [434443434,55667788,1029384756],
         ['rando1', 'rando2', 'fakeHandle'],
-        50,
+        [50,0],
         ['twitter','transfer','https://i.picsum.photos/id/2/200/200.jpg','']
       )
       assert.isOk(res.receipt['status'], 'Transfer to rando2 failed')
       res = await instance.initCommand(
         [434443434,1029384756,1029384756],
         ['rando1', 'rando3', 'fakeHandle'],
-        50,
+        [50,0],
         ['twitter','transfer','https://i.picsum.photos/id/2/200/200.jpg','']
       )
       assert.isOk(res.receipt['status'], 'Transfer to rando3 failed')
@@ -157,7 +157,7 @@ contract("TransactionManagement", async accounts => {
       res = await TransactionManagementInstance.initCommand(
         [434443434,0,0],
         ['rando2', '', ''],
-        0,
+        [0,0],
         ['twitter','mapaccount','https://i.picsum.photos/id/111/200/200.jpg',randoAddr]
       )
       res = await userManagementInstance.getUser(434443434);
@@ -181,14 +181,14 @@ contract("TransactionManagement", async accounts => {
       let res = await TransactionManagementInstance.initCommand(
           [fakeUserId,0,0],
           ['dropStateTester', '', ''],
-          0,
+          [0,0],
           ['twitter','launch','https://i.picsum.photos/id/898/200/200.jpg',''],
       )
       //2. transfer some
       res = await TransactionManagementInstance.initCommand(
         [fakeUserId,fakeUserId2,0],
         ['dropStateTester', 'rando1', ''],
-        200000000,
+        [200000000,0],
         ['twitter','transfer','https://i.picsum.photos/id/899/200/200.jpg','']
       )
 
@@ -211,14 +211,14 @@ contract("TransactionManagement", async accounts => {
       res = await TransactionManagementInstance.initCommand(
           [fakeUserId,0,0],
           ['dropStateTesterReborn', '', ''],
-          0,
+          [0,0],
           ['twitter','launch','https://i.picsum.photos/id/899/200/200.jpg','']
       )
       //5. transfer some again
       res = await TransactionManagementInstance.initCommand(
         [fakeUserId,fakeUserId2,0],
         ['dropStateTesterReborn', 'rando1', ''],
-        222222222,
+        [222222222,0],
         ['twitter','transfer','https://i.picsum.photos/id/899/200/200.jpg','']
       )
       //6. check new balance.
