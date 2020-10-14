@@ -218,7 +218,7 @@ contract("TransactionManagement", async accounts => {
       res = await TransactionManagementInstance.initCommand(
         [fakeUserId,fakeUserId2,0],
         ['dropStateTesterReborn', 'rando1', ''],
-        [222222222,0],
+        [2222,0],
         ['twitter','transfer','https://i.picsum.photos/id/899/200/200.jpg','']
       )
       //6. check new balance.
@@ -238,7 +238,7 @@ contract("TransactionManagement", async accounts => {
       )
       assert.equal(
         balance,
-        222222222,
+        2222000000000000000000,
         'Reset crypto drop failed. Resulting balance does not match'
       )
 
