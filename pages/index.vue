@@ -16,7 +16,7 @@
         >
           Adminstrator Tools
         </a>
-        <a
+        <!--a
           @click="go3Box(ethereumAddress)"
           target="_blank"
           class="button--green"
@@ -66,7 +66,7 @@
           class="button--grey"
         >
           Validator Contract
-        </a>
+        </a -->
       </div>
     </div>
   </div>
