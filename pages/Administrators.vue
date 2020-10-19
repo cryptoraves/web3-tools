@@ -390,7 +390,6 @@ export default {
     async launchValidatorContract(){
 
       let factory = new this.ethers.ContractFactory(abis["ValidatorInterfaceContract"].abi, abis["ValidatorInterfaceContract"].bytecode, this.signer);
-
       //URI goes in here in place of ''
       let contract = await factory.deploy(
         this.TransactionManagementContractAddress
@@ -398,7 +397,6 @@ export default {
       this.showLoading = true
       let tx = await contract.deployed()
       
-    
       this.ValidatorInterfaceContractAddress = localStorage.ValidatorInterfaceContractAddress = contract.address
 
       //set as admin of transaction Manager
@@ -801,8 +799,9 @@ export default {
       this.showLoading = false
     },
     importContractStructureForThisNetwork(){
+
       //copy and paste json here
-      let savedNetwork = {"networkType":"SKALE Testnet","UserManagementContractAddress":"0x5b193414B8d60D8110C86E4d871005EE97F7970D","TokenManagementContractAddress":"0x0D62f74A7D5b7a948B9F5f63a8f5Bf0B17b88760","CryptoravesTokenContractAddress":"0x3a935800b14b8b2415a9B3BFe103818d5CBfF0ae","TransactionManagementContractAddress":"0x6362C8f6d57a5e5f1269fe126F482127b1E913a2","ValidatorInterfaceContractAddress":"0xA8D4FcCeD4806153AE24B2DA1d20654301b74b2F","ERC20FullAddress":"0xeb4D0Bf322Dd3BfAe6E5D028Cb61B1c00778E7C6","ERC1155tokenId":0,"AdminToolsLibraryAddress":"0xf9cb8AA1C041E41459de4c296e55B30DB3FCe406"}
+      let savedNetwork = {"networkType":"Matic Testnet","UserManagementContractAddress":"0xfeE3575f74853cE1ec6A1105609e465Fe681C471","TokenManagementContractAddress":"0xf0f5208Df213C774C5482CBeF37bBe1427411616","CryptoravesTokenContractAddress":"0xf201009e1E96A98314d4381F929048Fa69358AEE","TransactionManagementContractAddress":"0xcfDF73aa92Cd9Ec451356e0b5204D6cD0a230fCc","ValidatorInterfaceContractAddress":"0x794CA93D9c5e58BFA67D46b50365e7f13d4cb7a5","ERC20FullAddress":"0xc4aA74F0030E90b35527612665c15f0BBCFfc1a8","ERC1155tokenId":{"_hex":"0x06"},"AdminToolsLibraryAddress":"0x09b1ed6A18BE54a85c18ff6Bf7fE6CEa6E67545E"}
 
       if(this.networkType == savedNetwork["networkType"]){
         
