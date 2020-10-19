@@ -95,12 +95,12 @@ contract("ValidatorInterfaceContract", async accounts => {
       let bytes = ethers.utils.formatBytes32String('')
       for(i=0; i < 5; i++){
         ids[i] = getRandomInt(100000000, 200000000)
-        let rInt = getRandomInt(1, 999999999).toString()+'.0'
+        let rInt = getRandomInt(1, 99999999).toString()+'.0'
 
         amounts[i] = ethers.utils.parseUnits(rInt,18)
         let uri = 'https://i.picsum.photos/id/'+ids[i].toString()+'/200/200.jpg'
         await instance.validateCommand([ids[i],0,0], ['@rando'+ids[i].toString(), '', ''], [0,0], ['twitter','launch',uri, bytes])
-        await instance.validateCommand([ids[i],primaryUserId,0], ['@rando'+ids[i].toString(), '@fakeHandle', ''], [amounts[i],0], ['twitter','transfer',uri, bytes])
+        await instance.validateCommand([ids[i],primaryUserId,0], ['@rando'+ids[i].toString(), '@fakeHandle', ''], [amounts[i],18], ['twitter','transfer',uri, bytes])
       }
       let primaryUserAccount = await instanceUserManagement.getUserAccount(primaryUserId)
       let heldIds = await instanceTokenManagement.getHeldTokenIds(
