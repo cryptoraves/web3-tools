@@ -68,7 +68,7 @@ contract TokenManagement is  ERCDepositable {
         uint256 _1155tokenId = getManagedTokenIdByAddress(account);
         
         //add username as symbol
-        _checkTickerAddress(_twitterHandleFrom, account);
+        _checkSymbolAddress(_twitterHandleFrom, _1155tokenId);
 
         _mint(account, _1155tokenId, amount, data);
         
@@ -77,6 +77,13 @@ contract TokenManagement is  ERCDepositable {
         
         emit CryptoDropped(account, _1155tokenId);
         
+    }
+    
+    function _checkSymbolAddress(string memory _sym, uint256 _tokenId) internal {
+        //only adds ticker if not yet taken
+        if(symbolAndEmojiLookupTable[_sym] == 0){
+            symbolAndEmojiLookupTable[_sym] = _tokenId;
+        }
     }
     function getL2AddressForManagedDeposit() private view returns(address){
         //check if existing user:
@@ -151,7 +158,11 @@ contract TokenManagement is  ERCDepositable {
         return _1155tokenId;
         
     }
-    
+    function getAddressBySymbol(string memory _symbol) public view returns (address) {
+        
+        uint256 _tokenId = symbolAndEmojiLookupTable[_symbol];
+        return tokenListById[_tokenId];
+    }
     function getTotalSupply(uint256 _tokenId) public view  returns(uint256){
         address _tokenAddr = tokenListById[_tokenId];
         return managedTokenListByAddress[_tokenAddr].totalSupply;

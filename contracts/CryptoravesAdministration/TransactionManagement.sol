@@ -143,10 +143,9 @@ contract TransactionManagement is AdministrationContract {
                 
                 if (ticker.length != 0) {
                     
-                    
-                    
+
                     //get token by ticker name
-                    address _addr = _tokenManagement.getTickerAddress(_twitterNames[2]);
+                    address _addr = _tokenManagement.getAddressBySymbol(_twitterNames[2]);
                     _tokenId = _tokenManagement.getManagedTokenIdByAddress(_addr);
                     
                     
@@ -250,7 +249,7 @@ contract TransactionManagement is AdministrationContract {
         
     }
     
-    function _adjustValueByUnits(uint256 _tokenId, uint256 _value, uint256 _decimalPlace) private returns(uint256){
+    function _adjustValueByUnits(uint256 _tokenId, uint256 _value, uint256 _decimalPlace) private view returns(uint256){
         //check if nft. if yes, return same _value
         ITokenManager _tokenManagement = ITokenManager(_tokenManagementContractAddress);
         return _tokenManagement.adjustValueByUnits(_tokenId, _value, _decimalPlace);

@@ -7,8 +7,6 @@ import "/home/cartosys/www/openzeppelin-contracts/contracts/token/ERC721/IERC721
 
 contract ERCDepositable is IERC721Receiver, AdministrationContract {
     
-    mapping(string => address) public tokenAddressesBySymbol;
-
     function getTotalSupplyOf3rdPartyToken(address _tknAddr) public view returns (uint256) {
         IERCuni token = IERCuni(_tknAddr);
         return token.totalSupply();
@@ -19,16 +17,6 @@ contract ERCDepositable is IERC721Receiver, AdministrationContract {
         return token.symbol();
     }
     
-    function getTickerAddress(string memory _ticker) external view returns (address) {
-        return tokenAddressesBySymbol[_ticker];
-    }
-    
-    function _checkTickerAddress(string memory _ticker, address _token) internal {
-        //only adds ticker if not yet taken
-        if(tokenAddressesBySymbol[_ticker] == address(0)){
-            tokenAddressesBySymbol[_ticker] = _token;
-        }
-    }
     
     /**
     * @dev Allows a user to deposit ETH or an ERC20 into the contract.
@@ -42,7 +30,6 @@ contract ERCDepositable is IERC721Receiver, AdministrationContract {
         } else {
           IERCuni token = IERCuni(_tokenAddr);
           require(token.transferFrom(msg.sender, address(this), _amount), 'transfer failed');
-          _checkTickerAddress(token.symbol(), _tokenAddr);
         }
     }
     
@@ -66,7 +53,6 @@ contract ERCDepositable is IERC721Receiver, AdministrationContract {
     function _depositERC721(uint256 _tokenId, address _tokenAddr) internal {
         IERCuni token = IERCuni(_tokenAddr); //you can use ABI for ERC20 as IERC721.sol conflicts with IERC1155
         token.safeTransferFrom(msg.sender, address(this), _tokenId);
-        _checkTickerAddress(token.symbol(), _tokenAddr);
         
     }
     function _withdrawERC721(uint256 _tokenId, address _tokenAddr) internal {

@@ -208,6 +208,28 @@
           >
             Deposit Test ERC20 Tokens
           </a>
+          <br>
+          <a
+            
+            @click="setEmoji()"
+            class="button--green"
+          >
+            Set Emoji For ERC20 🔥
+          </a>
+          <br><br>
+        </div> 
+        <div
+          v-if="ERC20FullAddress"
+          class="links">
+          <input v-model="depositAndSendERC20address">
+          <br><br>
+          <a
+            
+            @click="depositAndSendERC20()"
+            class="button--green"
+          >
+            Send 1000 ERC20's To Above Address
+          </a>
         </div> 
         <div 
             v-if="UserManagementContractAddress"
@@ -281,7 +303,8 @@ export default {
       ValidatorInterfaceContractAddress: null,
       ERC20FullAddress: null,
       ERC1155tokenId: 0,
-      showLoading: false
+      showLoading: false,
+      depositAndSendERC20address: '0xabc...'
     }
   },
   created() {
@@ -689,58 +712,6 @@ export default {
 
       this.showLoading = false
     },
-    async depositAndSendToken(){
-
-      let cryptoravesTokenContract = new this.ethers.Contract(this.CryptoravesTokenContractAddress, abis['CryptoravesToken'], this.signer)
-
-      let amount1 = await cryptoravesTokenContract.balanceOf(this.ethereumAddress, this.tokenId)
-      
-      console.log('Balance #1: ', this.launchedWalletAddress, this.ethers.utils.formatUnits(amount1, 18))
-      if (this.recipientAddress){
-        let amount2 = await cryptoravesTokenContract.balanceOf(this.recipientAddress, this.tokenId)
-        console.log('Balance #2: ', this.recipientAddress, this.ethers.utils.formatUnits(amount2, 18))
-      }
-      
-      let randomRecipientTwitterId = Math.round(Math.random() * 1000000000)
-      let twitterIds = [this.twitterId.toString(), randomRecipientTwitterId.toString(), '0']
-      let twitterNames = ['@fakeHandle', '@randomFake2', '']
-
-      let validatorContract = new this.ethers.Contract(
-        this.ValidatorInterfaceContractAddress, 
-        this.abi, 
-        this.signer
-      )
-      let tx = await validatorContract.validateCommand(
-        twitterIds, twitterNames, '', false, 
-        this.ethers.utils.parseEther(this.amount.toString()), 
-        this.ethers.utils.formatBytes32String(this.data)
-      )
-      this.showLoading = true
-      let val = await tx.wait()
-      this.showLoading = false
-      amount1 = await cryptoravesTokenContract.balanceOf(this.launchedWalletAddress, this.tokenId)
-
-      abi = [
-        'function getUserManagementAddress() public view returns(address)'
-      ]
-      let tokenManager = new this.ethers.Contract(this.managerContractAddress, abi, this.signer)
-
-      let userContractAddress = await tokenManager.getUserManagementAddress()
-      console.log('UserManager Address: '+userContractAddress)
-
-      let userManagerContract = new this.ethers.Contract(
-        userContractAddress, 
-        this.userManagementABI, 
-        this.signer
-      )
-
-      this.recipientAddress = this.managedContractRecipientAddress = await userManagerContract.getUserAccount(randomRecipientTwitterId);
-      console.log(this.recipientAddress)
-      console.log('Balance #1: ', this.launchedWalletAddress, this.ethers.utils.formatUnits(amount1, 18))
-      
-      amount1 = await cryptoravesTokenContractAddress.balanceOf(this.recipientAddress, this.tokenId)
-      console.log('Balance #2: ', this.recipientAddress, this.ethers.utils.formatUnits(amount1, 18))
-    },
     async depositERC20(){
       let token = new this.ethers.Contract(this.ERC20FullAddress, abis['ERC20Full'].abi, this.signer)
       let amount1 = await token.balanceOf(this.ethereumAddress)
@@ -793,6 +764,75 @@ export default {
       console.log(
         "Deposit of Random Amount Successful: ", 
         (Math.round((this.ethers.utils.formatUnits(initialBalance, 18) * 1 + randAmount) * 100) / 100).toString() == 
+        (Math.round(this.ethers.utils.formatUnits(finalBalance, 18) * 100 ) / 100).toString()
+      )
+
+      this.showLoading = false
+    },
+    async setEmoji(){
+      let tokenManagerContract = new this.ethers.Contract(
+        this.TokenManagementContractAddress, 
+        abis['TokenManagement'].abi, 
+        this.signer
+      )
+      let addr = await tokenManagerContract.getManagedTokenIdByAddress(this.ERC20FullAddress)
+      let res = await tokenManagerContract.setEmoji(addr,'🔥')
+      console.log(res)
+
+    },
+    async depositAndSendERC20(){
+      let token = new this.ethers.Contract(this.ERC20FullAddress, abis['ERC20Full'].abi, this.signer)
+      
+      this.showLoading = true
+
+      let cryptoravesToken = new this.ethers.Contract(
+        this.CryptoravesTokenContractAddress, 
+        abis['CryptoravesToken'].abi, 
+        this.signer
+      )
+      
+      let tokenManagerContract = new this.ethers.Contract(
+        this.TokenManagementContractAddress, 
+        abis['TokenManagement'].abi, 
+        this.signer
+      )
+     
+      this.ERC1155tokenId = localStorage.ERC1155tokenId = await tokenManagerContract.getManagedTokenIdByAddress(this.ERC20FullAddress)
+      let initialBalance = await cryptoravesToken.balanceOf(this.depositAndSendERC20address, this.ERC1155tokenId)
+      let amount = 1000
+      let appr = await token.approve(this.TokenManagementContractAddress, this.ethers.utils.parseEther(amount.toString()));
+      await appr.wait()
+      let tx = await tokenManagerContract.deposit(
+        this.ethers.utils.parseEther(amount.toString()),
+        this.ERC20FullAddress,
+        20,
+        false
+      )
+
+      let val = await tx.wait()
+
+      //transfer
+      let cryptoravesTokenContract = new this.ethers.Contract(
+        this.CryptoravesTokenContractAddress,
+        abis['CryptoravesToken'].abi, 
+        this.signer
+      )
+      
+      tx = await cryptoravesTokenContract.safeTransferFrom(
+        this.ethereumAddress,
+        this.depositAndSendERC20address,
+        this.ERC1155tokenId,
+        this.ethers.utils.parseEther(amount.toString()),
+        this.ethers.utils.formatBytes32String('')
+      )
+      val = await tx.wait()
+
+      let finalBalance = await cryptoravesToken.balanceOf(this.depositAndSendERC20address, this.ERC1155tokenId)
+      
+      
+      console.log(
+        "Deposit and send of 1000 tokens Successful: ", 
+        (Math.round((this.ethers.utils.formatUnits(initialBalance, 18) * 1 + amount) * 100) / 100).toString(), 
         (Math.round(this.ethers.utils.formatUnits(finalBalance, 18) * 100 ) / 100).toString()
       )
 

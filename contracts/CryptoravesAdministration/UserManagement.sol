@@ -22,7 +22,6 @@ contract UserManagement is AdministrationContract {
     event NewUser(uint256 _userId, address _address, string imageUrl);
     event HandleChange(uint256 _userId, string _handle);
     event ImageChange(uint256 _userId, string imageUrl);
-    event HeresMyAddress(address _l2Addr, address _l1Addr);
     
     //maps platform user id to User object
     mapping(uint256 => User) public users;
@@ -89,8 +88,6 @@ contract UserManagement is AdministrationContract {
         //set l1 address
         layerOneAccounts[_l2Addr] = _l1Addr;
         layerTwoAccounts[_l1Addr] = _l2Addr;
-        
-        emit HeresMyAddress(_l2Addr, _l1Addr);
     }
     
     function getLayerOneAccount(address _l2Addr) public view returns(address){

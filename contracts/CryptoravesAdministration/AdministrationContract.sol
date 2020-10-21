@@ -14,7 +14,7 @@ interface ITransactionManager {
 interface ITokenManager {
     function getCryptoravesTokenAddress() external view returns(address);
     function getUserManagementAddress() external view returns(address);
-    function getTickerAddress(string memory) external view returns(address);
+    function getAddressBySymbol(string memory) external view returns(address);
     function getManagedTokenIdByAddress(address) external view returns(uint256);
     function dropCrypto(string memory, address, uint256, uint256, bytes memory) external;
     function _checkHeldToken(address, uint256) external;
