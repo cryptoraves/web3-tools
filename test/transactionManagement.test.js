@@ -204,6 +204,7 @@ contract("TransactionManagement", async accounts => {
         user.account
       )
 
+      let orgUserAcct = user.account
       //3. reset tokenDropState
       await TransactionManagementInstance.resetTokenDrop(fakeUserId)
 
@@ -230,12 +231,12 @@ contract("TransactionManagement", async accounts => {
         user.account
       )
       user = await userManagementInstance.getUser(fakeUserId2)
-      let balance = await instanceCryptoravesToken.balanceOf(user.account, tokenId1155_B)
       assert.notEqual(
         tokenId1155_A,
         tokenId1155_B,
         'tokenId1155\'s should not match'
       )
+      let balance = await instanceCryptoravesToken.balanceOf(user.account, tokenId1155_B)
       assert.equal(
         balance,
         2222000000000000000000,
@@ -253,7 +254,14 @@ contract("TransactionManagement", async accounts => {
         'get/set emoji and/or symbol failed'
       )
 
-      
+      //8. get contract address by ticker & emoji
+      let addressB1 = await instanceTokenManagement.getAddressBySymbol('NEWFAKESYMBOL')
+      let addressB2 = await instanceTokenManagement.getAddressBySymbol('💫')
+      assert.isOk(
+        addressB1 == addressB2,
+        addressB2 == orgUserAcct,
+        'emoji & symbol address lookup failed'
+      )
     })
     it("set a new userManagement & TokenManagement address and check it", async () => {
       let instance = await TransactionManagement.deployed()
