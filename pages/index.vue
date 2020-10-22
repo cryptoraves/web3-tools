@@ -21,7 +21,7 @@
           target="_blank"
           class="button--green"
         >
-          Token Management Testing
+          Web3 Portal Testing
         </a>
         <!--a
           @click="go3Box(ethereumAddress)"
