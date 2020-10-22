@@ -16,6 +16,13 @@
         >
           Adminstrator Tools
         </a>
+        <a
+          @click="gofeature('TokenManagementTesting')"
+          target="_blank"
+          class="button--green"
+        >
+          Token Management Testing
+        </a>
         <!--a
           @click="go3Box(ethereumAddress)"
           target="_blank"
