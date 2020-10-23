@@ -414,18 +414,30 @@ export default {
       await this.testVariables()
     },
     async getBalances(){
-
-      
       try {
         await this.getERC20Balance()
-        await this.getERC721Balance()
-        await this.getAllERC721sHeld()
-        await this.getWrappedBalances()
-        console.log('here')
-        await this.getEmojis()
-        console.log('here1')
       }catch{
-        console.log('Error with init getBalances')
+        console.log('Error with init getERC20Balance')
+      }
+      try {
+        await this.getERC721Balance()
+      }catch{
+        console.log('Error with init getERC721Balance')
+      }
+      try {
+        await this.getAllERC721sHeld()
+      }catch{
+        console.log('Error with init getAllERC721sHeld')
+      }
+      try {
+        await this.getWrappedBalances()
+      }catch{
+        console.log('Error with init getWrappedBalances')
+      }
+      try {
+        await this.getEmojis()
+      }catch{
+        console.log('Error with init getEmojis')
       }
       
     },
@@ -498,10 +510,10 @@ export default {
         this.signer
       )
       this.ERC20Emoji = await tokenManagerContract.getEmoji(this.ERC20WrappedId)
-      console.log(this.ERC20WrappedId)
+      console.log(this.ERC20WrappedId.toString())
       console.log(this.ERC20Emoji)
       this.ERC721Emoji = await tokenManagerContract.getEmoji(this.ERC721WrappedId)
-      console.log(this.ERC721WrappedId)
+      console.log(this.ERC721WrappedId.toString())
       console.log(this.ERC721Emoji)
     },
     async getERC20Balance(){

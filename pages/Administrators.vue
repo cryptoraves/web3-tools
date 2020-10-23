@@ -39,7 +39,7 @@
         Admin Functions
       </h1>
       <h2 class="subtitle">
-        For Administering Contract Upgrades and End User Support
+        For Deploying, Administering Contract Upgrades, and End User Support
       </h2>
     </div>
     <div v-if="ready && !showLoading">
@@ -841,7 +841,7 @@ export default {
     importContractStructureForThisNetwork(){
 
       //copy and paste json here
-      let savedNetwork = {"networkType":"Matic Testnet","UserManagementContractAddress":"0xfeE3575f74853cE1ec6A1105609e465Fe681C471","TokenManagementContractAddress":"0xf0f5208Df213C774C5482CBeF37bBe1427411616","CryptoravesTokenContractAddress":"0xf201009e1E96A98314d4381F929048Fa69358AEE","TransactionManagementContractAddress":"0xcfDF73aa92Cd9Ec451356e0b5204D6cD0a230fCc","ValidatorInterfaceContractAddress":"0x794CA93D9c5e58BFA67D46b50365e7f13d4cb7a5","ERC20FullAddress":"0xc4aA74F0030E90b35527612665c15f0BBCFfc1a8","ERC1155tokenId":{"_hex":"0x06"},"AdminToolsLibraryAddress":"0x09b1ed6A18BE54a85c18ff6Bf7fE6CEa6E67545E"}
+      let savedNetwork = {"networkType":"Matic Testnet","UserManagementContractAddress":"0xfeE3575f74853cE1ec6A1105609e465Fe681C471","TokenManagementContractAddress":"0xf0f5208Df213C774C5482CBeF37bBe1427411616","CryptoravesTokenContractAddress":"0xf201009e1E96A98314d4381F929048Fa69358AEE","TransactionManagementContractAddress":"0xcfDF73aa92Cd9Ec451356e0b5204D6cD0a230fCc","ValidatorInterfaceContractAddress":"0x794CA93D9c5e58BFA67D46b50365e7f13d4cb7a5","ERC20FullAddress":"0x5DCe53E033013AeAAD02929169d9539A42870b09","ERC1155tokenId":0,"AdminToolsLibraryAddress":"0x09b1ed6A18BE54a85c18ff6Bf7fE6CEa6E67545E"}
 
       if(this.networkType == savedNetwork["networkType"]){
         
