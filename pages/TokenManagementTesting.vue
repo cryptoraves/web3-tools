@@ -515,6 +515,9 @@ export default {
       this.ERC721Emoji = await tokenManagerContract.getEmoji(this.ERC721WrappedId)
       console.log(this.ERC721WrappedId.toString())
       console.log(this.ERC721Emoji)
+
+      console.log(await tokenManagerContract.getAddressBySymbol('🔥'))
+      console.log('here')
     },
     async getERC20Balance(){
       let token = new this.ethers.Contract(this.ERC20FullAddress, abis['ERC20Full'].abi, this.signer)
