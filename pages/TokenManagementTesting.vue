@@ -81,7 +81,7 @@
               @click="goEtherscan(ERC20FullAddress)">
               Test ERC20 Contract Address:<br> {{ this.ERC20FullAddress }}<br>
           </a>
-          <a  v-if="ERC20WrappedId"
+          <a  v-if="ERC20WrappedId > 0"
               target="_blank">
               Your ERC20 Wrapped ID: {{ this.ERC20WrappedId }}<br>
               
@@ -91,7 +91,7 @@
               Your ERC20 Balance: {{ this.ERC20balance }}<br>
               
           </a>
-          <a  v-if="ERC20balance"
+          <a  v-if="ERC20balance && ERC20WrappedId > 0"
               target="_blank">
               Your ERC20 Wrapped Balance: {{ this.ERC20WrappedBalance }}<br>
 
@@ -118,6 +118,19 @@
           <br>
         </div> 
         <div
+          v-if="ERC20FullAddress && ERC20WrappedId"
+          class="links">
+          <input v-model="depositAndSendERC20address">
+          <br><br>
+          <a
+            
+            @click="sendWrappedERC20()"
+            class="button--green"
+          >
+            Send Wrapped ERC20 To Above Address
+          </a>
+        </div>
+        <div
           class="links">
           <a
             v-if="ValidatorInterfaceContractAddress && ! ERC721FullAddress"
@@ -135,7 +148,7 @@
               @click="goEtherscan(ERC721FullAddress)">
               Test ERC721 Contract Address:<br> {{ this.ERC721FullAddress }}<br>
           </a>
-          <a  v-if="ERC721WrappedId"
+          <a  v-if="ERC721WrappedId > 0"
               target="_blank">
               Your ERC721 Wrapped ID: {{ this.ERC721WrappedId }}<br>
               
@@ -145,7 +158,7 @@
               @click="goEtherscan(ERC721FullAddress)">
               Your ERC721 Balance: {{ this.ERC721balance }}<br>
           </a>
-          <a  v-if="ERC721balance"
+          <a  v-if="ERC721balance && ERC721WrappedId > 0"
               target="_blank">
               Your ERC721 Wrapped Balance: {{ this.ERC721WrappedBalance }}<br>
           </a>
@@ -184,7 +197,7 @@
           <br><br>
           <a
             
-            @click="depositAndSendERC721(0)"
+            @click="sendWrappedERC721(0)"
             class="button--green"
           >
             Send An ERC721 To Above Address
@@ -268,7 +281,6 @@ export default {
       ERC721WrappedBalance: 0,
       ERC721Emoji: '',
       ERC721WrappedId: 0,
-      ERC1155tokenId: 0,
       showLoading: false,
       depositAndSendERC20address: '0xabc...',
       depositAndSendERC721address: '0x123...'
@@ -515,18 +527,16 @@ export default {
       this.ERC721Emoji = await tokenManagerContract.getEmoji(this.ERC721WrappedId)
       console.log(this.ERC721WrappedId.toString())
       console.log(this.ERC721Emoji)
-
-      console.log(await tokenManagerContract.getAddressBySymbol('🔥'))
-      console.log('here')
+      console.log(await tokenManagerContract.getAddressBySymbol(this.ERC721Emoji))
     },
     async getERC20Balance(){
       let token = new this.ethers.Contract(this.ERC20FullAddress, abis['ERC20Full'].abi, this.signer)
       this.ERC20balance = this.ethers.utils.formatUnits(await token.balanceOf(this.ethereumAddress), 18)
     },
-    async depositERC20(){
+    async depositERC20(){     
       let token = new this.ethers.Contract(this.ERC20FullAddress, abis['ERC20Full'].abi, this.signer)
       let amount1 = await token.balanceOf(this.ethereumAddress)
-      
+ 
       this.showLoading = true
 
       let cryptoravesToken = new this.ethers.Contract(
@@ -534,10 +544,10 @@ export default {
         abis['CryptoravesToken'].abi, 
         this.signer
       )
-
-      let initialBalance 
-      initialBalance = await cryptoravesToken.balanceOf(this.ethereumAddress, this.ERC1155tokenId)
-      
+      let initialBalance = 0
+      try{
+        initialBalance = await cryptoravesToken.balanceOf(this.ethereumAddress, this.ERC1155tokenIdForERC20)
+      }catch{}
       let tokenManagerContract = new this.ethers.Contract(
         this.TokenManagementContractAddress, 
         abis['TokenManagement'].abi, 
@@ -558,10 +568,10 @@ export default {
       let val = await tx.wait()
       this.ERC20balance = await token.balanceOf(this.ethereumAddress)
 
-      this.ERC1155tokenId = localStorage.ERC1155tokenId = await tokenManagerContract.getManagedTokenIdByAddress(this.ERC20FullAddress)
-      console.log('ERC1155 Token ID: '+this.ERC1155tokenId)
+      this.ERC1155tokenIdForERC20 = localStorage.ERC1155tokenIdForERC20 = await tokenManagerContract.getManagedTokenIdByAddress(this.ERC20FullAddress)
+      console.log('ERC1155 Token ID: '+this.ERC1155tokenIdForERC20)
       
-      let finalBalance = await cryptoravesToken.balanceOf(this.ethereumAddress, this.ERC1155tokenId)
+      let finalBalance = await cryptoravesToken.balanceOf(this.ethereumAddress, this.ERC1155tokenIdForERC20)
  
       console.log(
         "Deposit of Random Amount Successful: ", 
@@ -583,63 +593,42 @@ export default {
       let res = await tokenManagerContract.setEmoji(id,'🔥')
       console.log('Emoji set', res)
     },
-    async depositAndSendERC20(){
+    async sendWrappedERC20(){
       let token = new this.ethers.Contract(this.ERC20FullAddress, abis['ERC20Full'].abi, this.signer)
-      
       this.showLoading = true
-
-      let cryptoravesToken = new this.ethers.Contract(
+      let cryptoravesTokenContract = new this.ethers.Contract(
         this.CryptoravesTokenContractAddress, 
         abis['CryptoravesToken'].abi, 
         this.signer
       )
-      
       let tokenManagerContract = new this.ethers.Contract(
         this.TokenManagementContractAddress, 
         abis['TokenManagement'].abi, 
         this.signer
       )
-     
-      this.ERC1155tokenId = localStorage.ERC1155tokenId = await tokenManagerContract.getManagedTokenIdByAddress(this.ERC20FullAddress)
-      let initialBalance = await cryptoravesToken.balanceOf(this.depositAndSendERC20address, this.ERC1155tokenId)
-      let amount = 1000
-      let appr = await token.approve(this.TokenManagementContractAddress, this.ethers.utils.parseEther(amount.toString()));
-      await appr.wait()
-      let tx = await tokenManagerContract.deposit(
-        this.ethers.utils.parseEther(amount.toString()),
-        this.ERC20FullAddress,
-        20,
-        false
-      )
+      this.ERC1155tokenIdForERC20 = localStorage.ERC1155tokenIdForERC20 = await tokenManagerContract.getManagedTokenIdByAddress(this.ERC20FullAddress)
 
-      let val = await tx.wait()
-
-      //transfer
-      let cryptoravesTokenContract = new this.ethers.Contract(
-        this.CryptoravesTokenContractAddress,
-        abis['CryptoravesToken'].abi, 
-        this.signer
-      )
-      
-      tx = await cryptoravesTokenContract.safeTransferFrom(
+      let initialBalance = await cryptoravesTokenContract.balanceOf(this.depositAndSendERC20address, this.ERC1155tokenIdForERC20)
+      let tx = await cryptoravesTokenContract.safeTransferFrom(
         this.ethereumAddress,
         this.depositAndSendERC20address,
-        this.ERC1155tokenId,
-        this.ethers.utils.parseEther(amount.toString()),
+        this.ERC1155tokenIdForERC20,
+        this.ethers.utils.parseEther((this.ERC20WrappedBalance * 0.1).toString()),
         this.ethers.utils.formatBytes32String('')
       )
-      val = await tx.wait()
+      let val = await tx.wait()
 
-      let finalBalance = await cryptoravesToken.balanceOf(this.depositAndSendERC20address, this.ERC1155tokenId)
-      
-      
+      let finalBalance = await cryptoravesTokenContract.balanceOf(this.depositAndSendERC20address, this.ERC1155tokenIdForERC20)      
+      console.log('Send Amount: ', (this.ERC20WrappedBalance * 0.1).toString())
       console.log(
-        "Deposit and send of 1000 tokens Successful: ", 
-        (Math.round((this.ethers.utils.formatUnits(initialBalance, 18) * 1 + amount) * 100) / 100).toString(), 
+        "Deposit and send of wrapped erc20 tokens Successful: ", 
+        (Math.round(this.ethers.utils.formatUnits(initialBalance, 18) * 100) / 100).toString(), 
         (Math.round(this.ethers.utils.formatUnits(finalBalance, 18) * 100 ) / 100).toString()
       )
 
       this.showLoading = false
+      this.getBalances()
+
     },
     async launchERC721(){
       this.showLoading = true
@@ -730,6 +719,46 @@ export default {
       console.log(res)
 
     },
+    async sendWrappedERC721(){
+      let token = new this.ethers.Contract(this.ERC721FullAddress, abis['ERC721Full'].abi, this.signer)
+      this.showLoading = true
+      let cryptoravesTokenContract = new this.ethers.Contract(
+        this.CryptoravesTokenContractAddress, 
+        abis['CryptoravesToken'].abi, 
+        this.signer
+      )
+      let tokenManagerContract = new this.ethers.Contract(
+        this.TokenManagementContractAddress, 
+        abis['TokenManagement'].abi, 
+        this.signer
+      )
+      this.ERC1155tokenIdForERC721 = localStorage.ERC1155tokenIdForERC721 = await tokenManagerContract.getManagedTokenIdByAddress(this.ERC721FullAddress)
+
+      let initialBalance = await cryptoravesTokenContract.balanceOf(this.depositAndSendERC721address, this.ERC1155tokenIdForERC721)
+
+      tokenId
+
+      let tx = await cryptoravesTokenContract.safeTransferFrom(
+        this.ethereumAddress,
+        this.depositAndSendERC20address,
+        this.ERC1155tokenIdForERC721,
+        tokenId,
+        this.ethers.utils.formatBytes32String('')
+      )
+      let val = await tx.wait()
+
+      let finalBalance = await cryptoravesTokenContract.balanceOf(this.depositAndSendERC721address, this.ERC1155tokenIdForERC721)      
+      console.log('Send ID: ', tokenId)
+      console.log(
+        "Deposit and send of wrapped erc721 tokens Successful: ", 
+        initialBalance, 
+        finalBalance,
+      )
+
+      this.showLoading = false
+      this.getBalances()
+
+    },
     async depositAndSendERC721(tokenId){
       let token = new this.ethers.Contract(this.ERC721FullAddress, abis['ERC721Full'].abi, this.signer)
       
@@ -747,10 +776,10 @@ export default {
         this.signer
       )
 
-      this.ERC1155tokenId = localStorage.ERC1155tokenId = await tokenManagerContract.getManagedTokenIdByAddress(this.ERC721FullAddress)
+      this.ERC1155tokenIdForERC721 = localStorage.ERC1155tokenIdForERC721 = await tokenManagerContract.getManagedTokenIdByAddress(this.ERC721FullAddress)
       console.log(this.depositAndSendERC721address)
-      console.log(this.ERC1155tokenId.toString())
-      let initialBalance = await cryptoravesToken.balanceOf(this.depositAndSendERC721address, this.ERC1155tokenId.toString())
+      console.log(this.ERC1155tokenIdForERC721.toString())
+      let initialBalance = await cryptoravesToken.balanceOf(this.depositAndSendERC721address, this.ERC1155tokenIdForERC721.toString())
       let appr = await token.approve(this.TokenManagementContractAddress, tokenId);
 
       let tx = await tokenManagerContract.deposit(
@@ -772,13 +801,13 @@ export default {
       tx = await cryptoravesTokenContract.safeTransferFrom(
         this.ethereumAddress,
         this.depositAndSendERC721address,
-        this.ERC1155tokenId,
+        this.ERC1155tokenIdForERC721,
         tokenId,
         this.ethers.utils.formatBytes32String('')
       )
       val = await tx.wait()
 
-      let finalBalance = await cryptoravesToken.balanceOf(this.depositAndSendERC721address, this.ERC1155tokenId)
+      let finalBalance = await cryptoravesToken.balanceOf(this.depositAndSendERC721address, this.ERC1155tokenIdForERC721)
       
       
       console.log(
@@ -804,6 +833,9 @@ export default {
         results[i] = res.toString()
       }
       return results
+    },
+    async getAllWrappedERC721sHeld(){
+
     },
     goEtherscan(param){
       if (param.length == 42){

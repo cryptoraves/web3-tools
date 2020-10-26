@@ -2,7 +2,7 @@
 pragma solidity 0.6.10;
 
 import "./AdministrationContract.sol";
-import "/home/cartosys/www/openzeppelin-contracts/contracts/token/ERC1155/ERC1155.sol";
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC1155/ERC1155.sol";
 
 contract CryptoravesToken is ERC1155, AdministrationContract {
     
@@ -14,32 +14,7 @@ contract CryptoravesToken is ERC1155, AdministrationContract {
         setAdministrator(tx.origin);
         setAdministrator(msg.sender);
     }
- /*   
-    function _beforeTokenTransfer(
-        address operator,
-        address from,
-        address to,
-        uint256[] memory ids,
-        uint256[] memory amounts,
-        bytes memory data
-    )
-        internal override
-    {
-        for(uint i=0; i < ids.length; i++){
-            if(amounts[i] > 0){
-                if(from == address(0)){
-                    _checkHeldToken(to, ids[i]);
-                }else{
-                    if(balanceOf(from, ids[i]) >= amounts[i]){
-                        _checkHeldToken(to, ids[i]);
-                    }
-                }
-            }
-        }
-        operator; 
-        data;
-    }
-*/
+    
     // General mint function
     function mint(address account, uint256 id, uint256 amount, bytes memory data) public virtual onlyAdmin {
         _mint(account, id, amount, data);
@@ -64,4 +39,79 @@ contract CryptoravesToken is ERC1155, AdministrationContract {
     function testDownstreamAdminConfiguration() public view onlyAdmin returns(bool){
         return true;
     }
+    
+    
+    
+    
+    //https://github.com/enjin/erc-1155/blob/master/contracts/ERC1155MixedFungible.sol
+    //begin cut-an-pase from mixedFungible:
+    
+    
+    
+    // Use a split bit implementation.
+    // Store the type in the upper 128 bits..
+    uint256 constant TYPE_MASK = uint256(uint128(~0)) << 128;
+
+    // ..and the non-fungible index in the lower 128
+    uint256 constant NF_INDEX_MASK = uint128(~0);
+
+    // The top bit is a flag to tell if this is a NFI.
+    uint256 constant TYPE_NF_BIT = 1 << 255;
+
+    mapping (uint256 => address) nfOwners;
+
+    // Only to make code clearer. Should not be functions
+    function isNonFungible(uint256 _id) public pure returns(bool) {
+        return _id & TYPE_NF_BIT == TYPE_NF_BIT;
+    }
+    function isFungible(uint256 _id) public pure returns(bool) {
+        return _id & TYPE_NF_BIT == 0;
+    }
+    function getNonFungibleIndex(uint256 _id) public pure returns(uint256) {
+        return _id & NF_INDEX_MASK;
+    }
+    function getNonFungibleBaseType(uint256 _id) public pure returns(uint256) {
+        return _id & TYPE_MASK;
+    }
+    function isNonFungibleBaseType(uint256 _id) public pure returns(bool) {
+        // A base type has the NF bit but does not have an index.
+        return (_id & TYPE_NF_BIT == TYPE_NF_BIT) && (_id & NF_INDEX_MASK == 0);
+    }
+    function isNonFungibleItem(uint256 _id) public pure returns(bool) {
+        // A base type has the NF bit but does has an index.
+        return (_id & TYPE_NF_BIT == TYPE_NF_BIT) && (_id & NF_INDEX_MASK != 0);
+    }
+    function ownerOf(uint256 _id) public view returns (address) {
+        return nfOwners[_id];
+    }
+
+    
+    function _beforeTokenTransfer(
+        address operator,
+        address from,
+        address to,
+        uint256[] memory ids,
+        uint256[] memory amounts,
+        bytes memory data
+    )
+        internal override
+    {
+        require(to != address(0x0), "cannot send to zero address");
+        require(ids.length == amounts.length, "Array length must match");
+
+        // Only supporting a global operator approval allows us to do only 1 check and not to touch storage to handle allowances.
+        require(from == _msgSender() || isApprovedForAll(from, _msgSender()), "Need operator approval for 3rd party transfers.");
+
+        for (uint256 i = 0; i < ids.length; ++i) {
+            // Cache value to local variable to reduce read costs.
+            uint256 id = ids[i];
+
+            if (isNonFungible(id)) {
+                require(nfOwners[id] == from);
+                nfOwners[id] = to;
+            }
+        }
+        operator; data;
+    }
+
 }
