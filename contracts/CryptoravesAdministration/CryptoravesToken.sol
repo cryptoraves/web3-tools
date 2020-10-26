@@ -58,7 +58,7 @@ contract CryptoravesToken is ERC1155, AdministrationContract {
     // The top bit is a flag to tell if this is a NFI.
     uint256 constant TYPE_NF_BIT = 1 << 255;
 
-    mapping (uint256 => address) nfOwners;
+    mapping (uint256 => address) public nfOwners;
 
     // Only to make code clearer. Should not be functions
     function isNonFungible(uint256 _id) public pure returns(bool) {
