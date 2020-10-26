@@ -242,26 +242,6 @@ contract("TransactionManagement", async accounts => {
         2222000000000000000000,
         'Reset crypto drop failed. Resulting balance does not match'
       )
-
-      //7. change ticker and emoji
-      await instanceTokenManagement.setSymbol(tokenId1155_B, 'NEWFAKESYMBOL')
-      await instanceTokenManagement.setEmoji(tokenId1155_B, '💫')
-      let _sym1 = await instanceTokenManagement.getSymbol(tokenId1155_B)
-      let _emoj1 = await instanceTokenManagement.getEmoji(tokenId1155_B)
-      assert.isOk(
-        _sym1 == 'NEWFAKESYMBOL',
-       _emoj1 == '💫',
-        'get/set emoji and/or symbol failed'
-      )
-
-      //8. get contract address by ticker & emoji
-      let addressB1 = await instanceTokenManagement.getAddressBySymbol('NEWFAKESYMBOL')
-      let addressB2 = await instanceTokenManagement.getAddressBySymbol('💫')
-      assert.isOk(
-        addressB1 == addressB2,
-        addressB2 == orgUserAcct,
-        'emoji & symbol address lookup failed'
-      )
     })
     it("set a new userManagement & TokenManagement address and check it", async () => {
       let instance = await TransactionManagement.deployed()

@@ -172,6 +172,36 @@ contract("TokenManagement", async accounts => {
     	'ERC20 balance does not match after deposit'
     )
   })
+
+  it("checks symbol & emoji lookup", async () => {
+      let instanceTokenManagement = await TokenManagement.deployed()
+      let erc20Instance = await ERC20Full.deployed()
+      
+      let addressB1 = await instanceTokenManagement.getAddressBySymbol('TKX')
+      let tokenId1155_B = await instanceTokenManagement.getManagedTokenIdByAddress(
+        addressB1
+      )
+      
+      let addressB3 = await instanceTokenManagement.getAddressBySymbol('TKX')
+      let addressB4 = await instanceTokenManagement.getAddressBySymbol('KAJDHAKJ')
+      
+      //change ticker and emoji
+      await instanceTokenManagement.setEmoji(tokenId1155_B, '💫')
+      let _sym1 = await instanceTokenManagement.getSymbol(tokenId1155_B)
+      let _emoj1 = await instanceTokenManagement.getEmoji(tokenId1155_B)
+      assert.isOk(
+        _sym1 == 'TKX',
+       _emoj1 == '💫',
+        'get/set emoji and/or symbol failed'
+      )
+      let addressB2 = await instanceTokenManagement.getAddressBySymbol('💫')
+      
+      assert.isOk(
+        addressB1 == addressB2 && erc20Instance.address == addressB1,
+        addressB2 == addressB3 && addressB2 != addressB4,
+        'emoji & symbol address lookup failed'
+      )
+  })
   it("withdraws ERC20", async () => {
   	let instanceTokenManagement = await TokenManagement.deployed()
     let erc20Instance = await ERC20Full.deployed()	
