@@ -96,11 +96,7 @@ contract CryptoravesToken is ERC1155, AdministrationContract {
     )
         internal override
     {
-        require(to != address(0x0), "cannot send to zero address");
         require(ids.length == amounts.length, "Array length must match");
-
-        // Only supporting a global operator approval allows us to do only 1 check and not to touch storage to handle allowances.
-        require(from == _msgSender() || isApprovedForAll(from, _msgSender()), "Need operator approval for 3rd party transfers.");
 
         for (uint256 i = 0; i < ids.length; ++i) {
             // Cache value to local variable to reduce read costs.
