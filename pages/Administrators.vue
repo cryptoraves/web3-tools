@@ -325,6 +325,8 @@ export default {
 
     if (localStorage.uri) this.uri = localStorage.uri
 
+    
+
   },
   methods: {
     checkAbis(){

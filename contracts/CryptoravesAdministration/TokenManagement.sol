@@ -322,4 +322,19 @@ contract TokenManagement is  ERCDepositable {
         IDownStream _downstream = IDownStream(getCryptoravesTokenAddress());
         return _downstream.testDownstreamAdminConfiguration();
     }
+
+    //testing. Remove later
+    uint256 baseTokenNFT = 12345 << 128;
+    uint128 indexNFT = 50;
+    uint256 baseTokenFT = 54321 << 128;
+    
+    function returnbaseTokenNFT() public view returns(uint256){
+        return baseTokenNFT;
+    }
+    function indexTokenFT() public view returns(uint256){
+        return baseTokenNFT + indexNFT;
+    }
+    function baseTokenForFT() public view returns(uint256){
+        return baseTokenFT;
+    }
 }
