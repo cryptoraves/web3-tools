@@ -1,11 +1,5 @@
 export const state = () => ({
-  web3js: null,
-  ethersProvider: null,
-  ethereumAddress: null,
-  launchAddress: null,
-  launchHash: null,
-  recipient: null,
-  recipientAddress: null
+  networkInfo: null,
 })
 export const mutations = {
   setEthersProvider(state, value) {

@@ -426,8 +426,6 @@ export default {
       await this.testVariables()
     },
     async getBalances(){
-      let baseTokenNFT = 12345 << 128
-      console.log(baseTokenNFT)
       try {
         await this.getERC20Balance()
       }catch{

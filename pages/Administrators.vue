@@ -1,9 +1,9 @@
-<template>  
+<template>
   <div 
     class="container"
   >
     <div v-if="ready">
-
+      <div v-if='loadNetworkData()'></div>
       <div class="highlight">
         <h2
           v-if="networkType == 'SKALE Testnet'" 
@@ -250,10 +250,10 @@
             <br>
             <br>
             <a
-              @click="exportContractStructureForThisNetwork()"
+              @click="exportContractStructureForThisNetwork(true)"
               class="button--green"
             >
-              Export Network Settings
+              Save Network Settings
             </a>
           </div>
           <div 
@@ -261,10 +261,10 @@
             <br>
             <br>
             <a
-              @click="importContractStructureForThisNetwork()"
+              @click="importContractStructureForThisNetwork(true)"
               class="button--green"
             >
-              Import Network Settings
+              Load Network Settings
             </a>
           </div>
 
@@ -312,9 +312,8 @@ export default {
 
   },
   mounted() {
-
- 
-    if (localStorage.CryptoravesTokenContractAddress) this.CryptoravesTokenContractAddress = localStorage.CryptoravesTokenContractAddress
+    
+    /*if (localStorage.CryptoravesTokenContractAddress) this.CryptoravesTokenContractAddress = localStorage.CryptoravesTokenContractAddress
     if (localStorage.UserManagementContractAddress) this.UserManagementContractAddress = localStorage.UserManagementContractAddress
     if (localStorage.TokenManagementContractAddress) this.TokenManagementContractAddress = localStorage.TokenManagementContractAddress
     if (localStorage.TransactionManagementContractAddress) this.TransactionManagementContractAddress = localStorage.TransactionManagementContractAddress
@@ -324,11 +323,16 @@ export default {
     if (localStorage.AdminToolsLibraryAddress) this.AdminToolsLibraryAddress = localStorage.AdminToolsLibraryAddress
 
     if (localStorage.uri) this.uri = localStorage.uri
-
-    
-
+*/
   },
   methods: {
+    loadNetworkData(){
+      console.log(this.networkType)
+      if(this.networkType){
+        this.importContractStructureForThisNetwork(false)
+        return true
+      }
+    },
     checkAbis(){
       this.contractNames.forEach(function(element) {
         if(typeof abis[element] === 'undefined') {
@@ -595,6 +599,9 @@ export default {
       this.showLoading = false
     },
     async testVariables(){
+      
+      this.exportContractStructureForThisNetwork(false)
+
       let res, cumulativeBool
       let contract = new this.ethers.Contract(
         this.ValidatorInterfaceContractAddress, 
@@ -840,34 +847,43 @@ export default {
 
       this.showLoading = false
     },
-    importContractStructureForThisNetwork(){
-
-      //copy and paste json here
-      let savedNetwork = {"networkType":"Matic Testnet","UserManagementContractAddress":"0xfeE3575f74853cE1ec6A1105609e465Fe681C471","TokenManagementContractAddress":"0xf0f5208Df213C774C5482CBeF37bBe1427411616","CryptoravesTokenContractAddress":"0xf201009e1E96A98314d4381F929048Fa69358AEE","TransactionManagementContractAddress":"0xcfDF73aa92Cd9Ec451356e0b5204D6cD0a230fCc","ValidatorInterfaceContractAddress":"0x794CA93D9c5e58BFA67D46b50365e7f13d4cb7a5","ERC20FullAddress":"0x5DCe53E033013AeAAD02929169d9539A42870b09","ERC1155tokenId":0,"AdminToolsLibraryAddress":"0x09b1ed6A18BE54a85c18ff6Bf7fE6CEa6E67545E"}
-
-      if(this.networkType == savedNetwork["networkType"]){
-        
-        this.UserManagementContractAddress = localStorage.UserManagementContractAddress = savedNetwork["UserManagementContractAddress"]
-        this.TokenManagementContractAddress = localStorage.TokenManagementContractAddress = savedNetwork["TokenManagementContractAddress"]
-        this.CryptoravesTokenContractAddress = localStorage.CryptoravesTokenContractAddress = savedNetwork["CryptoravesTokenContractAddress"]
-        this.TransactionManagementContractAddress = localStorage.TransactionManagementContractAddress = savedNetwork["TransactionManagementContractAddress"]
-        this.ValidatorInterfaceContractAddress = localStorage.ValidatorInterfaceContractAddress = savedNetwork["ValidatorInterfaceContractAddress"]
-        if(savedNetwork["ERC20FullAddress"]){
-          this.ERC20FullAddress = localStorage.ERC20FullAddress = savedNetwork["ERC20FullAddress"]
+    importContractStructureForThisNetwork(alertsBool){
+      let savedNetwork = {}
+      if(localStorage.networkInfo){
+        let networkInfo = JSON.parse(localStorage.networkInfo)
+        if(networkInfo[this.networkType]){
+          savedNetwork[this.networkType] = networkInfo[this.networkType]
+        }else{
+          if(alertsBool){
+            alert('No Saved Network Info for '+this.networkType)
+          }
+          return 0
         }
-        this.ERC1155tokenId = localStorage.ERC1155tokenId = savedNetwork["ERC1155tokenId"]
-        this.AdminToolsLibraryAddress = localStorage.AdminToolsLibraryAddress = savedNetwork["AdminToolsLibraryAddress"]
+      }
+      if(this.networkType == savedNetwork[this.networkType]["networkType"]){
+        
+        this.UserManagementContractAddress = localStorage.UserManagementContractAddress = savedNetwork[this.networkType]["UserManagementContractAddress"]
+        this.TokenManagementContractAddress = localStorage.TokenManagementContractAddress = savedNetwork[this.networkType]["TokenManagementContractAddress"]
+        this.CryptoravesTokenContractAddress = localStorage.CryptoravesTokenContractAddress = savedNetwork[this.networkType]["CryptoravesTokenContractAddress"]
+        this.TransactionManagementContractAddress = localStorage.TransactionManagementContractAddress = savedNetwork[this.networkType]["TransactionManagementContractAddress"]
+        this.ValidatorInterfaceContractAddress = localStorage.ValidatorInterfaceContractAddress = savedNetwork[this.networkType]["ValidatorInterfaceContractAddress"]
+        if(savedNetwork["ERC20FullAddress"]){
+          this.ERC20FullAddress = localStorage.ERC20FullAddress = savedNetwork[this.networkType]["ERC20FullAddress"]
+        }
+        this.ERC1155tokenId = localStorage.ERC1155tokenId = savedNetwork[this.networkType]["ERC1155tokenId"]
+        this.AdminToolsLibraryAddress = localStorage.AdminToolsLibraryAddress = savedNetwork[this.networkType]["AdminToolsLibraryAddress"]
 
       }else{
-        alert('Network Name doesn\'t match. Cannot Save Info.', this.networkType, savedNetwork["networkType"])
+        if(alertsBool){
+          alert('Network Name doesn\'t match. Cannot Save Info.', this.networkType, savedNetwork[this.networkType]["networkType"])
+        }
       }
     },
-    exportContractStructureForThisNetwork(){
+    exportContractStructureForThisNetwork(alertsBool){
       if(this.networkType){
         
         //if localsotrage.networkName is set then prompt for overwrite confirmation
         let savedNetwork = {}
-        savedNetwork = {}
         savedNetwork["networkType"] = this.networkType
         savedNetwork["UserManagementContractAddress"] = this.UserManagementContractAddress
         savedNetwork["TokenManagementContractAddress"] = this.TokenManagementContractAddress
@@ -880,9 +896,20 @@ export default {
         savedNetwork["ERC1155tokenId"] = this.ERC1155tokenId
         savedNetwork["AdminToolsLibraryAddress"]  = this.AdminToolsLibraryAddress
         
-        this.copyToClipboard(JSON.stringify(savedNetwork))
+        let networkInfo = {}
+        if(localStorage.networkInfo){
+          networkInfo = JSON.parse(localStorage.networkInfo)
+        } 
+        networkInfo[this.networkType] = savedNetwork
+        localStorage.networkInfo = JSON.stringify(networkInfo)
 
-        alert('JSON output copied to clipboard')
+        if(alertsBool){
+          this.copyToClipboard(JSON.stringify(savedNetwork))
+          alert('Network Info Saved for '+this.networkType+ ' and copied to clipboard')
+        }else{
+          console.log('Network Info Saved for '+this.networkType+ ' and copied to clipboard')
+        }
+
       }else{
         alert('No Network Name. Cannot Export Info.')
       }
@@ -920,6 +947,13 @@ export default {
       localStorage.removeItem('ERC20FullAddress')
       localStorage.removeItem('ERC1155tokenId')
       localStorage.removeItem('AdminToolsLibrary')
+      if(localStorage.networkInfo){
+        let netdata = JSON.parse(localStorage.networkInfo)
+        if(netdata.hasOwnProperty(this.networkType)){
+          delete netdata[this.networkType]
+          localStorage.networkInfo = JSON.stringify(netdata)
+        }
+      }
       location.reload()
     },
     goEtherscan(param){
