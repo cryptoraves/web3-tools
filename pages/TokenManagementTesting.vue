@@ -2,8 +2,9 @@
   <div 
     class="container"
   >
+    <div v-if='loadNetworkData()'></div>
     <div v-if="ready">
-
+      
       <div class="highlight">
         <h2
           v-if="networkType == 'SKALE Testnet'" 
@@ -43,6 +44,7 @@
       </h2>
     </div>
     <div v-if="ready && !showLoading">
+        
         <div v-if="ValidatorInterfaceContractAddress"
           class="links">
           <a
@@ -53,7 +55,7 @@
           </a>
           <br>
           <a
-            
+            v-if="ERC20FullAddress"
             @click="getBalances()"
             class="button--green"
           >
@@ -291,8 +293,11 @@ export default {
 
   },
   mounted() {
-
- 
+    if (localStorage.ERC20FullAddress) this.ERC20FullAddress = localStorage.ERC20FullAddress
+    if (localStorage.ERC721FullAddress) {
+      this.ERC721FullAddress = localStorage.ERC721FullAddress
+    } 
+ /*
     if (localStorage.CryptoravesTokenContractAddress) this.CryptoravesTokenContractAddress = localStorage.CryptoravesTokenContractAddress
     if (localStorage.UserManagementContractAddress) this.UserManagementContractAddress = localStorage.UserManagementContractAddress
     if (localStorage.TokenManagementContractAddress) this.TokenManagementContractAddress = localStorage.TokenManagementContractAddress
@@ -307,9 +312,77 @@ export default {
     if (localStorage.AdminToolsLibraryAddress) this.AdminToolsLibraryAddress = localStorage.AdminToolsLibraryAddress
 
     if (localStorage.uri) this.uri = localStorage.uri
+*/
 
   },
   methods: {
+    loadNetworkData(){
+      if(this.networkType){
+        this.importContractStructureForThisNetwork(false)
+        return true
+      }
+    },
+    importContractStructureForThisNetwork(alertsBool){
+      let savedNetwork = {}
+      if(localStorage.networkInfo){
+        let networkInfo = JSON.parse(localStorage.networkInfo)
+        if(networkInfo[this.networkType]){
+          savedNetwork[this.networkType] = networkInfo[this.networkType]
+        }else{
+          if(alertsBool){
+            alert('No Saved Network Info for '+this.networkType)
+          }
+          return 0
+        }
+      }
+      if(this.networkType == savedNetwork[this.networkType]["networkType"]){
+        
+        this.UserManagementContractAddress = localStorage.UserManagementContractAddress = savedNetwork[this.networkType]["UserManagementContractAddress"]
+        this.TokenManagementContractAddress = localStorage.TokenManagementContractAddress = savedNetwork[this.networkType]["TokenManagementContractAddress"]
+        this.CryptoravesTokenContractAddress = localStorage.CryptoravesTokenContractAddress = savedNetwork[this.networkType]["CryptoravesTokenContractAddress"]
+        this.TransactionManagementContractAddress = localStorage.TransactionManagementContractAddress = savedNetwork[this.networkType]["TransactionManagementContractAddress"]
+        this.ValidatorInterfaceContractAddress = localStorage.ValidatorInterfaceContractAddress = savedNetwork[this.networkType]["ValidatorInterfaceContractAddress"]
+        if(savedNetwork["ERC20FullAddress"]){
+          this.ERC20FullAddress = localStorage.ERC20FullAddress = savedNetwork[this.networkType]["ERC20FullAddress"]
+        }
+        if(savedNetwork["ERC721FullAddress"]){
+          this.ERC721FullAddress = localStorage.ERC721FullAddress = savedNetwork[this.networkType]["ERC721FullAddress"]
+        }
+        this.AdminToolsLibraryAddress = localStorage.AdminToolsLibraryAddress = savedNetwork[this.networkType]["AdminToolsLibraryAddress"]
+
+      }else{
+        if(alertsBool){
+          alert('Network Name doesn\'t match. Cannot Save Info.', this.networkType, savedNetwork[this.networkType]["networkType"])
+        }
+      }
+    },
+    exportContractStructureForThisNetwork(alertsBool){
+      if(this.networkType){
+        let networkInfo = {}
+        if(localStorage.networkInfo){
+          networkInfo = JSON.parse(localStorage.networkInfo)
+        }else{
+          networkInfo[this.networkType] = {}
+        }
+        //if localsotrage.networkName is set then prompt for overwrite confirmation
+        let savedNetwork = {}
+        if (this.ERC20FullAddress){
+          networkInfo[this.networkType]["ERC20FullAddress"] = this.ERC20FullAddress
+        }
+        if (this.ERC721FullAddress){
+          networkInfo[this.networkType]["ERC721FullAddress"] = this.ERC721FullAddress
+        }
+        
+        localStorage.networkInfo = JSON.stringify(networkInfo)
+
+       
+        console.log('Network Info Saved for '+this.networkType+ ' and copied to clipboard')
+        
+
+      }else{
+        alert('No Network Name. Cannot Export Info.')
+      }
+    },
     checkAbis(){
       this.contractNames.forEach(function(element) {
         if(typeof abis[element] === 'undefined') {
@@ -317,113 +390,6 @@ export default {
         }
       })
       return true
-    },
-
-    async launchUserManagementContract(){
-      let factory = new this.ethers.ContractFactory(abis["UserManagement"].abi, abis["UserManagement"].bytecode, this.signer);
-      let contract = await factory.deploy();
-      this.showLoading = true
-      let tx = await contract.deployed()
-      this.UserManagementContractAddress = localStorage.UserManagementContractAddress = contract.address
-      this.showLoading = false
-    },
-    async launchTokenManagementContract(uri){
-      let factory = new this.ethers.ContractFactory(abis["TokenManagement"].abi, abis["TokenManagement"].bytecode, this.signer);
-      let contract = await factory.deploy(uri);
-      this.showLoading = true
-      let tx = await contract.deployed()
-      
-      this.TokenManagementContractAddress = localStorage.TokenManagementContractAddress = contract.address
-      this.CryptoravesTokenContractAddress = localStorage.CryptoravesTokenContractAddress = await contract.getCryptoravesTokenAddress()
-
-      //set admin for cryptoraves token (to allow minting rights)
-      let cryptoravesTokenContract = new this.ethers.Contract(
-        this.CryptoravesTokenContractAddress, 
-        abis['CryptoravesToken'].abi, 
-        this.signer
-      )
-      await cryptoravesTokenContract.setAdministrator(this.TokenManagementContractAddress)
-      if(
-        await cryptoravesTokenContract.isAdministrator(this.TokenManagementContractAddress)
-      ){
-        console.log("Set Admin For Token Manager")
-      }
-      this.showLoading = false
-    },
-    async launchTransactionManagementContract(_tokenManagementAddr, _userManagementAddr){
-
-      let factory = new this.ethers.ContractFactory(abis["AdminToolsLibrary"].abi, abis["AdminToolsLibrary"].bytecode, this.signer);
-      let contract = await factory.deploy()
-      
-      this.AdminToolsLibraryAddress = localStorage.AdminToolsLibraryAddress = contract.address
-
-      console.log('AdminToolsContract Address:', contract.address)
-      let bytecode = this.linkLibrary(abis["TransactionManagement"].bytecode, 'AdminToolsLibrary', contract.address)
-      
-      factory = new this.ethers.ContractFactory(abis["TransactionManagement"].abi, bytecode, this.signer);
-      contract = await factory.deploy(_tokenManagementAddr, _userManagementAddr);
-      this.showLoading = true
-      let tx = await contract.deployed()
-      
-      this.TransactionManagementContractAddress = localStorage.TransactionManagementContractAddress = contract.address
-
-      //set as admin for all downstream contracts
-      contract = new this.ethers.Contract(
-        this.TokenManagementContractAddress, 
-        abis["TokenManagement"].abi, 
-        this.signer
-      )
-      await contract.setAdministrator(this.TransactionManagementContractAddress)
-      if(
-        await contract.isAdministrator(this.TransactionManagementContractAddress)
-      ){
-        console.log("Set Admin For Token Manager")
-      }
-      
-      contract = new this.ethers.Contract(
-        this.UserManagementContractAddress, 
-        abis["UserManagement"].abi, 
-        this.signer
-      )
-      await contract.setAdministrator(this.TransactionManagementContractAddress)
-      if(
-        await contract.isAdministrator(this.TransactionManagementContractAddress)
-      ){
-        console.log("Set Admin For User Manager")
-      }
-      this.showLoading = false
-    },
-    async launchValidatorContract(){
-
-      let factory = new this.ethers.ContractFactory(abis["ValidatorInterfaceContract"].abi, abis["ValidatorInterfaceContract"].bytecode, this.signer);
-      //URI goes in here in place of ''
-      let contract = await factory.deploy(
-        this.TransactionManagementContractAddress
-      );
-      this.showLoading = true
-      let tx = await contract.deployed()
-      
-      this.ValidatorInterfaceContractAddress = localStorage.ValidatorInterfaceContractAddress = contract.address
-
-      //set as admin of transaction Manager
-      let transactionManagement = new this.ethers.Contract(
-        this.TransactionManagementContractAddress, 
-        abis["TransactionManagement"].abi, 
-        this.signer
-      )
-      try{
-        await transactionManagement.setAdministrator(this.ValidatorInterfaceContractAddress)
-        if(
-          await contract.isAdministrator(this.ValidatorInterfaceContractAddress)
-        ){
-          console.log('Set Admin For Transaction Manager')
-        }
-      } catch(e) {
-        throw new Error(e)
-      }
-      this.showLoading = false
-      //test for proper admin configuration
-      await this.testVariables()
     },
     async getBalances(){
       try {
@@ -451,7 +417,6 @@ export default {
       }catch{
         console.log('Error with init getEmojis')
       }
-      
     },
     async launchERC20(){
       this.showLoading = true
@@ -488,7 +453,7 @@ export default {
       this.ERC20WrappedId = ERC1155tokenIdForERC20
 
       this.getBalances()
-
+      this.exportContractStructureForThisNetwork(false)
       this.showLoading = false
     },
     async getWrappedBalances(){
@@ -650,7 +615,7 @@ export default {
       this.ERC721FullAddress = localStorage.ERC721FullAddress = contract.address
 
       this.getBalances()
-
+      this.exportContractStructureForThisNetwork(false)
       this.showLoading = false
     }, 
     async getERC721Balance(){
