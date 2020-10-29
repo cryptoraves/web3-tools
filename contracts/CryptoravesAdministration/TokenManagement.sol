@@ -129,7 +129,7 @@ contract TokenManagement is  ERCDepositable {
         
         _mint(_mintTo, _1155tokenId, _amount, '');
         
-        heldTokenIds[_mintTo].push(_1155tokenId);
+        _checkHeldToken(_mintTo, _1155tokenId);
         
         emit Deposit(_mintTo, _amountOrId, _token, _1155tokenId, _ercType);
         
