@@ -293,26 +293,6 @@ export default {
 
   },
   mounted() {
-    if (localStorage.ERC20FullAddress) this.ERC20FullAddress = localStorage.ERC20FullAddress
-    if (localStorage.ERC721FullAddress) {
-      this.ERC721FullAddress = localStorage.ERC721FullAddress
-    } 
- /*
-    if (localStorage.CryptoravesTokenContractAddress) this.CryptoravesTokenContractAddress = localStorage.CryptoravesTokenContractAddress
-    if (localStorage.UserManagementContractAddress) this.UserManagementContractAddress = localStorage.UserManagementContractAddress
-    if (localStorage.TokenManagementContractAddress) this.TokenManagementContractAddress = localStorage.TokenManagementContractAddress
-    if (localStorage.TransactionManagementContractAddress) this.TransactionManagementContractAddress = localStorage.TransactionManagementContractAddress
-    if (localStorage.ValidatorInterfaceContractAddress) this.ValidatorInterfaceContractAddress = localStorage.ValidatorInterfaceContractAddress 
-
-    if (localStorage.ERC20FullAddress) this.ERC20FullAddress = localStorage.ERC20FullAddress
-    if (localStorage.ERC721FullAddress) {
-      this.ERC721FullAddress = localStorage.ERC721FullAddress
-    } 
-
-    if (localStorage.AdminToolsLibraryAddress) this.AdminToolsLibraryAddress = localStorage.AdminToolsLibraryAddress
-
-    if (localStorage.uri) this.uri = localStorage.uri
-*/
 
   },
   methods: {
@@ -335,19 +315,17 @@ export default {
           return 0
         }
       }
+
       if(this.networkType == savedNetwork[this.networkType]["networkType"]){
-        
+     
         this.UserManagementContractAddress = localStorage.UserManagementContractAddress = savedNetwork[this.networkType]["UserManagementContractAddress"]
         this.TokenManagementContractAddress = localStorage.TokenManagementContractAddress = savedNetwork[this.networkType]["TokenManagementContractAddress"]
         this.CryptoravesTokenContractAddress = localStorage.CryptoravesTokenContractAddress = savedNetwork[this.networkType]["CryptoravesTokenContractAddress"]
         this.TransactionManagementContractAddress = localStorage.TransactionManagementContractAddress = savedNetwork[this.networkType]["TransactionManagementContractAddress"]
         this.ValidatorInterfaceContractAddress = localStorage.ValidatorInterfaceContractAddress = savedNetwork[this.networkType]["ValidatorInterfaceContractAddress"]
-        if(savedNetwork["ERC20FullAddress"]){
-          this.ERC20FullAddress = localStorage.ERC20FullAddress = savedNetwork[this.networkType]["ERC20FullAddress"]
-        }
-        if(savedNetwork["ERC721FullAddress"]){
-          this.ERC721FullAddress = localStorage.ERC721FullAddress = savedNetwork[this.networkType]["ERC721FullAddress"]
-        }
+        this.ERC20FullAddress = localStorage.ERC20FullAddress = savedNetwork[this.networkType]["ERC20FullAddress"]
+        this.ERC721FullAddress = localStorage.ERC721FullAddress = savedNetwork[this.networkType]["ERC721FullAddress"]
+        
         this.AdminToolsLibraryAddress = localStorage.AdminToolsLibraryAddress = savedNetwork[this.networkType]["AdminToolsLibraryAddress"]
 
       }else{
@@ -417,6 +395,11 @@ export default {
       }catch{
         console.log('Error with init getEmojis')
       }
+      try {
+        await this.getAll1155TokensHeld()
+      }catch{
+        console.log('Error with init getAll1155TokensHeld')
+      }
     },
     async launchERC20(){
       this.showLoading = true
@@ -435,16 +418,8 @@ export default {
       
 
       //get new contract id
-      let tokenManagerContract = new this.ethers.Contract(
-        this.TokenManagementContractAddress, 
-        abis['TokenManagement'].abi, 
-        this.signer
-      )
-      let cryptoravesToken = new this.ethers.Contract(
-        this.CryptoravesTokenContractAddress, 
-        abis['CryptoravesToken'].abi, 
-        this.signer
-      )
+      let tokenManagerContract = this.loadTokenManagementContract()
+      let cryptoravesToken = this.loadCryptoravesTokenContract()
       let ERC1155tokenIdForERC20 = await tokenManagerContract.getManagedTokenIdByAddress(this.ERC20FullAddress)
       this.ERC20WrappedBalance = this.ethers.utils.formatUnits(
         await cryptoravesToken.balanceOf(this.ethereumAddress, ERC1155tokenIdForERC20),
@@ -458,16 +433,8 @@ export default {
     },
     async getWrappedBalances(){
 
-      let tokenManagerContract = new this.ethers.Contract(
-        this.TokenManagementContractAddress, 
-        abis['TokenManagement'].abi, 
-        this.signer
-      )
-      let cryptoravesToken = new this.ethers.Contract(
-        this.CryptoravesTokenContractAddress, 
-        abis['CryptoravesToken'].abi, 
-        this.signer
-      )
+      let tokenManagerContract = this.loadTokenManagementContract()
+      let cryptoravesToken = this.loadCryptoravesTokenContract()
       let ERC1155tokenIdForERC20 = await tokenManagerContract.getManagedTokenIdByAddress(this.ERC20FullAddress)
       this.ERC20WrappedBalance = this.ethers.utils.formatUnits(
         await cryptoravesToken.balanceOf(this.ethereumAddress, ERC1155tokenIdForERC20),
@@ -481,11 +448,7 @@ export default {
 
     },
     async getEmojis(){
-      let tokenManagerContract = new this.ethers.Contract(
-        this.TokenManagementContractAddress, 
-        abis['TokenManagement'].abi, 
-        this.signer
-      )
+      let tokenManagerContract = this.loadTokenManagementContract()
       this.ERC20Emoji = await tokenManagerContract.getEmoji(this.ERC20WrappedId)
       console.log(this.ERC20WrappedId.toString())
       console.log(this.ERC20Emoji)
@@ -504,20 +467,12 @@ export default {
  
       this.showLoading = true
 
-      let cryptoravesToken = new this.ethers.Contract(
-        this.CryptoravesTokenContractAddress, 
-        abis['CryptoravesToken'].abi, 
-        this.signer
-      )
+      let cryptoravesToken = this.loadCryptoravesTokenContract()
       let initialBalance = 0
       try{
         initialBalance = await cryptoravesToken.balanceOf(this.ethereumAddress, this.ERC1155tokenIdForERC20)
       }catch{}
-      let tokenManagerContract = new this.ethers.Contract(
-        this.TokenManagementContractAddress, 
-        abis['TokenManagement'].abi, 
-        this.signer
-      )
+      let tokenManagerContract = this.loadTokenManagementContract()
 
       let randAmount = Math.round((Math.random() * 10 + Number.EPSILON) * 100) / 100
       console.log('Random Amount: ', randAmount)
@@ -549,11 +504,7 @@ export default {
 
     },
     async setERC20Emoji(){
-      let tokenManagerContract = new this.ethers.Contract(
-        this.TokenManagementContractAddress, 
-        abis['TokenManagement'].abi, 
-        this.signer
-      )
+      let tokenManagerContract = this.loadTokenManagementContract()
       let id = await tokenManagerContract.getManagedTokenIdByAddress(this.ERC20FullAddress)
       let res = await tokenManagerContract.setEmoji(id,'🔥')
       console.log('Emoji set', res)
@@ -561,16 +512,8 @@ export default {
     async sendWrappedERC20(){
       let token = new this.ethers.Contract(this.ERC20FullAddress, abis['ERC20Full'].abi, this.signer)
       this.showLoading = true
-      let cryptoravesTokenContract = new this.ethers.Contract(
-        this.CryptoravesTokenContractAddress, 
-        abis['CryptoravesToken'].abi, 
-        this.signer
-      )
-      let tokenManagerContract = new this.ethers.Contract(
-        this.TokenManagementContractAddress, 
-        abis['TokenManagement'].abi, 
-        this.signer
-      )
+      let cryptoravesTokenContract = this.loadCryptoravesTokenContract()
+      let tokenManagerContract = this.loadTokenManagementContract()
       this.ERC1155tokenIdForERC20 = localStorage.ERC1155tokenIdForERC20 = await tokenManagerContract.getManagedTokenIdByAddress(this.ERC20FullAddress)
 
       let initialBalance = await cryptoravesTokenContract.balanceOf(this.depositAndSendERC20address, this.ERC1155tokenIdForERC20)
@@ -632,16 +575,8 @@ export default {
       this.showLoading = true
       let token = new this.ethers.Contract(this.ERC721FullAddress, abis['ERC721Full'].abi, this.signer)      
 
-      let cryptoravesToken = new this.ethers.Contract(
-        this.CryptoravesTokenContractAddress, 
-        abis['CryptoravesToken'].abi, 
-        this.signer
-      )
-      let tokenManagerContract = new this.ethers.Contract(
-        this.TokenManagementContractAddress, 
-        abis['TokenManagement'].abi, 
-        this.signer
-      )
+      let cryptoravesToken = this.loadCryptoravesTokenContract()
+      let tokenManagerContract = this.loadTokenManagementContract()
       this.ERC721WrappedId = localStorage.ERC721WrappedId = await tokenManagerContract.getManagedTokenIdByAddress(this.ERC721FullAddress)
 
       let initialBalance = await cryptoravesToken.balanceOf(this.ethereumAddress, this.ERC721WrappedId)
@@ -673,11 +608,7 @@ export default {
       this.showLoading = false
     },
     async setERC721Emoji(){
-      let tokenManagerContract = new this.ethers.Contract(
-        this.TokenManagementContractAddress, 
-        abis['TokenManagement'].abi, 
-        this.signer
-      )
+      let tokenManagerContract = this.loadTokenManagementContract()
       let id = await tokenManagerContract.getManagedTokenIdByAddress(this.ERC721FullAddress)
       console.log(id)
       let res = await tokenManagerContract.setEmoji(id,'✨')
@@ -687,16 +618,8 @@ export default {
     async sendWrappedERC721(){
       let token = new this.ethers.Contract(this.ERC721FullAddress, abis['ERC721Full'].abi, this.signer)
       this.showLoading = true
-      let cryptoravesTokenContract = new this.ethers.Contract(
-        this.CryptoravesTokenContractAddress, 
-        abis['CryptoravesToken'].abi, 
-        this.signer
-      )
-      let tokenManagerContract = new this.ethers.Contract(
-        this.TokenManagementContractAddress, 
-        abis['TokenManagement'].abi, 
-        this.signer
-      )
+      let cryptoravesTokenContract = this.loadCryptoravesTokenContract()
+      let tokenManagerContract = this.loadTokenManagementContract()
       this.ERC1155tokenIdForERC721 = localStorage.ERC1155tokenIdForERC721 = await tokenManagerContract.getManagedTokenIdByAddress(this.ERC721FullAddress)
 
       let initialBalance = await cryptoravesTokenContract.balanceOf(this.depositAndSendERC721address, this.ERC1155tokenIdForERC721)
@@ -729,17 +652,9 @@ export default {
       
       this.showLoading = true
 
-      let cryptoravesToken = new this.ethers.Contract(
-        this.CryptoravesTokenContractAddress, 
-        abis['CryptoravesToken'].abi, 
-        this.signer
-      )
+      let cryptoravesToken = this.loadCryptoravesTokenContract()
       
-      let tokenManagerContract = new this.ethers.Contract(
-        this.TokenManagementContractAddress, 
-        abis['TokenManagement'].abi, 
-        this.signer
-      )
+      let tokenManagerContract = this.loadTokenManagementContract()
 
       this.ERC1155tokenIdForERC721 = localStorage.ERC1155tokenIdForERC721 = await tokenManagerContract.getManagedTokenIdByAddress(this.ERC721FullAddress)
       console.log(this.depositAndSendERC721address)
@@ -757,11 +672,7 @@ export default {
       let val = await tx.wait()
 
       //transfer
-      let cryptoravesTokenContract = new this.ethers.Contract(
-        this.CryptoravesTokenContractAddress,
-        abis['CryptoravesToken'].abi, 
-        this.signer
-      )
+      let cryptoravesTokenContract = this.loadCryptoravesTokenContract()
       
       tx = await cryptoravesTokenContract.safeTransferFrom(
         this.ethereumAddress,
@@ -799,8 +710,24 @@ export default {
       }
       return results
     },
-    async getAllWrappedERC721sHeld(){
+    async getAll1155TokensHeld(){
+      let tokenManagerContract = this.loadTokenManagementContract()
+      console.log(await tokenManagerContract.getHeldTokenIds(this.ethereumAddress))
 
+    },
+    loadTokenManagementContract(){
+      return new this.ethers.Contract(
+        this.TokenManagementContractAddress,
+        abis['TokenManagement'].abi, 
+        this.signer
+      )
+    },
+    loadCryptoravesTokenContract(){
+      return new this.ethers.Contract(
+        this.CryptoravesTokenContractAddress,
+        abis['CryptoravesToken'].abi, 
+        this.signer
+      )
     },
     goEtherscan(param){
       if (param.length == 42){

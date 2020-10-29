@@ -96,16 +96,6 @@ contract TokenManagement is  ERCDepositable {
     }
     
     function deposit(uint256 _amountOrId, address _token, uint _ercType, bool _managedTransfer) public payable returns(uint256){
-        
-        uint256 _amount;
-        address _mintTo;
-        if(_ercType == 20){
-            _depositERC20(_amountOrId, _token);
-            _amount = _amountOrId;
-        } else {
-            _depositERC721(_amountOrId, _token);
-            _amount = 1;
-        }
 
         if(!managedTokenListByAddress[_token].isManagedToken) {
             _addTokenToManagedTokenList(_token, _ercType, 0);
@@ -121,13 +111,25 @@ contract TokenManagement is  ERCDepositable {
         
         uint256 _1155tokenId = getManagedTokenIdByAddress(_token);
         
+        address _mintTo;
         if(_managedTransfer){
             _mintTo = getL2AddressForManagedDeposit();
         } else {
             _mintTo = msg.sender;
         }
         
+        uint256 _amount;
+        if(_ercType == 20){
+            _depositERC20(_amountOrId, _token);
+            _amount = _amountOrId;
+        } else {
+            _depositERC721(_amountOrId, _token);
+            _amount = 1;
+        }
+        
         _mint(_mintTo, _1155tokenId, _amount, '');
+        
+        heldTokenIds[_mintTo].push(_1155tokenId);
         
         emit Deposit(_mintTo, _amountOrId, _token, _1155tokenId, _ercType);
         
@@ -321,20 +323,5 @@ contract TokenManagement is  ERCDepositable {
     function testDownstreamAdminConfiguration() public view onlyAdmin returns(bool){
         IDownStream _downstream = IDownStream(getCryptoravesTokenAddress());
         return _downstream.testDownstreamAdminConfiguration();
-    }
-
-    //testing. Remove later
-    uint256 baseTokenNFT = 12345 << 128;
-    uint128 indexNFT = 50;
-    uint256 baseTokenFT = 54321 << 128;
-    
-    function returnbaseTokenNFT() public view returns(uint256){
-        return baseTokenNFT;
-    }
-    function indexTokenFT() public view returns(uint256){
-        return baseTokenNFT + indexNFT;
-    }
-    function baseTokenForFT() public view returns(uint256){
-        return baseTokenFT;
     }
 }
