@@ -1,7 +1,7 @@
 #!/bin/bash
 relPath=$(dirname $(realpath $0))/build/contracts/*
 # keep in alphabetical order
-contractJsons=('AdminToolsLibrary', 'ERC20Full', 'CryptoravesToken', 'TokenManagement', 'TransactionManagement', 'UserManagement', 'ValidatorInterfaceContract')
+contractJsons=('AdminToolsLibrary', 'ERC20Full', 'ERC721Full', 'CryptoravesToken', 'TokenManagement', 'TransactionManagement', 'UserManagement', 'ValidatorInterfaceContract')
 
 echo 'const abis = { ' > ./pages/abis.js
 for f in $relPath

@@ -192,6 +192,11 @@ contract TokenManagement is  ERCDepositable {
         symbolAndEmojiLookupTable[_emoji] = _tokenId;
     }
     
+    function getERCtype(uint256 _tokenId) public view  returns(uint){
+        address _tokenAddr = tokenListByBaseId[_tokenId >> 128];
+        return managedTokenListByAddress[_tokenAddr].ercType;
+    }
+    
     //for adjusting incoming human-typed values to smart contract uint values
     function adjustValueByUnits(uint256 _tokenId, uint256 _value, uint256 _decimalPlace) public view onlyAdmin returns(uint256){
         address _tokenAddr = tokenListByBaseId[_tokenId >> 128];

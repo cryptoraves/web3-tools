@@ -20,6 +20,7 @@ interface ITokenManager {
     function _checkHeldToken(address, uint256) external;
     function setIsManagedToken(address, bool) external;
     function adjustValueByUnits(uint256, uint256, uint256) external view returns(uint256);
+    function getERCtype(uint256) external view returns(uint256);
 }
 
 interface IUserManager {

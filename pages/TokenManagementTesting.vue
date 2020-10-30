@@ -397,8 +397,8 @@ export default {
       }
       try {
         await this.getAll1155TokensHeld()
-      }catch{
-        console.log('Error with init getAll1155TokensHeld')
+      }catch(e){
+        console.log(e, 'Error with init getAll1155TokensHeld')
       }
     },
     async launchERC20(){
@@ -489,6 +489,7 @@ export default {
       this.ERC20balance = await token.balanceOf(this.ethereumAddress)
 
       this.ERC1155tokenIdForERC20 = localStorage.ERC1155tokenIdForERC20 = await tokenManagerContract.getManagedTokenIdByAddress(this.ERC20FullAddress)
+      console.log(this.ERC1155tokenIdForERC20)
       console.log('ERC1155 Token ID: '+this.ERC1155tokenIdForERC20)
       
       let finalBalance = await cryptoravesToken.balanceOf(this.ethereumAddress, this.ERC1155tokenIdForERC20)
@@ -583,10 +584,9 @@ export default {
       console.log('ERC1155 Wrapped Balance Before Deposit: '+initialBalance)
 
       let heldTokens = await this.getAllERC721sHeld()
-      console.log(heldTokens)
+
       console.log('Depositing first held token (key 0): ', heldTokens[0])
       let appr = await token.approve(this.TokenManagementContractAddress, heldTokens[0]);
-
       await appr.wait()
       let tx = await tokenManagerContract.deposit(
         heldTokens[0],
@@ -624,7 +624,6 @@ export default {
 
       let initialBalance = await cryptoravesTokenContract.balanceOf(this.depositAndSendERC721address, this.ERC1155tokenIdForERC721)
 
-      tokenId
 
       let tx = await cryptoravesTokenContract.safeTransferFrom(
         this.ethereumAddress,
@@ -712,7 +711,11 @@ export default {
     },
     async getAll1155TokensHeld(){
       let tokenManagerContract = this.loadTokenManagementContract()
-      console.log(await tokenManagerContract.getHeldTokenIds(this.ethereumAddress))
+      let tokens1155 = await tokenManagerContract.getHeldTokenIds(this.ethereumAddress)
+
+      tokens1155.forEach(function(element) {
+        console.log(element)
+      });
 
     },
     loadTokenManagementContract(){

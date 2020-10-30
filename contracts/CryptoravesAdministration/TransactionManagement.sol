@@ -169,6 +169,10 @@ contract TransactionManagement is AdministrationContract {
             
             uint256 _adjustedValue = _adjustValueByUnits(_tokenId, _values[0], _values[1]);
             
+            if(_tokenManagement.getERCtype(_tokenId) == 721){
+                _tokenId = _tokenId + _values[0];
+            }
+            
             _managedTransfer(_fromAddress, _toAddress, _tokenId, _adjustedValue, AdminToolsLibrary.stringToBytes(_metaData[3]));
         }
     }
