@@ -94,14 +94,7 @@ contract("TokenManagement", async accounts => {
     const txInfo = await web3.eth.getTransaction(res.tx); 
 	const gasCost = txInfo.gasPrice * res.receipt.gasUsed
     
-    /*console.log(res)
-	console.log('initial bal: ', initialEthBalance)
-	console.log('final bal: ', finalEthBalance)
-	console.log('final bal + deposit amt: ', (finalEthBalance * 1) + (formatttedWeiAmt * 1) )
-	console.log('Gas used in gwei: ', gasUsed)
-	console.log('Gas used in wei: ', gasUsed * 20000000000)
-	console.log('final bal + deposit amt + gas used x 2: ', (finalEthBalance * 1) + (formatttedWeiAmt * 1) + (gasUsed * 20000000000))
-	*/
+  
 	let totalFinalBalance = (finalEthBalance * 1) + (formatttedWeiAmt * 1) + gasCost
 	assert.equal(
 		Number.parseFloat(initialEthBalance.toString()).toPrecision(14),
@@ -134,13 +127,7 @@ contract("TokenManagement", async accounts => {
     let finalEthBalance = await web3.eth.getBalance(accounts[0]);
 	
     let totalFinalBalance = (initialEthBalance * 1) + (formatttedWeiAmt * 1) - gasCost
-	/*console.log('initial bal: ', initialEthBalance)
-	console.log('final bal: ', finalEthBalance)
-	console.log('init bal + withdrawal amt: ', (initialEthBalance * 1) + (formatttedWeiAmt * 1) )
-	console.log('Gas used in gwei: ', gasCost)
-	console.log('Gas used in wei: ', gasCost)
-	console.log('init bal + withdrawal amt + gas used x 2: ', (initialEthBalance * 1) + (formatttedWeiAmt * 1) - gasCost)
-	*/
+	
     assert.equal(
     	Number.parseFloat(finalEthBalance.toString()).toPrecision(14),
     	Number.parseFloat(totalFinalBalance.toString()).toPrecision(14),
