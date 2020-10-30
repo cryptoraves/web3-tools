@@ -65,7 +65,7 @@ contract TokenManagement is  ERCDepositable {
             _addTokenToManagedTokenList(account, 1155, _totalSupply);
         }
 
-        uint256 _1155tokenId = getManagedTokenBaseIdByAddress(account);
+        uint256 _1155tokenId = getManagedTokenIdByAddress(account);
         
         //add username as symbol
         _checkSymbolAddress(_twitterHandleFrom, _1155tokenId);
@@ -122,12 +122,12 @@ contract TokenManagement is  ERCDepositable {
         if(_ercType == 20){
             _depositERC20(_amountOrId, _contract);
             _amount = _amountOrId;
-            _1155tokenId = getManagedTokenBaseIdByAddress(_contract) << 128;
+            _1155tokenId = getManagedTokenIdByAddress(_contract);
         }
         if(_ercType == 721){
             _depositERC721(_amountOrId, _contract);
             _amount = 1;
-            _1155tokenId = (getManagedTokenBaseIdByAddress(_contract) << 128) + _amountOrId;
+            _1155tokenId = getManagedTokenIdByAddress(_contract) + _amountOrId;
         }
         
         _mint(_mintTo, _1155tokenId, _amount, '');
@@ -143,7 +143,7 @@ contract TokenManagement is  ERCDepositable {
     function withdrawERC20(uint256 _amount, address _contract) public payable returns(uint256){
         _withdrawERC20(_amount, _contract);
         
-        uint256 _1155tokenId = getManagedTokenBaseIdByAddress(_contract) << 128;
+        uint256 _1155tokenId = getManagedTokenIdByAddress(_contract);
         _burn(msg.sender, _1155tokenId, _amount);
         
         Withdraw(msg.sender, _amount, _contract, _1155tokenId);
@@ -155,7 +155,7 @@ contract TokenManagement is  ERCDepositable {
     function withdrawERC721(uint256 _tokenId, address _contract) public payable returns(uint256){
         _withdrawERC721(_tokenId, _contract);
         
-        uint256 _1155tokenId = (getManagedTokenBaseIdByAddress(_contract) << 128) + _tokenId;
+        uint256 _1155tokenId = getManagedTokenIdByAddress(_contract) + _tokenId;
         _burn(msg.sender, _1155tokenId, 1);
         
         Withdraw(msg.sender, _tokenId, _contract, _1155tokenId);
@@ -225,8 +225,9 @@ contract TokenManagement is  ERCDepositable {
         managedTokenListByAddress[_token].isManagedToken = _state;
     }
 
-    function getManagedTokenBaseIdByAddress(address _tokenOriginAddr) public view returns(uint256) {
-        return managedTokenListByAddress[_tokenOriginAddr].managedTokenBaseId;
+    function getManagedTokenIdByAddress(address _tokenOriginAddr) public view returns(uint256) {
+        //split byte format
+        return managedTokenListByAddress[_tokenOriginAddr].managedTokenBaseId << 128;
     }
     
     function getTokenListCount() public view returns(uint count) {

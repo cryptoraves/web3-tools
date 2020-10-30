@@ -146,12 +146,12 @@ contract TransactionManagement is AdministrationContract {
 
                     //get token by ticker name
                     address _addr = _tokenManagement.getAddressBySymbol(_twitterNames[2]);
-                    _tokenId = _tokenManagement.getManagedTokenBaseIdByAddress(_addr) << 128;
+                    _tokenId = _tokenManagement.getManagedTokenIdByAddress(_addr);
                     
                     
                 } else {
                     //No third party given, user transfer using thier dropped tokens
-                    _tokenId = _tokenManagement.getManagedTokenBaseIdByAddress(_userAccount)  << 128;
+                    _tokenId = _tokenManagement.getManagedTokenIdByAddress(_userAccount);
                 }
                 
                 
@@ -163,7 +163,7 @@ contract TransactionManagement is AdministrationContract {
                 
                 require(_userAccount!=address(0), 'Third party token given--with username method--does not exist in system');
                     //not a dropped token attempted to be transferred. Check for 
-                _tokenId = _tokenManagement.getManagedTokenBaseIdByAddress(_userAccount)  << 128;
+                _tokenId = _tokenManagement.getManagedTokenIdByAddress(_userAccount);
                 
             }
             
@@ -202,7 +202,7 @@ contract TransactionManagement is AdministrationContract {
 
         require(_userAccount != address(0), 'User account does not exist');
 
-        return _tokenManagement.getManagedTokenBaseIdByAddress(_userAccount) << 128;
+        return _tokenManagement.getManagedTokenIdByAddress(_userAccount);
     }
     
     function getUserL1AccountFromL2Account(address _l2) public view returns(address) {

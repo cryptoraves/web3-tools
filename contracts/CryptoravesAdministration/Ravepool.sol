@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.6.10;
 
-import "/home/cartosys/www/openzeppelin-contracts/contracts/token/ERC1155/ERC1155Burnable.sol";
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC1155/ERC1155Burnable.sol";
 import "./AdministrationContract.sol";
 
 interface CryptoravesTokenManager {
-    function getManagedTokenBaseIdByAddress(address _account) external view returns(uint256);
+    function getManagedTokenIdByAddress(address _account) external view returns(uint256);
     function getHeldTokenIds(address _addr) external view returns(uint256[] memory);
     function getHeldTokenBalances(address _addr) external view returns(uint256[] memory);
     function safeTransferFrom(address from, address to, uint256 id, uint256 amount, bytes memory data) external;
@@ -67,7 +67,7 @@ contract Ravepool is AdministrationContract {
         address _cryptoravesTokenAddress = ITokenManager(_tokenManager).getCryptoravesTokenAddress();
         
         //get personal token Id
-        uint256 _1155tokenId  = CryptoravesTokenManager(_cryptoravesTokenAddress).getManagedTokenBaseIdByAddress(address(this));
+        uint256 _1155tokenId  = CryptoravesTokenManager(_cryptoravesTokenAddress).getManagedTokenIdByAddress(address(this));
         
         //require sent token to be the designated personal token
         require(_sentTokenId == _1155tokenId, 'Token ID sent to redeemAndBurnViaRavepool doesn\'t match designated burn token ID');
