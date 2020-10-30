@@ -440,24 +440,21 @@ export default {
       let ERC1155tokenIdForERC721 = await tokenManagerContract.getManagedTokenIdByAddress(this.ERC721FullAddress)
       let held1155s = await this.getAll1155TokensHeld()
       let upperLimit = await tokenManagerContract.getNextBaseId(ERC1155tokenIdForERC721)
+      let ERC721WrappedBalance = 0
       held1155s.forEach( function(element) {
         if(element.lt(upperLimit) && element.gte(ERC1155tokenIdForERC721)){
-          console.log('1155: ', element)
+          ERC721WrappedBalance++
         }
       })
-      this.ERC721WrappedBalance = await cryptoravesToken.balanceOf(this.ethereumAddress, ERC1155tokenIdForERC721)
+      this.ERC721WrappedBalance = ERC721WrappedBalance
       this.ERC721WrappedId = ERC1155tokenIdForERC721
 
     },
     async getEmojis(){
       let tokenManagerContract = this.loadTokenManagementContract()
       this.ERC20Emoji = await tokenManagerContract.getEmoji(this.ERC20WrappedId)
-      console.log(this.ERC20WrappedId.toString())
-      console.log(this.ERC20Emoji)
       this.ERC721Emoji = await tokenManagerContract.getEmoji(this.ERC721WrappedId)
-      console.log(this.ERC721WrappedId.toString())
-      console.log(this.ERC721Emoji)
-      console.log(await tokenManagerContract.getAddressBySymbol(this.ERC721Emoji))
+      //console.log(await tokenManagerContract.getAddressBySymbol(this.ERC721Emoji))
     },
     async getERC20Balance(){
       let token = new this.ethers.Contract(this.ERC20FullAddress, abis['ERC20Full'].abi, this.signer)
