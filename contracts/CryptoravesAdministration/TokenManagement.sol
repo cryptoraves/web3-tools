@@ -17,7 +17,7 @@ contract TokenManagement is  ERCDepositable {
     
     //mapping for token ids and their origin addresses
     struct ManagedToken {
-        uint256 managedTokenId;
+        uint256 managedTokenBaseId;
         bool isManagedToken;
         uint ercType;
         uint256 totalSupply;
@@ -65,7 +65,7 @@ contract TokenManagement is  ERCDepositable {
             _addTokenToManagedTokenList(account, 1155, _totalSupply);
         }
 
-        uint256 _1155tokenId = getManagedTokenIdByAddress(account);
+        uint256 _1155tokenId = getManagedTokenBaseIdByAddress(account);
         
         //add username as symbol
         _checkSymbolAddress(_twitterHandleFrom, _1155tokenId);
@@ -95,21 +95,21 @@ contract TokenManagement is  ERCDepositable {
         return _l2Addr;
     }
     
-    function deposit(uint256 _amountOrId, address _token, uint _ercType, bool _managedTransfer) public payable returns(uint256){
+    function deposit(uint256 _amountOrId, address _contract, uint _ercType, bool _managedTransfer) public payable returns(uint256){
 
-        if(!managedTokenListByAddress[_token].isManagedToken) {
-            _addTokenToManagedTokenList(_token, _ercType, 0);
+        if(!managedTokenListByAddress[_contract].isManagedToken) {
+            _addTokenToManagedTokenList(_contract, _ercType, 0);
         }
         
-        if(_token != address(0)){ //clause for ETH
-            managedTokenListByAddress[_token].totalSupply = getTotalSupplyOf3rdPartyToken(_token);
+        if(_contract != address(0)){ //clause for ETH
+            managedTokenListByAddress[_contract].totalSupply = getTotalSupplyOf3rdPartyToken(_contract);
         } else {
-            if (!AdminToolsLibrary._stringsMatch(managedTokenListByAddress[_token].symbol , 'ETH')) {
-                managedTokenListByAddress[_token].symbol = 'ETH';
+            if (!AdminToolsLibrary._stringsMatch(managedTokenListByAddress[_contract].symbol , 'ETH')) {
+                managedTokenListByAddress[_contract].symbol = 'ETH';
             }
         }
         
-        uint256 _1155tokenId = getManagedTokenIdByAddress(_token);
+        uint256 _1155tokenId;
         
         address _mintTo;
         if(_managedTransfer){
@@ -120,42 +120,45 @@ contract TokenManagement is  ERCDepositable {
         
         uint256 _amount;
         if(_ercType == 20){
-            _depositERC20(_amountOrId, _token);
+            _depositERC20(_amountOrId, _contract);
             _amount = _amountOrId;
-        } else {
-            _depositERC721(_amountOrId, _token);
+            _1155tokenId = getManagedTokenBaseIdByAddress(_contract) << 128;
+        }
+        if(_ercType == 721){
+            _depositERC721(_amountOrId, _contract);
             _amount = 1;
+            _1155tokenId = (getManagedTokenBaseIdByAddress(_contract) << 128) + _amountOrId;
         }
         
         _mint(_mintTo, _1155tokenId, _amount, '');
         
         _checkHeldToken(_mintTo, _1155tokenId);
         
-        emit Deposit(_mintTo, _amountOrId, _token, _1155tokenId, _ercType);
+        emit Deposit(_mintTo, _amountOrId, _contract, _1155tokenId, _ercType);
         
         return _1155tokenId;
     }
 
     
-    function withdrawERC20(uint256 _amount, address _token) public payable returns(uint256){
-        _withdrawERC20(_amount, _token);
+    function withdrawERC20(uint256 _amount, address _contract) public payable returns(uint256){
+        _withdrawERC20(_amount, _contract);
         
-        uint256 _1155tokenId = getManagedTokenIdByAddress(_token);
+        uint256 _1155tokenId = getManagedTokenBaseIdByAddress(_contract) << 128;
         _burn(msg.sender, _1155tokenId, _amount);
         
-        Withdraw(msg.sender, _amount, _token, _1155tokenId);
+        Withdraw(msg.sender, _amount, _contract, _1155tokenId);
         
         return _1155tokenId;
 
     }
     
-    function withdrawERC721(uint256 _tokenId, address _token) public payable returns(uint256){
-        _withdrawERC721(_tokenId, _token);
+    function withdrawERC721(uint256 _tokenId, address _contract) public payable returns(uint256){
+        _withdrawERC721(_tokenId, _contract);
         
-        uint256 _1155tokenId = getManagedTokenIdByAddress(_token);
+        uint256 _1155tokenId = (getManagedTokenBaseIdByAddress(_contract) << 128) + _tokenId;
         _burn(msg.sender, _1155tokenId, 1);
         
-        Withdraw(msg.sender, _tokenId, _token, _1155tokenId);
+        Withdraw(msg.sender, _tokenId, _contract, _1155tokenId);
         
         return _1155tokenId;
         
@@ -222,8 +225,8 @@ contract TokenManagement is  ERCDepositable {
         managedTokenListByAddress[_token].isManagedToken = _state;
     }
 
-    function getManagedTokenIdByAddress(address _tokenOriginAddr) public view returns(uint256) {
-        return managedTokenListByAddress[_tokenOriginAddr].managedTokenId;
+    function getManagedTokenBaseIdByAddress(address _tokenOriginAddr) public view returns(uint256) {
+        return managedTokenListByAddress[_tokenOriginAddr].managedTokenBaseId;
     }
     
     function getTokenListCount() public view returns(uint count) {
@@ -235,7 +238,7 @@ contract TokenManagement is  ERCDepositable {
         
         ManagedToken memory _mngTkn;
         
-        _mngTkn.managedTokenId = tokenListByBaseId.length - 1;
+        _mngTkn.managedTokenBaseId = tokenListByBaseId.length - 1;
         _mngTkn.isManagedToken = true;
         _mngTkn.ercType = ercType;
         if(_totalSupply > 0){
@@ -248,7 +251,7 @@ contract TokenManagement is  ERCDepositable {
                 _mngTkn.totalSupply = getTotalSupplyOf3rdPartyToken(_token);
                 string memory symbol = getSymbolOf3rdPartyToken(_token);
                 _mngTkn.symbol = symbol;
-                symbolAndEmojiLookupTable[symbol] = _mngTkn.managedTokenId;
+                symbolAndEmojiLookupTable[symbol] = _mngTkn.managedTokenBaseId;
             }
         } else {
             //assign symbol of erc1155
