@@ -166,35 +166,35 @@ contract TokenManagement is  ERCDepositable {
     function getAddressBySymbol(string memory _symbol) public view returns (address) {
         
         uint256 _tokenId = symbolAndEmojiLookupTable[_symbol];
-        return tokenListByBaseId[_tokenId >> 128];
+        return tokenListByBaseId[_tokenId];
     }
     function getTotalSupply(uint256 _tokenId) public view  returns(uint256){
-        address _tokenAddr = tokenListByBaseId[_tokenId >> 128];
+        address _tokenAddr = tokenListByBaseId[_tokenId];
         return managedTokenListByAddress[_tokenAddr].totalSupply;
     }
     
     function getSymbol(uint256 _tokenId) public view  returns(string memory){
-        address _tokenAddr = tokenListByBaseId[_tokenId >> 128];
+        address _tokenAddr = tokenListByBaseId[_tokenId];
         return managedTokenListByAddress[_tokenAddr].symbol;
     }
     function setSymbol(uint256 _tokenId, string memory _symbol) public onlyAdmin {
-        address _tokenAddr = tokenListByBaseId[_tokenId >> 128];
+        address _tokenAddr = tokenListByBaseId[_tokenId];
         managedTokenListByAddress[_tokenAddr].symbol = _symbol;
         symbolAndEmojiLookupTable[_symbol] = _tokenId;
     }
     function getEmoji(uint256 _tokenId) public view  returns(string memory){
-        address _tokenAddr = tokenListByBaseId[_tokenId >> 128];
+        address _tokenAddr = tokenListByBaseId[_tokenId];
         return managedTokenListByAddress[_tokenAddr].emoji;
     }
     function setEmoji(uint256 _tokenId, string memory _emoji) public onlyAdmin {
-        address _tokenAddr = tokenListByBaseId[_tokenId >> 128];
+        address _tokenAddr = tokenListByBaseId[_tokenId];
         managedTokenListByAddress[_tokenAddr].emoji = _emoji;
         symbolAndEmojiLookupTable[_emoji] = _tokenId;
     }
     
     //for adjusting incoming human-typed values to smart contract uint values
     function adjustValueByUnits(uint256 _tokenId, uint256 _value, uint256 _decimalPlace) public view onlyAdmin returns(uint256){
-        address _tokenAddr = tokenListByBaseId[_tokenId >> 128];
+        address _tokenAddr = tokenListByBaseId[_tokenId];
         ManagedToken memory _tknData = managedTokenListByAddress[_tokenAddr];
         if(_tknData.ercType == 721){
             require(_decimalPlace == 0, 'Attempted to send NFT with fractional value');
@@ -213,7 +213,7 @@ contract TokenManagement is  ERCDepositable {
     }
     
     function subtractFromTotalSupply(uint256 _tokenId, uint256 _amount) public onlyAdmin {
-        address _tokenAddr = tokenListByBaseId[_tokenId >> 128];
+        address _tokenAddr = tokenListByBaseId[_tokenId];
         managedTokenListByAddress[_tokenAddr].totalSupply = managedTokenListByAddress[_tokenAddr].totalSupply - _amount;
     }
     
@@ -252,7 +252,7 @@ contract TokenManagement is  ERCDepositable {
                 _mngTkn.totalSupply = getTotalSupplyOf3rdPartyToken(_token);
                 string memory symbol = getSymbolOf3rdPartyToken(_token);
                 _mngTkn.symbol = symbol;
-                symbolAndEmojiLookupTable[symbol] = _mngTkn.managedTokenBaseId;
+                symbolAndEmojiLookupTable[symbol] = _mngTkn.managedTokenBaseId << 128;
             }
         } else {
             //assign symbol of erc1155
