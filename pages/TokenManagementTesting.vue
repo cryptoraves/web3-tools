@@ -372,33 +372,28 @@ export default {
     async getBalances(){
       try {
         await this.getERC20Balance()
-      }catch{
-        console.log('Error with init getERC20Balance')
+      }catch(e){
+        console.log(e,'Error with init getERC20Balance')
       }
       try {
         await this.getERC721Balance()
-      }catch{
-        console.log('Error with init getERC721Balance')
+      }catch(e){
+        console.log(e,'Error with init getERC721Balance')
       }
       try {
         await this.getAllERC721sHeld()
-      }catch{
-        console.log('Error with init getAllERC721sHeld')
+      }catch(e){
+        console.log(e,'Error with init getAllERC721sHeld')
       }
       try {
         await this.getWrappedBalances()
-      }catch{
-        console.log('Error with init getWrappedBalances')
+      }catch(e){
+        console.log(e,'Error with init getWrappedBalances')
       }
       try {
         await this.getEmojis()
-      }catch{
-        console.log('Error with init getEmojis')
-      }
-      try {
-        await this.getAll1155TokensHeld()
       }catch(e){
-        console.log(e, 'Error with init getAll1155TokensHeld')
+        console.log(e,'Error with init getEmojis')
       }
     },
     async launchERC20(){
@@ -443,6 +438,13 @@ export default {
       this.ERC20WrappedId = ERC1155tokenIdForERC20
 
       let ERC1155tokenIdForERC721 = await tokenManagerContract.getManagedTokenIdByAddress(this.ERC721FullAddress)
+      let held1155s = await this.getAll1155TokensHeld()
+      let upperLimit = await tokenManagerContract.getNextBaseId(ERC1155tokenIdForERC721)
+      held1155s.forEach( function(element) {
+        if(element.lt(upperLimit) && element.gte(ERC1155tokenIdForERC721)){
+          console.log('1155: ', element)
+        }
+      })
       this.ERC721WrappedBalance = await cryptoravesToken.balanceOf(this.ethereumAddress, ERC1155tokenIdForERC721)
       this.ERC721WrappedId = ERC1155tokenIdForERC721
 
@@ -711,12 +713,7 @@ export default {
     },
     async getAll1155TokensHeld(){
       let tokenManagerContract = this.loadTokenManagementContract()
-      let tokens1155 = await tokenManagerContract.getHeldTokenIds(this.ethereumAddress)
-
-      tokens1155.forEach(function(element) {
-        console.log(element)
-      });
-
+      return await tokenManagerContract.getHeldTokenIds(this.ethereumAddress)
     },
     loadTokenManagementContract(){
       return new this.ethers.Contract(
