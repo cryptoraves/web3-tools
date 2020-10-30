@@ -176,8 +176,6 @@ contract("TokenManagement", async accounts => {
       await instanceTokenManagement.setEmoji(tokenId1155_B, '💫')
       let _sym1 = await instanceTokenManagement.getSymbol(tokenId1155_B)
       let _emoj1 = await instanceTokenManagement.getEmoji(tokenId1155_B)
-      console.log(_sym1)
-      console.log(_emoj1)
       assert.isOk(
         _sym1 == 'TKX',
        _emoj1 == '💫',
@@ -353,12 +351,12 @@ contract("TokenManagement", async accounts => {
 
   	assert.equal(
   		id20.toString(),
-  		2,
+  		'680564733841876926926749214863536422912',
   		"ERC20 token id lookup failed"
   	)
   	assert.equal(
   		id721.toString(),
-  		3,
+  		'1020847100762815390390123822295304634368',
   		"ERC721 token id lookup failed"
   	)
   })
@@ -388,14 +386,15 @@ contract("TokenManagement", async accounts => {
   it("check emojis and symbol reverse-lookup", async () => {
     let instanceTokenManagement = await TokenManagement.deployed()
 
+    let res = await instanceTokenManagement.symbolAndEmojiLookupTable('TKX')
     assert.equal(
-      await instanceTokenManagement.symbolAndEmojiLookupTable('TKX'),
-      '2',
+      res.toString(),
+      '680564733841876926926749214863536422912',
       'ERC20 symbol reverse lookup failed'
     )
     assert.equal(
       await instanceTokenManagement.symbolAndEmojiLookupTable('TKY'),
-      '3',
+      '1020847100762815390390123822295304634368',
       'ERC721 symbol reverse lookup failed'
     )
     assert.equal(
@@ -403,10 +402,10 @@ contract("TokenManagement", async accounts => {
       '0',
       'ETH symbol reverse lookup failed'
     )
-    let res = await instanceTokenManagement.symbolAndEmojiLookupTable(emoji)
+    res = await instanceTokenManagement.symbolAndEmojiLookupTable(emoji)
     assert.equal(
       res.toString(),
-      '2',
+      '680564733841876926926749214863536422912',
       'ERC20 Emoji reverse lookup failed'
     )
   })
@@ -419,8 +418,9 @@ contract("TokenManagement", async accounts => {
       1234567000000000000000,
       'erc20 decimal adjustment didn\'t work'
     )
+    let res = await instanceTokenManagement.adjustValueByUnits(tokenId2, 2, 0)
     assert.equal(
-      await instanceTokenManagement.adjustValueByUnits(tokenId2, 2, 0),
+      res.toString(),
       2,
       'nft decimal adjustment didn\'t work'
     )
