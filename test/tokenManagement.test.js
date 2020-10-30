@@ -176,6 +176,8 @@ contract("TokenManagement", async accounts => {
       await instanceTokenManagement.setEmoji(tokenId1155_B, '💫')
       let _sym1 = await instanceTokenManagement.getSymbol(tokenId1155_B)
       let _emoj1 = await instanceTokenManagement.getEmoji(tokenId1155_B)
+      console.log(_sym1)
+      console.log(_emoj1)
       assert.isOk(
         _sym1 == 'TKX',
        _emoj1 == '💫',
@@ -401,8 +403,9 @@ contract("TokenManagement", async accounts => {
       '0',
       'ETH symbol reverse lookup failed'
     )
+    let res = await instanceTokenManagement.symbolAndEmojiLookupTable(emoji)
     assert.equal(
-      await instanceTokenManagement.symbolAndEmojiLookupTable(emoji),
+      res.toString(),
       '2',
       'ERC20 Emoji reverse lookup failed'
     )

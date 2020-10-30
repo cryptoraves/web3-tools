@@ -87,9 +87,9 @@ contract("TransactionManagement", async accounts => {
       let tokenId = await instance.getTokenIdFromPlatformId.call(1029388888)
   //WARNING Zero is returned if no tokenId exists. Must fix??
       assert.isAbove(
-        tokenId.toNumber(),
-        0,
-        "Token ID not valid: "+tokenId.toNumber()
+        tokenId.toString().length,
+        1,
+        "Token ID not valid: "+tokenId.toString()
       )
     })
 
