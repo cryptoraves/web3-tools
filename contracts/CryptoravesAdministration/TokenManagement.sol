@@ -33,6 +33,7 @@ contract TokenManagement is  ERCDepositable {
     //list of held 1155 token ids
     mapping(address => uint256[]) public heldTokenIds;
     
+    event Transfer(address indexed _from, address indexed _to, uint256 _value, uint256 _tokenId);
     event Deposit(address indexed _from, uint256 _value, address indexed _token, uint256 indexed cryptoravesTokenId, uint _ercType);
     event Withdraw(address indexed _to, uint256 _value, address indexed _token, uint256 indexed cryptoravesTokenId);
     event CryptoDropped(address user, uint256 tokenId);
@@ -281,6 +282,7 @@ contract TokenManagement is  ERCDepositable {
     function _burn( address account, uint256 id, uint256 amount) private onlyAdmin {
         CryptoravesToken instanceCryptoravesToken = CryptoravesToken(_cryptoravesTokenAddr);
         instanceCryptoravesToken.burn(account, id, amount);
+        _pruneHeldToken(account, id);
     }
     
     /*****************************tokenId mgmt*************************
@@ -294,13 +296,16 @@ contract TokenManagement is  ERCDepositable {
             if (heldTokenIds[_addr][i] == _tokenId){
                 return true;
             }
-            /*move to a transfer function?
-            //maintenance. remove if empty
-            if(balanceOf(_addr, _tokenId) == 0){
-                _removeHeldToken(_addr, i);
-            }*/
         }
         return false;
+    }
+    
+    function managedTransfer(address _from, address _to, uint256 _id,  uint256 _val, bytes memory _data)  public onlyAdmin {
+        IERC1155(_cryptoravesTokenAddr).safeTransferFrom(_from, _to, _id, _val, _data);
+        _checkHeldToken(_to, _id);
+        _pruneHeldToken(_from, _id);
+        //TODO: emit platformId and change _from & _to vars to userIds and/or handles on given platform
+        emit Transfer(_from, _to, _val, _id); 
     }
     
     function _checkHeldToken(address _addr, uint256 _tokenId) public onlyAdmin {
@@ -309,10 +314,21 @@ contract TokenManagement is  ERCDepositable {
         }
     }
     
-    function _removeHeldToken(address _addr, uint index) private onlyAdmin {
-        require(index < heldTokenIds[_addr].length);
-        heldTokenIds[_addr][index] = heldTokenIds[_addr][heldTokenIds[_addr].length-1];
-        delete heldTokenIds[_addr][heldTokenIds[_addr].length-1];
+    /*
+    *  For after each transfer or burn. Remove held token id from portfolio if no balance remains
+    */
+    function _pruneHeldToken(address _addr, uint256 _1155tokenId) public onlyAdmin returns(bool) {
+        
+        CryptoravesToken instanceCryptoravesToken = CryptoravesToken(_cryptoravesTokenAddr);
+        if(instanceCryptoravesToken.balanceOf(_addr, _1155tokenId) == 0){
+            for(uint i=0; i < heldTokenIds[_addr].length; i++){
+                if(_1155tokenId == heldTokenIds[_addr][i]){
+                    delete heldTokenIds[_addr][i];
+                    return true;
+                }
+            }
+        }
+        return false;
     }
     
     function getHeldTokenIds(address _addr) public view returns(uint256[] memory){

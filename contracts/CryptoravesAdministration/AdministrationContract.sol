@@ -17,7 +17,7 @@ interface ITokenManager {
     function getAddressBySymbol(string memory) external view returns(address);
     function getManagedTokenIdByAddress(address) external view returns(uint256);
     function dropCrypto(string memory, address, uint256, uint256, bytes memory) external;
-    function _checkHeldToken(address, uint256) external;
+    function managedTransfer(address, address, uint256, uint256, bytes memory) external;
     function setIsManagedToken(address, bool) external;
     function adjustValueByUnits(uint256, uint256, uint256) external view returns(uint256);
     function getERCtype(uint256) external view returns(uint256);
