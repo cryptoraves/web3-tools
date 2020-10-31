@@ -9,6 +9,8 @@ interface ITransactionManager {
     function testForTransactionManagementAddressUniquely() external pure returns(bool);
     function getUserL1AccountFromL2Account(address) external view returns(address);
     function getUserL2AccountFromL1Account(address) external view returns(address);
+    function getTokenManagementAddress() external view returns(address);
+    function getCryptoravesTokenAddress() external view returns(address);
 }
 
 interface ITokenManager {
