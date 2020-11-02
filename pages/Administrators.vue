@@ -747,7 +747,6 @@ export default {
       console.log('Random Amount: ', randAmount)
       let appr = await token.approve(this.TokenManagementContractAddress, this.ethers.utils.parseEther(randAmount.toString()));
       await appr.wait()
-      console.log('here')
       let tx = await tokenManagerContract.deposit(
         this.ethers.utils.parseEther(randAmount.toString()),
         this.ERC20FullAddress,

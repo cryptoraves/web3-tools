@@ -201,7 +201,6 @@ contract TokenManagement is  ERCDepositable {
     function getNextBaseId(uint256 _tokenId) public pure returns(uint256){
         return ((_tokenId >> 128) + 1) << 128;
     }
-    
     //for adjusting incoming human-typed values to smart contract uint values
     function adjustValueByUnits(uint256 _tokenId, uint256 _value, uint256 _decimalPlace) public view onlyAdmin returns(uint256){
         address _tokenAddr = tokenListByBaseId[_tokenId >> 128];

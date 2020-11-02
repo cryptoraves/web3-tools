@@ -8,7 +8,7 @@ interface IERC1155 {
     function safeTransferFrom(address from, address to, uint256 id, uint256 amount, bytes memory data) external;
 }
 
-//can manage tokens for any Cryptoraves-native address
+//manages all transactions coming in from social media
 contract TransactionManagement is AdministrationContract {
     
     address private _tokenManagementContractAddress;
@@ -153,8 +153,6 @@ contract TransactionManagement is AdministrationContract {
                     _tokenId = _tokenManagement.getManagedTokenIdByAddress(_userAccount);
                 }
                 
-                
-                
             } else {
                 
                 //user transfer using non-cryptoraves tokens
@@ -166,10 +164,14 @@ contract TransactionManagement is AdministrationContract {
                 
             }
             
-            uint256 _adjustedValue = _adjustValueByUnits(_tokenId, _values[0], _values[1]);
+            uint256 _adjustedValue;
             
+            //nft id adjustment
             if(_tokenManagement.getERCtype(_tokenId) == 721){
                 _tokenId = _tokenId + _values[0];
+                _adjustedValue = 1;
+            }else{
+                _adjustedValue = _adjustValueByUnits(_tokenId, _values[0], _values[1]);
             }
 
             bytes memory mData = AdminToolsLibrary.stringToBytes(_metaData[3]);

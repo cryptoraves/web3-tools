@@ -150,9 +150,9 @@
               @click="goEtherscan(ERC721FullAddress)">
               Test ERC721 Contract Address:<br> {{ this.ERC721FullAddress }}<br>
           </a>
-          <a  v-if="ERC721WrappedId > 0"
+          <a  v-if="ERC721WrappedBaseId > 0"
               target="_blank">
-              Your ERC721 Wrapped ID: {{ this.ERC721WrappedId }}<br>
+              Your ERC721 Wrapped Base ID: {{ this.ERC721WrappedBaseId }}<br>
               
           </a>
           <a  v-if="ERC721balance"
@@ -160,7 +160,7 @@
               @click="goEtherscan(ERC721FullAddress)">
               Your ERC721 Balance: {{ this.ERC721balance }}<br>
           </a>
-          <a  v-if="ERC721balance && ERC721WrappedId > 0"
+          <a  v-if="ERC721balance && ERC721WrappedBaseId > 0"
               target="_blank">
               Your ERC721 Wrapped Balance: {{ this.ERC721WrappedBalance }}<br>
           </a>
@@ -174,7 +174,7 @@
               @click="mintERC721()"
               class="button--green"
           >
-              Mint An ERC721 To YOur Wallet
+              Mint An ERC721 To Your Wallet
           </a>
           <br>
           <a
@@ -193,7 +193,7 @@
           </a><br><br>
         </div> 
         <div
-          v-if="ERC721FullAddress && ERC721WrappedId"
+          v-if="ERC721FullAddress && ERC721WrappedBaseId"
           class="links">
           <input v-model="depositAndSendERC721address">
           <br><br>
@@ -282,7 +282,7 @@ export default {
       ERC721balance: 0,
       ERC721WrappedBalance: 0,
       ERC721Emoji: '',
-      ERC721WrappedId: 0,
+      ERC721WrappedBaseId: 0,
       showLoading: false,
       depositAndSendERC20address: '0xabc...',
       depositAndSendERC721address: '0x123...'
@@ -447,13 +447,13 @@ export default {
         }
       })
       this.ERC721WrappedBalance = ERC721WrappedBalance
-      this.ERC721WrappedId = ERC1155tokenIdForERC721
+      this.ERC721WrappedBaseId = ERC1155tokenIdForERC721
 
     },
     async getEmojis(){
       let tokenManagerContract = this.loadTokenManagementContract()
       this.ERC20Emoji = await tokenManagerContract.getEmoji(this.ERC20WrappedId)
-      this.ERC721Emoji = await tokenManagerContract.getEmoji(this.ERC721WrappedId)
+      this.ERC721Emoji = await tokenManagerContract.getEmoji(this.ERC721WrappedBaseId)
       console.log('get address by ticker:',await tokenManagerContract.getAddressBySymbol(this.ERC721Emoji))
     },
     async getERC20Balance(){
@@ -577,9 +577,11 @@ export default {
 
       let cryptoravesToken = this.loadCryptoravesTokenContract()
       let tokenManagerContract = this.loadTokenManagementContract()
-      this.ERC721WrappedId = localStorage.ERC721WrappedId = await tokenManagerContract.getManagedTokenIdByAddress(this.ERC721FullAddress)
+      this.ERC721WrappedBaseId = localStorage.ERC721WrappedBaseId = await tokenManagerContract.getManagedTokenIdByAddress(this.ERC721FullAddress)
+      
+      let bigNumberBaseId = this.ERC721WrappedBaseId
 
-      let initialBalance = await cryptoravesToken.balanceOf(this.ethereumAddress, this.ERC721WrappedId)
+      let initialBalance = this.ERC721WrappedBalance
       console.log('ERC1155 Wrapped Balance Before Deposit: '+initialBalance)
 
       let heldTokens = await this.getAllERC721sHeld()
@@ -595,42 +597,39 @@ export default {
       )
       let val = await tx.wait()
       
-      console.log('ERC1155 Token ID: '+this.ERC721WrappedId)
+      this.getWrappedBalances()
+      let finalBalance = this.ERC721WrappedBalance
       
-      let finalBalance = await cryptoravesToken.balanceOf(this.ethereumAddress, this.ERC721WrappedId)
       console.log('ERC1155 Wrapped Balance After Deposit: '+finalBalance)
       console.log(
-        "Deposit of Random Amount Successful: ", 
-        initialBalance , finalBalance
+        "Deposit of 1 NFT Successful: Ticker: TSTY OrgId: ",heldTokens[0]
       )
       this.setERC721Emoji()
+      this.getBalances()
       this.showLoading = false
     },
     async setERC721Emoji(){
       let tokenManagerContract = this.loadTokenManagementContract()
       let id = await tokenManagerContract.getManagedTokenIdByAddress(this.ERC721FullAddress)
-      console.log(id)
       let res = await tokenManagerContract.setEmoji(id,'✨')
-      console.log(res)
-
     },
     async sendWrappedERC721(){
       let token = new this.ethers.Contract(this.ERC721FullAddress, abis['ERC721Full'].abi, this.signer)
       this.showLoading = true
       let cryptoravesTokenContract = this.loadCryptoravesTokenContract()
       let tokenManagerContract = this.loadTokenManagementContract()
-      let ERC1155tokenIdForERC721 = localStorage.ERC1155tokenIdForERC721 = await tokenManagerContract.getManagedTokenIdByAddress(this.ERC721FullAddress)
+      let BaseTokenId = localStorage.BaseTokenId = await tokenManagerContract.getManagedTokenIdByAddress(this.ERC721FullAddress)
 
-      let initialBalance = await cryptoravesTokenContract.balanceOf(this.depositAndSendERC721address, ERC1155tokenIdForERC721)
+      let initialBalance = this.ERC721WrappedBalance
       let held1155s = await this.getAll1155TokensHeld()
-      let upperLimit = await tokenManagerContract.getNextBaseId(ERC1155tokenIdForERC721)
+      let upperLimit = await tokenManagerContract.getNextBaseId(BaseTokenId)
       let ERC721WrappedId = 0
       held1155s.forEach( function(element) {
-        if(element.lt(upperLimit) && element.gte(ERC1155tokenIdForERC721)){
+        if(element.lt(upperLimit) && element.gte(BaseTokenId)){
           ERC721WrappedId=element
         }
       })
-      console.log("sending wrqapped id:",ERC721WrappedId)
+      console.log("sending wrapped id:",ERC721WrappedId)
       let tx = await cryptoravesTokenContract.safeTransferFrom(
         this.ethereumAddress,
         this.depositAndSendERC721address,
@@ -639,16 +638,13 @@ export default {
         this.ethers.utils.formatBytes32String('')
       )   
       let val = await tx.wait()
-      let finalBalance = await cryptoravesTokenContract.balanceOf(this.depositAndSendERC721address, ERC1155tokenIdForERC721)      
-      console.log('Send ID: ', ERC721WrappedId)
+      this.getBalances()
+      let finalBalance = this.ERC721WrappedBalance     
       console.log(
-        "Transfer of wrapped erc721 tokens Successful: ", 
-        initialBalance, 
-        finalBalance,
+        "Transfer of wrapped TSTY tokens Successful. OrgID: ",ERC721WrappedId.sub(BaseTokenId).toString()
       )
 
       this.showLoading = false
-      this.getBalances()
 
     },
     async depositAndSendERC721(tokenId){
