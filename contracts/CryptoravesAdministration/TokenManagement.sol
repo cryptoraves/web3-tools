@@ -12,7 +12,7 @@ contract TokenManagement is  ERCDepositable {
     
     address private _cryptoravesTokenAddr;
     
-    //Token id list
+    //Inceremental base token id list
     address[] public tokenListByBaseId;
     
     //mapping for token ids and their origin addresses
@@ -95,8 +95,6 @@ contract TokenManagement is  ERCDepositable {
     
     function deposit(uint256 _amountOrId, address _contract, uint _ercType, bool _managedTransfer) public payable returns(uint256){
         
-        CryptoravesToken instanceCryptoravesToken = CryptoravesToken(_cryptoravesTokenAddr);
-         
         if(!managedTokenListByAddress[_contract].isManagedToken) {
             _addTokenToManagedTokenList(_contract, _ercType, 0);
         }
@@ -131,8 +129,6 @@ contract TokenManagement is  ERCDepositable {
         }
         
         _mint(_mintTo, _1155tokenId, _amount, '');
-        
-        instanceCryptoravesToken.checkHeldToken(_mintTo, _1155tokenId);
         
         emit Deposit(_mintTo, _amountOrId, _contract, _1155tokenId, _ercType);
         

@@ -2,7 +2,7 @@
 pragma solidity 0.6.10;
 
 import "./AdministrationContract.sol";
-import "/home/cartosys/www/openzeppelin-contracts/contracts/token/ERC1155/ERC1155.sol";
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC1155/ERC1155.sol";
 
 contract CryptoravesToken is ERC1155, AdministrationContract {
     
@@ -11,6 +11,24 @@ contract CryptoravesToken is ERC1155, AdministrationContract {
     
     //list of held 1155 token ids
     mapping(address => uint256[]) public heldTokenIds;
+    
+    //Inceremental base token id list
+    address[] public tokenListByBaseId;
+    
+    //mapping for token ids and their origin addresses
+    struct ManagedToken {
+        uint256 managedTokenBaseId;
+        bool isManagedToken;
+        uint ercType;
+        uint256 totalSupply;
+        string symbol;
+        uint256 decimals;
+        string emoji;
+    }
+    mapping(address => ManagedToken) public managedTokenListByAddress;
+
+    //find tokenId by symbol or emoji
+    mapping(string => uint256) public symbolAndEmojiLookupTable;
     
     constructor(string memory _uri) ERC1155(_uri) public {
         //default managers include parent contract and ValidatorInterfaceContract Owner
@@ -34,15 +52,13 @@ contract CryptoravesToken is ERC1155, AdministrationContract {
     }
     
     /*
-    *  For after each transfer or burn. Remove held token id from account portfolio if no balance remains
+    *  For after each transfer or burn. Remove held token id from account portfolio after checking balance == 0
     */
     function pruneHeldToken(address _addr, uint256 _1155tokenId) private onlyAdmin {
         
-        if(balanceOf(_addr, _1155tokenId) == 0){
-            for(uint i=0; i < heldTokenIds[_addr].length; i++){
-                if(_1155tokenId == heldTokenIds[_addr][i]){
-                    delete heldTokenIds[_addr][i];
-                }
+        for(uint i=0; i < heldTokenIds[_addr].length; i++){
+            if(_1155tokenId == heldTokenIds[_addr][i]){
+                delete heldTokenIds[_addr][i];
             }
         }
     }
@@ -77,7 +93,7 @@ contract CryptoravesToken is ERC1155, AdministrationContract {
         if(from != address(0)){
             //this is a mint or tranfer from
             for(uint i=0; i < ids.length; i++){
-                if(balanceOf(from, ids[i]) + amounts[i] == 0){
+                if(balanceOf(from, ids[i]) - amounts[i] == 0){
                     pruneHeldToken(from, ids[i]);
                 }
             }
@@ -85,7 +101,7 @@ contract CryptoravesToken is ERC1155, AdministrationContract {
         operator; data;
     }
     
-    // General mint function
+    // General mint & burn function
     function mint(address account, uint256 id, uint256 amount, bytes memory data) public virtual onlyAdmin {
         _mint(account, id, amount, data);
     }

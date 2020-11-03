@@ -126,18 +126,4 @@ contract AdministrationContract {
         
         revert('No TransactionManagementAddress found!');
     }
-    /*
-    function testDownstreamAdminConfiguration(address [] memory _downstreamContracts) public view onlyAdmin returns(bool){
-        require(_downstreamContracts.length < 3, 'List of _downstreamContracts is too damn long!');
-        
-        bool _cumulativeReseult;
-        _cumulativeReseult = true;
-        if(_downstreamContracts.length > 0){
-            for (uint i=0; i<_downstreamContracts.length; i++) {
-                _cumulativeReseult = _cumulativeReseult && IDownStream(_downstreamContracts[i]).testDownstreamAdminConfiguration();
-            }
-        }
-        return _cumulativeReseult;
-        
-    }*/
 }
