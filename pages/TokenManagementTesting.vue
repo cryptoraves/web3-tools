@@ -241,6 +241,17 @@
               Import Network Settings
             </a>
           </div>
+          <div 
+            class="links">
+            <br>
+            <br>
+            <a
+              @click="pruneToken()"
+              class="button--green"
+            >
+              Prune Token
+            </a>
+          </div>
     </div>
     <div
       v-if="showLoading"
@@ -441,9 +452,12 @@ export default {
       let held1155s = await this.getAll1155TokensHeld()
       let upperLimit = await tokenManagerContract.getNextBaseId(ERC1155tokenIdForERC721)
       let ERC721WrappedBalance = 0
-      held1155s.forEach( function(element) {
+      let ethAddr = this.ethereumAddress
+      held1155s.forEach( async function(element) {
         if(element.lt(upperLimit) && element.gte(ERC1155tokenIdForERC721)){
+          
           ERC721WrappedBalance++
+          console.log(element.toString(), await cryptoravesToken.balanceOf(ethAddr, element))
         }
       })
       this.ERC721WrappedBalance = ERC721WrappedBalance
