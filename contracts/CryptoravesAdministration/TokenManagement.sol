@@ -274,13 +274,11 @@ contract TokenManagement is  ERCDepositable {
     function _mint( address account, uint256 id, uint256 amount, bytes memory data) private onlyAdmin {
         CryptoravesToken instanceCryptoravesToken = CryptoravesToken(_cryptoravesTokenAddr);
         instanceCryptoravesToken.mint(account, id, amount, data);
-        instanceCryptoravesToken.checkHeldToken(account, id);
     }
     
     function _burn( address account, uint256 id, uint256 amount) private onlyAdmin {
         CryptoravesToken instanceCryptoravesToken = CryptoravesToken(_cryptoravesTokenAddr);
         instanceCryptoravesToken.burn(account, id, amount);
-        instanceCryptoravesToken.pruneHeldToken(account, id);
     }
     
     /*****************************tokenId mgmt*************************
@@ -292,8 +290,6 @@ contract TokenManagement is  ERCDepositable {
     function managedTransfer(address _from, address _to, uint256 _id,  uint256 _val, bytes memory _data)  public onlyAdmin {
         CryptoravesToken instanceCryptoravesToken = CryptoravesToken(_cryptoravesTokenAddr);
         instanceCryptoravesToken.safeTransferFrom(_from, _to, _id, _val, _data);
-        instanceCryptoravesToken.checkHeldToken(_to, _id);
-        instanceCryptoravesToken.pruneHeldToken(_from, _id);
         //TODO: emit platformId and change _from & _to vars to userIds and/or handles on given platform
         emit Transfer(_from, _to, _val, _id); 
     }

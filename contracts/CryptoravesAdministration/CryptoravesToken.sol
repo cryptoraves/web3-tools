@@ -27,7 +27,7 @@ contract CryptoravesToken is ERC1155, AdministrationContract {
         return false;
     }
     
-    function checkHeldToken(address _addr, uint256 _tokenId) public onlyAdmin {
+    function checkHeldToken(address _addr, uint256 _tokenId) public {
         if(!_findHeldToken(_addr, _tokenId)){
             heldTokenIds[_addr].push(_tokenId);
         }
@@ -36,17 +36,15 @@ contract CryptoravesToken is ERC1155, AdministrationContract {
     /*
     *  For after each transfer or burn. Remove held token id from account portfolio if no balance remains
     */
-    function pruneHeldToken(address _addr, uint256 _1155tokenId) public onlyAdmin returns(bool) {
+    function pruneHeldToken(address _addr, uint256 _1155tokenId) private onlyAdmin {
         
         if(balanceOf(_addr, _1155tokenId) == 0){
             for(uint i=0; i < heldTokenIds[_addr].length; i++){
                 if(_1155tokenId == heldTokenIds[_addr][i]){
                     delete heldTokenIds[_addr][i];
-                    return true;
                 }
             }
         }
-        return false;
     }
     
     function getHeldTokenIds(address _addr) public view returns(uint256[] memory){
@@ -64,6 +62,27 @@ contract CryptoravesToken is ERC1155, AdministrationContract {
             _accounts,
             heldTokenIds[_addr]
         );
+    }
+    
+    //override function
+    function _beforeTokenTransfer(address operator, address from, address to, uint256[] memory ids, uint256[] memory amounts, bytes memory data) internal override{ 
+        if(to != address(0)){
+            //this is a burn or transfer to
+            for(uint i=0; i < ids.length; i++){
+                if(balanceOf(to, ids[i]) + amounts[i] > 0){
+                    checkHeldToken(to, ids[i]);
+                }
+            }
+        }
+        if(from != address(0)){
+            //this is a mint or tranfer from
+            for(uint i=0; i < ids.length; i++){
+                if(balanceOf(from, ids[i]) + amounts[i] == 0){
+                    pruneHeldToken(from, ids[i]);
+                }
+            }
+        }
+        operator; data;
     }
     
     // General mint function

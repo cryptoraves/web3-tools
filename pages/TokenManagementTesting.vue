@@ -725,8 +725,8 @@ export default {
       return results
     },
     async getAll1155TokensHeld(){
-      let tokenManagerContract = this.loadTokenManagementContract()
-      return await tokenManagerContract.getHeldTokenIds(this.ethereumAddress)
+      let cryptoravesTokenContract = this.loadCryptoravesTokenContract()
+      return await cryptoravesTokenContract.getHeldTokenIds(this.ethereumAddress)
     },
     loadTokenManagementContract(){
       return new this.ethers.Contract(
