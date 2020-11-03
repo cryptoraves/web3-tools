@@ -4,6 +4,8 @@ const TransactionManagement = artifacts.require("TransactionManagement");
 const TokenManagement = artifacts.require("TokenManagement");
 const UserManagement = artifacts.require("UserManagement");
 
+const CryptoravesToken = artifacts.require("CryptoravesToken");
+
 const ethers = require('ethers')
 
 let secondTokenManagerAddr = ''
@@ -103,7 +105,10 @@ contract("ValidatorInterfaceContract", async accounts => {
         await instance.validateCommand([ids[i],primaryUserId,0], ['@rando'+ids[i].toString(), '@fakeHandle', ''], [amounts[i],18], ['twitter','transfer',uri, bytes])
       }
       let primaryUserAccount = await instanceUserManagement.getUserAccount(primaryUserId)
-      let heldIds = await instanceTokenManagement.getHeldTokenIds(
+      let instanceCryptoravesToken = await CryptoravesToken.at(
+        await instanceTokenManagement.getCryptoravesTokenAddress()
+      )
+      let heldIds = await instanceCryptoravesToken.getHeldTokenIds(
         primaryUserAccount
       )
       assert.isAbove(heldIds.length, 0, 'No held token ids returned.')
@@ -120,7 +125,7 @@ contract("ValidatorInterfaceContract", async accounts => {
           
         }
       }
-      let balances = await instanceTokenManagement.getHeldTokenBalances(primaryUserAccount)
+      let balances = await instanceCryptoravesToken.getHeldTokenBalances(primaryUserAccount)
       assert.isAbove(balances.length, 0, 'No held token ids returned.')
       for(i=0; i < balances.length; i++){
         switch(i){
