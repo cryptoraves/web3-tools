@@ -37,13 +37,12 @@
       </div>
       <br><br><br>
       <h1 class="title">
-        Oracle Features Testing Page
+        L1 <-> L2 Portal
       </h1>
       <h2 class="subtitle">
-        For Testing And Developing Token Management System Through The Oracle
+        Deposit / Withdrawal from / to Layer 1
       </h2>
-    </div>
-    <div v-if="ready && !showLoading">
+    
         
         <div v-if="ValidatorInterfaceContractAddress"
           class="links">
@@ -64,6 +63,19 @@
         </div> 
         <div v-else>
           Please Launch ValidatorInterface Contract in Administrators View
+        </div>
+        <div>
+          <table class="dualbox">
+            <tr>
+              <td class="button--green">
+                asdsaasdasd
+              </td>
+
+              <td class="button--green">
+                asdadasd
+              </td>
+            </tr>
+          </table>
         </div>
         <div
           class="links">
@@ -204,54 +216,7 @@
           >
             Send A Wrapped ERC721 To Above Address
           </a>
-        </div> 
-        <div 
-            v-if="UserManagementContractAddress"
-            class="links">
-            <br>
-            <br>
-            <a
-              @click="resetLocalStorage()"
-              class="button--green"
-            >
-              Start From Scratch
-            </a>
-          </div>
-
-          <div 
-            v-if="UserManagementContractAddress && TokenManagementContractAddress && CryptoravesTokenContractAddress && TransactionManagementContractAddress && ValidatorInterfaceContractAddress"
-            class="links">
-            <br>
-            <br>
-            <a
-              @click="exportContractStructureForThisNetwork()"
-              class="button--green"
-            >
-              Export Network Settings
-            </a>
-          </div>
-          <div 
-            class="links">
-            <br>
-            <br>
-            <a
-              @click="importContractStructureForThisNetwork()"
-              class="button--green"
-            >
-              Import Network Settings
-            </a>
-          </div>
-          <div 
-            class="links">
-            <br>
-            <br>
-            <a
-              @click="pruneToken()"
-              class="button--green"
-            >
-              Prune Token
-            </a>
-          </div>
+        </div>           
     </div>
     <div
       v-if="showLoading"
@@ -260,7 +225,7 @@
           src="../assets/gif/loading.gif" 
           alt >
     </div>
-  </div>
+</div>
 </template>
 
 <script>
@@ -336,6 +301,8 @@ export default {
         this.ValidatorInterfaceContractAddress = localStorage.ValidatorInterfaceContractAddress = savedNetwork[this.networkType]["ValidatorInterfaceContractAddress"]
         this.ERC20FullAddress = localStorage.ERC20FullAddress = savedNetwork[this.networkType]["ERC20FullAddress"]
         this.ERC721FullAddress = localStorage.ERC721FullAddress = savedNetwork[this.networkType]["ERC721FullAddress"]
+        this.ERC20WrappedId = localStorage.ERC20WrappedId = savedNetwork[this.networkType]["ERC20WrappedId"]
+        this.ERC721WrappedId = localStorage.ERC721WrappedId = savedNetwork[this.networkType]["ERC721WrappedId"]
         
         this.AdminToolsLibraryAddress = localStorage.AdminToolsLibraryAddress = savedNetwork[this.networkType]["AdminToolsLibraryAddress"]
 
@@ -360,6 +327,13 @@ export default {
         }
         if (this.ERC721FullAddress){
           networkInfo[this.networkType]["ERC721FullAddress"] = this.ERC721FullAddress
+        }
+
+        if (this.ERC20WrappedId){
+          networkInfo[this.networkType]["ERC20WrappedId"] = this.ERC20WrappedId
+        }
+        if (this.ERC721WrappedId){
+          networkInfo[this.networkType]["ERC721WrappedId"] = this.ERC721WrappedId
         }
         
         localStorage.networkInfo = JSON.stringify(networkInfo)
@@ -766,6 +740,13 @@ export default {
 .container {
   margin: 0 auto;
   min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+.dualbox {
+  margin: 0 auto;
   display: flex;
   justify-content: center;
   align-items: center;

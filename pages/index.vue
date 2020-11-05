@@ -21,7 +21,14 @@
           target="_blank"
           class="button--green"
         >
-          Web3 Portal Testing
+          Oracle Path & ERC1155 Wrapping Testing
+        </a>
+        <a
+          @click="gofeature('Web3Portal')"
+          target="_blank"
+          class="button--green"
+        >
+          L1 <-> L2 Interface
         </a>
         <!--a
           @click="go3Box(ethereumAddress)"
