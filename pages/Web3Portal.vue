@@ -67,12 +67,50 @@
         <div>
           <table class="dualbox">
             <tr>
-              <td class="button--green">
-                asdsaasdasd
+              <td>
+                <BalancePanel
+                :selected-ticker="selectedTicker" 
+                :address="ethereumAddress"
+                :url="blockExplorerUrl"
+                :balance="ERC20balance"
+                :type="true"/>
               </td>
-
-              <td class="button--green">
-                asdadasd
+              <td>
+                <div class="user-transaction-section-buttons col-lg-4 col-md-12">
+                  <button
+                    type="button"
+                    class="btn btn-danger btn-arrow-right"
+                    @click="withdraw">
+                    Withdraw
+                  </button>
+                  <!--button
+                    v-if="resumeWithdrawalNeeded"
+                    type="button"
+                    class="btn btn-danger btn-arrow-right"
+                    @click="resumeWithdrawal">
+                    Retry
+                  </button-->                    
+                  <div class="portfolio-userimg">
+                    <img
+                      :src="tokenImageUrl"
+                      :title="selectedTicker">
+                  </div>
+                  <button 
+                    type="button"
+                    class="btn btn-success btn-arrow-left"
+                    @click="deposit">
+                    Deposit
+                  </button>
+                </div>
+              </td>
+              <td>
+                <div class="col-lg-4 col-md-12">
+                <BalancePanel 
+                  :selected-ticker="selectedTicker"
+                  :address="ethereumAddress"
+                  :url="ethBlockExplorerUrl"
+                  :balance="ERC20balance"/>                        
+              </div>
               </td>
             </tr>
           </table>
@@ -231,10 +269,15 @@
 <script>
 import MetamaskHandler from "./metamaskHandler"
 import abis from "./abis"
+
+
+
+import BalancePanel from '../components/BalancePanel'
+
 export default {
   name: "AdminTools",
   extends: MetamaskHandler,
-  components: {},
+  components: {BalancePanel},
   data() {
     return {
       contractNames: ["CryptoravesToken", "ERC20Full", "TokenManagement", "TransactionManagement", "UserManagement", "ValidatorInterfaceContract"],
@@ -261,7 +304,10 @@ export default {
       ERC721WrappedBaseId: 0,
       showLoading: false,
       depositAndSendERC20address: '0xabc...',
-      depositAndSendERC721address: '0x123...'
+      depositAndSendERC721address: '0x123...',
+
+      selectedTicker: 'TSTX',
+      tokenImageUrl: 'https://dummyimage.com/200x200/000/fff'
     }
   },
   created() {
@@ -272,6 +318,10 @@ export default {
 
   },
   methods: {
+    async deposit(){
+    },
+    async withdraw(){
+    },
     loadNetworkData(){
       if(this.networkType){
         this.importContractStructureForThisNetwork(false)
@@ -381,36 +431,6 @@ export default {
         console.log(e,'Error with init getEmojis')
       }
     },
-    async launchERC20(){
-      this.showLoading = true
-      let factory = new this.ethers.ContractFactory(abis['ERC20Full'].abi, abis["ERC20Full"].bytecode, this.signer);
-      let contract = await factory.deploy(
-        this.ethereumAddress, 
-        'TestXToken', 'TSTX', '18',
-        '1000000000000000000000000000' //1 billion
-      )
-
-      this.ERC20balance = await contract.balanceOf(this.ethereumAddress)
-      console.log('ERC20 Token Launched With Balance: ', this.ethers.utils.formatEther(this.ERC20balance))
-
-      this.ERC20FullAddress = localStorage.ERC20FullAddress = contract.address
-
-      
-
-      //get new contract id
-      let tokenManagerContract = this.loadTokenManagementContract()
-      let cryptoravesToken = this.loadCryptoravesTokenContract()
-      let ERC1155tokenIdForERC20 = await tokenManagerContract.getManagedTokenIdByAddress(this.ERC20FullAddress)
-      this.ERC20WrappedBalance = this.ethers.utils.formatUnits(
-        await cryptoravesToken.balanceOf(this.ethereumAddress, ERC1155tokenIdForERC20),
-        18
-      )
-      this.ERC20WrappedId = ERC1155tokenIdForERC20
-
-      this.getBalances()
-      this.exportContractStructureForThisNetwork(false)
-      this.showLoading = false
-    },
     async getWrappedBalances(){
 
       let tokenManagerContract = this.loadTokenManagementContract()
@@ -438,12 +458,6 @@ export default {
       this.ERC721WrappedBalance = ERC721WrappedBalance
       this.ERC721WrappedBaseId = ERC1155tokenIdForERC721
 
-    },
-    async getEmojis(){
-      let tokenManagerContract = this.loadTokenManagementContract()
-      this.ERC20Emoji = await tokenManagerContract.getEmoji(this.ERC20WrappedId)
-      this.ERC721Emoji = await tokenManagerContract.getEmoji(this.ERC721WrappedBaseId)
-      console.log('get address by ticker:',await tokenManagerContract.getAddressBySymbol(this.ERC721Emoji))
     },
     async getERC20Balance(){
       let token = new this.ethers.Contract(this.ERC20FullAddress, abis['ERC20Full'].abi, this.signer)
@@ -527,38 +541,9 @@ export default {
       this.getBalances()
 
     },
-    async launchERC721(){
-      this.showLoading = true
-      let factory = new this.ethers.ContractFactory(abis['ERC721Full'].abi, abis["ERC721Full"].bytecode, this.signer);
-      let contract = await factory.deploy(
-        this.ethereumAddress, 
-        'TestYToken', 'TSTY'
-      )
-
-      console.log("Mint Token 0")
-      await contract.mint(this.ethereumAddress, 'https://i.picsum.photos/id/0/200/200.jpg')
-      console.log("Mint Token 1")
-      await contract.mint(this.ethereumAddress, 'https://i.picsum.photos/id/1/200/200.jpg')
-      console.log("Mint Token 2")
-      await contract.mint(this.ethereumAddress, 'https://i.picsum.photos/id/2/200/200.jpg')
-
-      this.ERC721balance = await contract.balanceOf(this.ethereumAddress)
-      console.log('ERC721 Token Launched With Balance: ', this.ERC721balance)
-      this.ERC721FullAddress = localStorage.ERC721FullAddress = contract.address
-
-      this.getBalances()
-      this.exportContractStructureForThisNetwork(false)
-      this.showLoading = false
-    }, 
     async getERC721Balance(){
       let contract = new this.ethers.Contract(this.ERC721FullAddress, abis['ERC721Full'].abi, this.signer)
       this.ERC721balance = await contract.balanceOf(this.ethereumAddress)
-    },
-    async mintERC721(){
-      let contract = new this.ethers.Contract(this.ERC721FullAddress, abis['ERC721Full'].abi, this.signer)
-      let amount1 = await contract.totalSupply()
-      await contract.mint(this.ethereumAddress, 'https://i.picsum.photos/id/'+(amount1+1)+'/200/200.jpg')
-      this.getERC721Balance()
     },
     async depositERC721(){
       this.showLoading = true

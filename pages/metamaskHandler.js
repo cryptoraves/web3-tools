@@ -8,6 +8,7 @@ export default {
       ethereumAddress: null,
       networkType: null,
       blockExplorerUrl: null,
+      ethBlockExplorerUrl: null
     }
   },
   async mounted() {
@@ -38,12 +39,15 @@ export default {
       if (networkId==291){
         this.networkType = 'SKALE Bob Testnet'
         this.blockExplorerUrl = 'https://explorer.skale.network/'
+        this.ethBlockExplorerUrl = 'https://rinkeby.etherscan.io/'
       } else if (networkId==54173){
         this.networkType = 'SKALE Testnet'
         this.blockExplorerUrl = 'https://explorer.skale.network/'
+        this.ethBlockExplorerUrl = 'https://rinkeby.etherscan.io/'
       } else if (networkId==80001){
         this.networkType = 'Matic Testnet'
         this.blockExplorerUrl = 'https://explorer.testnet2.matic.network/'
+        this.ethBlockExplorerUrl = 'https://ropsten.etherscan.io/'
       } else {
         this.networkType = await web3.eth.net.getNetworkType()
         if(this.networkType == 'main'){
