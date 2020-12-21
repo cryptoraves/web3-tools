@@ -11,9 +11,6 @@ export default {
       ethBlockExplorerUrl: null
     }
   },
-  async mounted() {
-    await this.initWeb3()
-  },
   methods: {
     async initWeb3() {
       let web3js

@@ -311,8 +311,8 @@ export default {
     this.checkAbis()
 
   },
-  mounted() {
-    
+  async mounted() {
+    await this.initWeb3()
     /*if (localStorage.CryptoravesTokenContractAddress) this.CryptoravesTokenContractAddress = localStorage.CryptoravesTokenContractAddress
     if (localStorage.UserManagementContractAddress) this.UserManagementContractAddress = localStorage.UserManagementContractAddress
     if (localStorage.TokenManagementContractAddress) this.TokenManagementContractAddress = localStorage.TokenManagementContractAddress
@@ -647,6 +647,11 @@ export default {
       cumulativeBool = cumulativeBool && res
       console.log('Verify Correct TransactionManager 1: ', res)
 
+      //pause for matic's RPC limit
+      if (this.networkType == 'Matic Testnet'){
+        await this.sleep(1000)
+      }
+
       let cryptoravesTokenAddress = await transactionManagerContract.getCryptoravesTokenAddress()
       res = cryptoravesTokenAddress==this.CryptoravesTokenContractAddress
       cumulativeBool = cumulativeBool && res
@@ -684,6 +689,11 @@ export default {
       res = await tokenManagerContract.getTransactionManagerAddress() == txnManagerAddress && this.TransactionManagementContractAddress == txnManagerAddress
       cumulativeBool = cumulativeBool && res
       console.log('Verify Correct TransactionManager 2: ', res)
+
+      //pause for matic's RPC limit
+      if (this.networkType == 'Matic Testnet'){
+        await this.sleep(1000)
+      }
 
       res = await userManagerContract.testDownstreamAdminConfiguration()
       cumulativeBool = cumulativeBool && res
@@ -859,24 +869,26 @@ export default {
           return 0
         }
       }
-      if(this.networkType == savedNetwork[this.networkType]["networkType"]){
-        
-        this.UserManagementContractAddress = localStorage.UserManagementContractAddress = savedNetwork[this.networkType]["UserManagementContractAddress"]
-        this.TokenManagementContractAddress = localStorage.TokenManagementContractAddress = savedNetwork[this.networkType]["TokenManagementContractAddress"]
-        this.CryptoravesTokenContractAddress = localStorage.CryptoravesTokenContractAddress = savedNetwork[this.networkType]["CryptoravesTokenContractAddress"]
-        this.TransactionManagementContractAddress = localStorage.TransactionManagementContractAddress = savedNetwork[this.networkType]["TransactionManagementContractAddress"]
-        this.ValidatorInterfaceContractAddress = localStorage.ValidatorInterfaceContractAddress = savedNetwork[this.networkType]["ValidatorInterfaceContractAddress"]
-        if(savedNetwork["ERC20FullAddress"]){
-          this.ERC20FullAddress = localStorage.ERC20FullAddress = savedNetwork[this.networkType]["ERC20FullAddress"]
-        }
-        this.ERC1155tokenId = localStorage.ERC1155tokenId = savedNetwork[this.networkType]["ERC1155tokenId"]
-        this.AdminToolsLibraryAddress = localStorage.AdminToolsLibraryAddress = savedNetwork[this.networkType]["AdminToolsLibraryAddress"]
+      try{
+        if(this.networkType == savedNetwork[this.networkType]["networkType"]){
+          
+          this.UserManagementContractAddress = localStorage.UserManagementContractAddress = savedNetwork[this.networkType]["UserManagementContractAddress"]
+          this.TokenManagementContractAddress = localStorage.TokenManagementContractAddress = savedNetwork[this.networkType]["TokenManagementContractAddress"]
+          this.CryptoravesTokenContractAddress = localStorage.CryptoravesTokenContractAddress = savedNetwork[this.networkType]["CryptoravesTokenContractAddress"]
+          this.TransactionManagementContractAddress = localStorage.TransactionManagementContractAddress = savedNetwork[this.networkType]["TransactionManagementContractAddress"]
+          this.ValidatorInterfaceContractAddress = localStorage.ValidatorInterfaceContractAddress = savedNetwork[this.networkType]["ValidatorInterfaceContractAddress"]
+          if(savedNetwork["ERC20FullAddress"]){
+            this.ERC20FullAddress = localStorage.ERC20FullAddress = savedNetwork[this.networkType]["ERC20FullAddress"]
+          }
+          this.ERC1155tokenId = localStorage.ERC1155tokenId = savedNetwork[this.networkType]["ERC1155tokenId"]
+          this.AdminToolsLibraryAddress = localStorage.AdminToolsLibraryAddress = savedNetwork[this.networkType]["AdminToolsLibraryAddress"]
 
-      }else{
-        if(alertsBool){
-          alert('Network Name doesn\'t match. Cannot Save Info.', this.networkType, savedNetwork[this.networkType]["networkType"])
+        }else{
+          if(alertsBool){
+            alert('Network Name doesn\'t match. Cannot Save Info.', this.networkType, savedNetwork[this.networkType]["networkType"])
+          }
         }
-      }
+      }catch{}
     },
     exportContractStructureForThisNetwork(alertsBool){
       if(this.networkType){
@@ -969,6 +981,9 @@ export default {
           throw new Error(`Can't link '${libraryName}'.`);
       }
       return bytecode.replace(pattern, address);
+    },
+    sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
     }
   }
 }

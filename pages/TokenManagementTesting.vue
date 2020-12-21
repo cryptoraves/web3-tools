@@ -303,8 +303,9 @@ export default {
     this.checkAbis()
 
   },
-  mounted() {
-
+  async mounted() {
+    await this.initWeb3()
+    await this.getBalances()
   },
   methods: {
     loadNetworkData(){
@@ -364,13 +365,37 @@ export default {
         
         localStorage.networkInfo = JSON.stringify(networkInfo)
 
-       
+        this.copyToClipboard(localStorage.networkInfo)
         console.log('Network Info Saved for '+this.networkType+ ' and copied to clipboard')
         
 
       }else{
         alert('No Network Name. Cannot Export Info.')
       }
+    },
+    copyToClipboard(text) {
+        if (window.clipboardData && window.clipboardData.setData) {
+            // Internet Explorer-specific code path to prevent textarea being shown while dialog is visible.
+            return clipboardData.setData("Text", text);
+
+        }
+        else if (document.queryCommandSupported && document.queryCommandSupported("copy")) {
+            var textarea = document.createElement("textarea");
+            textarea.textContent = text;
+            textarea.style.position = "fixed";  // Prevent scrolling to bottom of page in Microsoft Edge.
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                return document.execCommand("copy");  // Security exception may be thrown by some browsers.
+            }
+            catch (ex) {
+                console.warn("Copy to clipboard failed.", ex);
+                return false;
+            }
+            finally {
+                document.body.removeChild(textarea);
+            }
+        }
     },
     checkAbis(){
       this.contractNames.forEach(function(element) {
@@ -381,6 +406,7 @@ export default {
       return true
     },
     async getBalances(){
+
       try {
         await this.getERC20Balance()
       }catch(e){
@@ -391,6 +417,12 @@ export default {
       }catch(e){
         console.log(e,'Error with init getERC721Balance')
       }
+      
+      //pause for matic's RPC limit
+      if (this.networkType == 'Matic Testnet'){
+        await this.sleep(1000)
+      }
+
       try {
         await this.getAllERC721sHeld()
       }catch(e){
@@ -453,10 +485,16 @@ export default {
       let upperLimit = await tokenManagerContract.getNextBaseId(ERC1155tokenIdForERC721)
       let ERC721WrappedBalance = 0
       let ethAddr = this.ethereumAddress
+
+      //pause for matic's RPC limit
+      if (this.networkType == 'Matic Testnet'){
+        await this.sleep(500)
+      }
       held1155s.forEach( async function(element) {
+        
         console.log(element)
         if(element.lt(upperLimit) && element.gte(ERC1155tokenIdForERC721)){
-          
+          new Promise(resolve => setTimeout(resolve, 250))
           ERC721WrappedBalance++
           console.log(element.toString(), await cryptoravesToken.balanceOf(ethAddr, element))
         }
@@ -498,22 +536,35 @@ export default {
         20,
         false
       )
-
+      
       let val = await tx.wait()
       this.ERC20balance = await token.balanceOf(this.ethereumAddress)
+
+      //pause for matic's RPC limit
+      if (this.networkType == 'Matic Testnet'){
+        await this.sleep(1000)
+      }
 
       this.ERC1155tokenIdForERC20 = localStorage.ERC1155tokenIdForERC20 = await tokenManagerContract.getManagedTokenIdByAddress(this.ERC20FullAddress)
       console.log(this.ERC1155tokenIdForERC20)
       console.log('ERC1155 Token ID: '+this.ERC1155tokenIdForERC20)
       
       let finalBalance = await cryptoravesToken.balanceOf(this.ethereumAddress, this.ERC1155tokenIdForERC20)
- 
+      
+
+
       console.log(
         "Deposit of Random Amount Successful: ", 
         (Math.round((this.ethers.utils.formatUnits(initialBalance, 18) * 1 + randAmount) * 100) / 100).toString(),
         (Math.round(this.ethers.utils.formatUnits(finalBalance, 18) * 100 ) / 100).toString()
       )
       this.setERC20Emoji()
+
+      //pause for matic's RPC limit
+      if (this.networkType == 'Matic Testnet'){
+        await this.sleep(1000)
+      }
+
       this.getBalances()
       this.showLoading = false
 
@@ -619,6 +670,12 @@ export default {
       console.log(
         "Deposit of 1 NFT Successful: Ticker: TSTY OrgId: ",heldTokens[0]
       )
+
+      //pause for matic's RPC limit
+      if (this.networkType == 'Matic Testnet'){
+        await this.sleep(1000)
+      }
+
       this.setERC721Emoji()
       this.getBalances()
       this.showLoading = false
@@ -757,6 +814,9 @@ export default {
           throw new Error(`Can't link '${libraryName}'.`);
       }
       return bytecode.replace(pattern, address);
+    },
+    sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
     }
   }
 }

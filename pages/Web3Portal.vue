@@ -314,8 +314,9 @@ export default {
     this.checkAbis()
 
   },
-  mounted() {
-
+  async mounted() {
+    await this.initWeb3()
+    await this.getBalances()
   },
   methods: {
     async deposit(){
