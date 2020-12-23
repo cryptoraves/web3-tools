@@ -313,21 +313,9 @@ export default {
   },
   async mounted() {
     await this.initWeb3()
-    /*if (localStorage.CryptoravesTokenContractAddress) this.CryptoravesTokenContractAddress = localStorage.CryptoravesTokenContractAddress
-    if (localStorage.UserManagementContractAddress) this.UserManagementContractAddress = localStorage.UserManagementContractAddress
-    if (localStorage.TokenManagementContractAddress) this.TokenManagementContractAddress = localStorage.TokenManagementContractAddress
-    if (localStorage.TransactionManagementContractAddress) this.TransactionManagementContractAddress = localStorage.TransactionManagementContractAddress
-    if (localStorage.ValidatorInterfaceContractAddress) this.ValidatorInterfaceContractAddress = localStorage.ValidatorInterfaceContractAddress 
-
-    if (localStorage.ERC20FullAddress) this.ERC20FullAddress = localStorage.ERC20FullAddress
-    if (localStorage.AdminToolsLibraryAddress) this.AdminToolsLibraryAddress = localStorage.AdminToolsLibraryAddress
-
-    if (localStorage.uri) this.uri = localStorage.uri
-*/
   },
   methods: {
     loadNetworkData(){
-      console.log(this.networkType)
       if(this.networkType){
         this.importContractStructureForThisNetwork(false)
         return true
