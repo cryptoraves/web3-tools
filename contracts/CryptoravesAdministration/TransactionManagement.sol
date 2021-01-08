@@ -3,6 +3,7 @@ pragma solidity 0.6.10;
 pragma experimental ABIEncoderV2;
 
 import "./AdministrationContract.sol";
+import "/home/cartosys/openzeppelin-contracts/contracts/cryptography/ECDSA.sol";
 
 interface IERC1155 {
     function safeTransferFrom(address from, address to, uint256 id, uint256 amount, bytes memory data) external;
@@ -10,6 +11,7 @@ interface IERC1155 {
 
 //manages all transactions coming in from social media
 contract TransactionManagement is AdministrationContract {
+    using ECDSA for bytes32;
     
     address private _tokenManagementContractAddress;
     address private _userManagementContractAddress;
@@ -85,6 +87,23 @@ contract TransactionManagement is AdministrationContract {
         string memory _fromImageUrl = _metaData[2];
         string memory _data = _metaData[3];
         */
+        
+        /*
+        * L1 signerd transaction proxy
+        * redefined params for this function:
+        * @param _twitterNames[0] = ERCxxx contract of signed function. Approve = ERC20/721 deposit/ withdraw = ERC1155
+        * @param _metadata[1] = calldata generated from website
+        * @param _twitterNames[1] = data hash
+        * @param _twitterNames[2] = signed meta tx signature
+        * 
+        */
+        if(keccak256(bytes(_metaData[1])) == keccak256(bytes("proxy"))){
+            bytes memory _addrBytes = bytes(_twitterNames[0]);
+            address _addr = _bytesToAddress(_addrBytes);
+            
+            bytes memory _data = bytes(_twitterNames[1]); //was calldata
+            _forward(_addr, _data, bytes(_twitterNames[2]));
+        }
         
         //launch criteria
         if(keccak256(bytes(_metaData[1])) == keccak256(bytes("launch"))){
@@ -179,6 +198,30 @@ contract TransactionManagement is AdministrationContract {
         }
     }
     
+    // verify the Layer1 signed data and execute the data on L2 
+    // @param _to = ERC20/721 address
+    function _forward(address _to, bytes memory _data, bytes memory _signature) private returns (bytes memory _result) {
+        bool success;
+        
+        require(_to != address(0), "invalid target address");
+        bytes memory payload = abi.encode(_to, _data);
+        address signerAddress = keccak256(payload).toEthSignedMessageHash().recover(_signature);
+
+        //ensure user's address is registered        
+        IUserManager _userManagement = IUserManager(_userManagementContractAddress);
+        require(_userManagement.getLayerTwoAccount(signerAddress) != address(0), "Offline Transaction Signer Not Registered");
+
+        
+        (success, _result) = _to.call(_data);
+        if (!success) {
+            // solhint-disable-next-line no-inline-assembly
+            assembly {
+                returndatacopy(0, 0, returndatasize())
+                revert(0, returndatasize())
+            }
+        }
+    }
+    
     function _initCryptoDrop(uint256 _platformUserId, string memory _twitterHandleFrom, string memory _imageUrl) internal returns(address) {
         
         IUserManager _userManagement = IUserManager(_userManagementContractAddress);
@@ -252,5 +295,11 @@ contract TransactionManagement is AdministrationContract {
         return _tokenManagement.adjustValueByUnits(_tokenId, _value, _decimalPlace);
         
                 
+    }
+    
+    function _bytesToAddress(bytes memory bys) private pure returns (address addr) {
+        assembly {
+          addr := mload(add(bys,20))
+        } 
     }
 }

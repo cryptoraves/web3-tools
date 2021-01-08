@@ -5,8 +5,12 @@ const TokenManagement = artifacts.require("TokenManagement");
 const UserManagement = artifacts.require("UserManagement");
 
 const CryptoravesToken = artifacts.require("CryptoravesToken");
+const ERC20Full = artifacts.require('ERC20Full')
 
 const ethers = require('ethers')
+
+const Web3 = require('web3');
+const web3 = new Web3();
 
 let secondTokenManagerAddr = ''
 let ids = []
@@ -17,6 +21,7 @@ let primaryUserId = 38845343252
 let txnMgmt2
 let usrMgmt2
 let tknMgmt2
+
 
 contract("ValidatorInterfaceContract", async accounts => {
   
@@ -78,7 +83,83 @@ contract("ValidatorInterfaceContract", async accounts => {
         "Token Manager Address not valid: "+txnManagerAddr
       );
     });
+    it("run heresMyAddress", async () => {
+      let instance = await ValidatorInterfaceContract.deployed()
+      let txnManagerAddr = await instance.getTransactionManagementAddress()
+      
+      var bytes = ethers.utils.formatBytes32String('')
 
+      let additionalAccount = accounts[7]
+      
+      let res = await instance.validateCommand(
+        [primaryUserId,0,0],
+        ['@fakeHandle', '', ''],
+        [0,0],
+        ['twitter','mapaccount','https://i.picsum.photos/id/2/200/200.jpg', additionalAccount]
+      )
+
+      let instanceTransactionManagement = await TransactionManagement.at(
+        await instance.getTransactionManagementAddress()
+      )
+      let instanceUserManagement = await UserManagement.at(
+        await instanceTransactionManagement.getUserManagementAddress()
+      )
+
+      let l2Address = await instanceUserManagement.getLayerTwoAccount(additionalAccount)
+      let user = await instanceUserManagement.getUserAccount(primaryUserId)
+      assert.equal(l2Address, user, 'L1 address mapped to non-matching l2 address');
+    });
+    it("inits and sends erc20", async () => {
+      let additionalAccount = accounts[7]
+      let instance = await ValidatorInterfaceContract.deployed()
+      let instanceTransactionManagement = await TransactionManagement.at(
+        await instance.getTransactionManagementAddress()
+      )
+      // Launch an ERC20 and deposit some to instantiate onto Cryptoraves. Then send some to Twitter user L1
+      let instanceTokenManagement = await TokenManagement.at(
+        await instanceTransactionManagement.getTokenManagementAddress()
+      )
+
+      let erc20Instance = await ERC20Full.deployed()  
+      let appr = await erc20Instance.approve(
+        instanceTokenManagement.address,
+        ethers.utils.parseUnits('1',18)
+      )
+      await instanceTokenManagement.deposit(
+        ethers.utils.parseUnits('1',18), 
+        erc20Instance.address,
+        20, //indicates ERC20
+        false
+      )
+      let tokenId1155 = await instanceTokenManagement.getManagedTokenIdByAddress(erc20Instance.address)
+      let amt = ethers.utils.parseUnits('111',18)
+      appr = await erc20Instance.approve(
+        additionalAccount,
+        amt
+      )
+      appr = await erc20Instance.transfer(
+        additionalAccount,
+        amt
+      )
+      res = await erc20Instance.balanceOf(additionalAccount)
+
+      assert.ok(res >= amt, 'ERC20 deposit and send went awry')
+    });
+    it("Sign and send ERC20 deposit to proxy", async () => {
+      let additionalAccount = accounts[7]
+      let instance = await ValidatorInterfaceContract.deployed()
+      let instanceTransactionManagement = await TransactionManagement.at(
+        await instance.getTransactionManagementAddress()
+      )
+      let instanceTokenManagement = await TokenManagement.at(
+        await instanceTransactionManagement.getTokenManagementAddress()
+      )
+      
+      //create and sign transaction
+      instanceTokenManagement.deposit()
+
+
+    });
     it("get held token balances", async () => {
       let instance = await ValidatorInterfaceContract.deployed()
 

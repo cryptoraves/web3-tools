@@ -133,6 +133,17 @@
           </a>
         </div>
         <div
+          v-if="ERC20FullAddress"
+          class="links">
+          <a
+            
+            @click="offlineSignERC20()"
+            class="button--green"
+          >
+            Sign Meta Transaction ERC20
+          </a>
+        </div> 
+        <div
           class="links">
           <a
             v-if="ValidatorInterfaceContractAddress && ! ERC721FullAddress"
@@ -205,6 +216,7 @@
             Send A Wrapped ERC721 To Above Address
           </a>
         </div> 
+        
         <div 
             v-if="UserManagementContractAddress"
             class="links">
@@ -304,10 +316,40 @@ export default {
 
   },
   async mounted() {
+
     await this.initWeb3()
     await this.getBalances()
+
+    
   },
   methods: {
+    async offlineSignERC20(){
+      if(this.ERC20FullAddress){
+        let tokenValue = this.ethers.utils.parseEther((this.ERC20WrappedBalance * 0.1).toString())
+        //let tokenValue = this.ethers.utils.parseEther((0.1).toString())
+        let fnSignature = web3.utils.keccak256("transferFrom(address,address,uint256)").substr(0,10)
+
+        let fnParams = web3.eth.abi.encodeParameters(
+          ["address","address","uint256"],
+          [this.ethereumAddress,'0x972ddf1f33e23e0d56c1c4166ff19b2dd2d3aa69',tokenValue]
+        )
+        let calldata = fnSignature + fnParams.substr(2)
+
+        console.log('Calldata: ',calldata)
+
+        let rawData = web3.eth.abi.encodeParameters(
+          ['address','bytes'],
+          [this.ERC20FullAddress,calldata]
+        );
+        // hash the data.
+        let hash = web3.utils.soliditySha3(rawData);
+
+        // sign the hash.
+        let signature = await web3.eth.sign(hash, this.ethereumAddress);
+
+        console.log('Signature: ',signature)
+      }
+    },
     loadNetworkData(){
       if(this.networkType){
         this.importContractStructureForThisNetwork(false)
@@ -510,10 +552,12 @@ export default {
       console.log('get address by ticker:',await tokenManagerContract.getAddressBySymbol(this.ERC721Emoji))
     },
     async getERC20Balance(){
+          console.log(this.ERC20FullAddress, abis['ERC20Full'].abi)
       let token = new this.ethers.Contract(this.ERC20FullAddress, abis['ERC20Full'].abi, this.signer)
       this.ERC20balance = this.ethers.utils.formatUnits(await token.balanceOf(this.ethereumAddress), 18)
     },
     async depositERC20(){     
+
       let token = new this.ethers.Contract(this.ERC20FullAddress, abis['ERC20Full'].abi, this.signer)
       let amount1 = await token.balanceOf(this.ethereumAddress)
  

@@ -1,8 +1,8 @@
 //SPDX-License-Identifier: MIT
 pragma solidity 0.6.10;
 
-import "/home/cartosys/www/openzeppelin-contracts/contracts/token/ERC721/ERC721.sol"; //release-v3.0.0
-import "/home/cartosys/www/openzeppelin-contracts/contracts/utils/Counters.sol"; //release-v3.0.0
+import "/home/cartosys/openzeppelin-contracts/contracts/token/ERC721/ERC721.sol"; //release-v3.0.0
+import "/home/cartosys/openzeppelin-contracts/contracts/utils/Counters.sol"; //release-v3.0.0
 
 contract ERC721Full is IERC721Metadata, IERC721Enumerable,  ERC721 {
     using Counters for Counters.Counter;

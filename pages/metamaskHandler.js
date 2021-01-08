@@ -8,7 +8,10 @@ export default {
       ethereumAddress: null,
       networkType: null,
       blockExplorerUrl: null,
-      ethBlockExplorerUrl: null
+      ethBlockExplorerUrl: null,
+      ethereumProvider: null,
+      signer: null,
+      web3js: null
     }
   },
   methods: {
