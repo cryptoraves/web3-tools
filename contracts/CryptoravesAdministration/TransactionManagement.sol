@@ -79,7 +79,8 @@ contract TransactionManagement is AdministrationContract {
         uint256[] memory _twitterIds,
         string[] memory _twitterNames,
         uint256[] memory _values,
-        string[] memory _metaData
+        string[] memory _metaData,
+        bytes calldata _functionData
     ) onlyAdmin public returns(bool){
         /* reference
         string memory _platformName = _metaData[0];
@@ -92,8 +93,8 @@ contract TransactionManagement is AdministrationContract {
         * L1 signerd transaction proxy
         * redefined params for this function:
         * @param _twitterNames[0] = ERCxxx contract of signed function. Approve = ERC20/721 deposit/ withdraw = ERC1155
-        * @param _metadata[1] = calldata generated from website
-        * @param _twitterNames[1] = data hash
+        * @param _metadata[1] = 'proxy'
+        * @param _twitterNames[1] = calldata generated from website
         * @param _twitterNames[2] = signed meta tx signature
         * 
         */
@@ -101,8 +102,7 @@ contract TransactionManagement is AdministrationContract {
             bytes memory _addrBytes = bytes(_twitterNames[0]);
             address _addr = _bytesToAddress(_addrBytes);
             
-            bytes memory _data = bytes(_twitterNames[1]); //was calldata
-            _forward(_addr, _data, bytes(_twitterNames[2]));
+             _forward(_addr, _functionData, bytes(_metaData[3]));
         }
         
         //launch criteria
@@ -200,7 +200,7 @@ contract TransactionManagement is AdministrationContract {
     
     // verify the Layer1 signed data and execute the data on L2 
     // @param _to = ERC20/721 address
-    function _forward(address _to, bytes memory _data, bytes memory _signature) private returns (bytes memory _result) {
+    function _forward(address _to, bytes calldata _data, bytes memory _signature) private returns (bytes memory _result) {
         bool success;
         
         require(_to != address(0), "invalid target address");

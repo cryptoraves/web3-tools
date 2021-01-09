@@ -9,8 +9,9 @@ const ERC20Full = artifacts.require('ERC20Full')
 
 const ethers = require('ethers')
 
-const Web3 = require('web3');
-const web3 = new Web3();
+const Web3 = require('web3')
+const web3 = new Web3()
+web3.setProvider(new web3.providers.HttpProvider())
 
 let secondTokenManagerAddr = ''
 let ids = []
@@ -39,7 +40,8 @@ contract("ValidatorInterfaceContract", async accounts => {
       	[primaryUserId,0,0],
       	['@fakeHandle', '', ''],
         [0,0],
-      	['twitter','launch','https://i.picsum.photos/id/1/200/200.jpg', bytes]
+      	['twitter','launch','https://i.picsum.photos/id/1/200/200.jpg', bytes],
+        bytes
       )
       assert.isOk(res);
     });
@@ -50,7 +52,8 @@ contract("ValidatorInterfaceContract", async accounts => {
       	[primaryUserId,434443434,0],
       	['@fakeHandle', '@rando1', ''],
         [20074,2], //this represents a user-input value of 200.74 
-      	['twitter','transfer','https://i.picsum.photos/id/1/200/200.jpg', bytes]
+      	['twitter','transfer','https://i.picsum.photos/id/1/200/200.jpg', bytes],
+        bytes
       )
       assert.isOk(res.receipt['status']);
     });
@@ -61,14 +64,16 @@ contract("ValidatorInterfaceContract", async accounts => {
       	[434443434,55667788,0],
       	['@rando1', '@rando2', ''],
         [50,0],
-      	['twitter','transfer','https://i.picsum.photos/id/2/200/200.jpg', bytes]
+      	['twitter','transfer','https://i.picsum.photos/id/2/200/200.jpg', bytes],
+        bytes
       )
       assert.isOk(res.receipt['status']);
       res = await instance.validateCommand(
       	[434443434,primaryUserId,0],
       	['@rando1', '@rando2', ''],
         [50,0],
-      	['twitter','transfer','https://i.picsum.photos/id/2/200/200.jpg', bytes]
+      	['twitter','transfer','https://i.picsum.photos/id/2/200/200.jpg', bytes],
+        bytes
       )
       assert.isOk(res.receipt['status']);
     });
@@ -95,7 +100,8 @@ contract("ValidatorInterfaceContract", async accounts => {
         [primaryUserId,0,0],
         ['@fakeHandle', '', ''],
         [0,0],
-        ['twitter','mapaccount','https://i.picsum.photos/id/2/200/200.jpg', additionalAccount]
+        ['twitter','mapaccount','https://i.picsum.photos/id/2/200/200.jpg', additionalAccount],
+        bytes
       )
 
       let instanceTransactionManagement = await TransactionManagement.at(
@@ -146,7 +152,7 @@ contract("ValidatorInterfaceContract", async accounts => {
       assert.ok(res >= amt, 'ERC20 deposit and send went awry')
     });
     it("Sign and send ERC20 deposit to proxy", async () => {
-      let additionalAccount = accounts[7]
+      let signerAccount = accounts[7]
       let instance = await ValidatorInterfaceContract.deployed()
       let instanceTransactionManagement = await TransactionManagement.at(
         await instance.getTransactionManagementAddress()
@@ -154,10 +160,62 @@ contract("ValidatorInterfaceContract", async accounts => {
       let instanceTokenManagement = await TokenManagement.at(
         await instanceTransactionManagement.getTokenManagementAddress()
       )
+      let erc20Instance = await ERC20Full.deployed()  
       
-      //create and sign transaction
-      instanceTokenManagement.deposit()
+      //create and sign transaction for instanceTokenManagement.deposit()
 
+      let fnSignature = web3.utils.keccak256("deposit(uint256,address,uint,bool)").substr(0,10)
+
+      let amount = ethers.utils.parseUnits('11',18)
+
+      let fnParams = web3.eth.abi.encodeParameters(
+        ["uint256","address","uint", "bool"],
+        [
+          amount, //_amountOrId
+          erc20Instance.address, //_contract
+          20, //_ercType
+          true //_managedTransfer. True because we want the deposit to go straight to the Cryptoraves managed wallet
+        ]
+      )
+      let calldata = fnSignature + fnParams.substr(2)
+
+      console.log('Calldata: ',calldata)
+
+      let rawData = web3.eth.abi.encodeParameters(
+        ['address','bytes'],
+        [instanceTokenManagement.address,calldata]
+      );
+      // hash the data.
+      let hash = web3.utils.soliditySha3(rawData);
+
+      // sign the hash.
+      let signature = await web3.eth.sign(hash, signerAccount)
+
+      console.log('Signature: ',signature)
+      assert.ok(signature.startsWith('0x'), 'Offline Signature failed')
+
+      //now send the signed transaction ad cryptoraves Admin
+      let res = await instance.validateCommand(
+        [0,0,0], 
+        [erc20Instance.address, '', ''], 
+        [0,0], 
+        ['twitter','proxy','', signature],
+        calldata)
+
+      console.log(res)
+      /*console.log(erc20Instance.address)
+      console.log(signerAccount)
+      console.log(accounts[0])
+      console.log(res.receipt.logs)
+      console.log(res.receipt.rawLogs)
+      */
+      assert.ok(
+        res.receipt.from == accounts[0] &&
+        res.tx.startsWith('0x')
+        , 
+        'Proxy tx execution failed'
+      )
+      
 
     });
     it("get held token balances", async () => {
@@ -182,8 +240,8 @@ contract("ValidatorInterfaceContract", async accounts => {
 
         amounts[i] = ethers.utils.parseUnits(rInt,18)
         let uri = 'https://i.picsum.photos/id/'+ids[i].toString()+'/200/200.jpg'
-        await instance.validateCommand([ids[i],0,0], ['@rando'+ids[i].toString(), '', ''], [0,0], ['twitter','launch',uri, bytes])
-        await instance.validateCommand([ids[i],primaryUserId,0], ['@rando'+ids[i].toString(), '@fakeHandle', ''], [amounts[i],18], ['twitter','transfer',uri, bytes])
+        await instance.validateCommand([ids[i],0,0], ['@rando'+ids[i].toString(), '', ''], [0,0], ['twitter','launch',uri, bytes], bytes)
+        await instance.validateCommand([ids[i],primaryUserId,0], ['@rando'+ids[i].toString(), '@fakeHandle', ''], [amounts[i],18], ['twitter','transfer',uri, bytes], bytes)
       }
       let primaryUserAccount = await instanceUserManagement.getUserAccount(primaryUserId)
       let instanceCryptoravesToken = await CryptoravesToken.at(

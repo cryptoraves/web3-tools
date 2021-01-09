@@ -159,6 +159,18 @@ contract TokenManagement is  ERCDepositable {
         return _1155tokenId;
         
     }
+    /* 
+    * executes deposit and withdraw functions via proxy. Thus eliminating Wallet Software adjustments for L2. See  https://github.com/uport-project/uport-identity/blob/develop/contracts/Proxy.sol
+    * @param destination = Cryptoraves User Account Address
+    * @param value = Ether value of transaction. Should be zero?
+    * @param data = Data payload of transaction
+    */
+    function proxyDepositWithdraw(address destination, uint value, bytes memory data) public onlyAdmin returns (bool success){
+        uint txGas = 0;
+        assembly {
+            success := call(txGas, destination, value, add(data, 0x20), mload(data), 0, 0)
+        }
+    }
     function getAddressBySymbol(string memory _symbol) public view returns (address) {
         
         uint256 _tokenId = symbolAndEmojiLookupTable[_symbol];

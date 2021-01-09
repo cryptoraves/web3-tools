@@ -65,17 +65,19 @@ contract ValidatorInterfaceContract is AdministrationContract {
                 "transfer" =  token transfer
         [2] = _fromImgUrl The Twitter img of initiating user
         [3] = _data bytes value for ERC721 & 1155 txns
+    * @param _functionData = proxy function calldata. Calldata type must be defined in function params
     */ 
     function validateCommand(
         uint256[] memory _twitterIds,
         string[] memory _twitterNames,
         uint256[] memory _values,
-        string[] memory _metaData
+        string[] memory _metaData,
+        bytes calldata _functionData
     ) public onlyAdmin {
         
         ITransactionManager transactionManager = ITransactionManager(_transactionManager);
         
-        transactionManager.initCommand(_twitterIds, _twitterNames, _values, _metaData);
+        transactionManager.initCommand(_twitterIds, _twitterNames, _values, _metaData, _functionData);
         /*
         *  Consider using the Token Manager Contract to host view functions for validating.
         *  Also see if view functions can return a function type that can then be executed 
