@@ -5,7 +5,7 @@ pragma experimental ABIEncoderV2;
 import "./AdminToolsLibrary.sol";
 
 interface ITransactionManager {
-    function initCommand(uint256[] memory, string[] memory, uint256[] memory, string[] memory, bytes calldata) external returns(bool);
+    function initCommand(uint256[] memory, string[] memory, bytes[] memory, bytes calldata) external returns(bool);
     function testForTransactionManagementAddressUniquely() external pure returns(bool);
     function getUserL1AccountFromL2Account(address) external view returns(address);
     function getUserL2AccountFromL1Account(address) external view returns(address);

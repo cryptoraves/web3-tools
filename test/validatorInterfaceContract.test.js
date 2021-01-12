@@ -37,10 +37,9 @@ contract("ValidatorInterfaceContract", async accounts => {
       let instance = await ValidatorInterfaceContract.deployed()
       var bytes = ethers.utils.formatBytes32String('')
       let res = await instance.validateCommand(
-      	[primaryUserId,0,0],
-      	['@fakeHandle', '', ''],
-        [0,0],
-      	['twitter','launch','https://i.picsum.photos/id/1/200/200.jpg', bytes],
+      	[primaryUserId,0,0,0,0],
+      	['@fakeHandle', '', '','twitter','launch','https://i.picsum.photos/id/1/200/200.jpg'],
+      	[bytes],
         bytes
       )
       assert.isOk(res);
@@ -49,10 +48,9 @@ contract("ValidatorInterfaceContract", async accounts => {
       let instance = await ValidatorInterfaceContract.deployed()
   	  var bytes = ethers.utils.formatBytes32String('')
       let res = await instance.validateCommand(
-      	[primaryUserId,434443434,0],
-      	['@fakeHandle', '@rando1', ''],
-        [20074,2], //this represents a user-input value of 200.74 
-      	['twitter','transfer','https://i.picsum.photos/id/1/200/200.jpg', bytes],
+      	[primaryUserId,434443434,0,20074,2], //20074,2 represents a user-input value of 200.74 
+      	['@fakeHandle', '@rando1', '','twitter','transfer','https://i.picsum.photos/id/1/200/200.jpg'],
+      	[bytes],
         bytes
       )
       assert.isOk(res.receipt['status']);
@@ -61,18 +59,16 @@ contract("ValidatorInterfaceContract", async accounts => {
       let instance = await ValidatorInterfaceContract.deployed()
       var bytes = ethers.utils.formatBytes32String('')
       let res = await instance.validateCommand(
-      	[434443434,55667788,0],
-      	['@rando1', '@rando2', ''],
-        [50,0],
-      	['twitter','transfer','https://i.picsum.photos/id/2/200/200.jpg', bytes],
+      	[434443434,55667788,0,50,0],
+      	['@rando1', '@rando2', '','twitter','transfer','https://i.picsum.photos/id/2/200/200.jpg'],
+      	[bytes],
         bytes
       )
       assert.isOk(res.receipt['status']);
       res = await instance.validateCommand(
-      	[434443434,primaryUserId,0],
-      	['@rando1', '@rando2', ''],
-        [50,0],
-      	['twitter','transfer','https://i.picsum.photos/id/2/200/200.jpg', bytes],
+      	[434443434,primaryUserId,0,50,0],
+      	['@rando1', '@rando2', '','twitter','transfer','https://i.picsum.photos/id/2/200/200.jpg'],
+      	[bytes],
         bytes
       )
       assert.isOk(res.receipt['status']);
@@ -97,10 +93,9 @@ contract("ValidatorInterfaceContract", async accounts => {
       let additionalAccount = accounts[7]
       
       let res = await instance.validateCommand(
-        [primaryUserId,0,0],
-        ['@fakeHandle', '', ''],
-        [0,0],
-        ['twitter','mapaccount','https://i.picsum.photos/id/2/200/200.jpg', additionalAccount],
+        [primaryUserId,0,0,0,0],
+        ['@fakeHandle', '', '', 'twitter','mapaccount','https://i.picsum.photos/id/2/200/200.jpg',additionalAccount],
+        [],
         bytes
       )
 
@@ -196,10 +191,9 @@ contract("ValidatorInterfaceContract", async accounts => {
 
       //now send the signed transaction ad cryptoraves Admin
       let res = await instance.validateCommand(
-        [0,0,0], 
-        [erc20Instance.address, '', ''], 
-        [0,0], 
-        ['twitter','proxy','', signature],
+        [0,0,0,0,0], 
+        [erc20Instance.address, '', '', 'twitter','proxy',''], 
+        [signature],
         calldata)
 
       console.log(res)
@@ -240,8 +234,8 @@ contract("ValidatorInterfaceContract", async accounts => {
 
         amounts[i] = ethers.utils.parseUnits(rInt,18)
         let uri = 'https://i.picsum.photos/id/'+ids[i].toString()+'/200/200.jpg'
-        await instance.validateCommand([ids[i],0,0], ['@rando'+ids[i].toString(), '', ''], [0,0], ['twitter','launch',uri, bytes], bytes)
-        await instance.validateCommand([ids[i],primaryUserId,0], ['@rando'+ids[i].toString(), '@fakeHandle', ''], [amounts[i],18], ['twitter','transfer',uri, bytes], bytes)
+        await instance.validateCommand([ids[i],0,0,0,0], ['@rando'+ids[i].toString(), '', '', 'twitter','launch',uri], [bytes], bytes)
+        await instance.validateCommand([ids[i],primaryUserId,0, amounts[i],18], ['@rando'+ids[i].toString(), '@fakeHandle', '','twitter','transfer',uri], [bytes], bytes)
       }
       let primaryUserAccount = await instanceUserManagement.getUserAccount(primaryUserId)
       let instanceCryptoravesToken = await CryptoravesToken.at(

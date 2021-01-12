@@ -59,62 +59,63 @@ contract TransactionManagement is AdministrationContract {
         
     /*
     * check incoming parsed Tweet data for valid command
-    * @param _twitterIds [0] = twitterIdFrom, [1] = twitterIdTo, [2] = twitterIdThirdParty
-    * @param _twitterNames [0] = twitterHandleFrom, [1] = twitterHandleTo, [2] = thirdPartyName
-    * @param _values 
-        [0] amount or id of token to transfer -- integers of any decimal value. eg 1.31 = 131, 12321.989293 = 12321989293, 1000 = 1000 etc
-        [1] where the decimal place lies: 1.31 = 2, 12321.989293 = 6, 1000 = 0 etc
-    * @param _metaData: 
-        [0] = _platformName:
+    * @param _twitterInts [0] = twitterIdFrom, [1] = twitterIdTo, [2] = twitterIdThirdParty
+        [3] amount or id of token to transfer -- integers of any decimal value. eg 1.31 = 131, 12321.989293 = 12321989293, 1000 = 1000 etc
+        [4] where the decimal place lies: 1.31 = 2, 12321.989293 = 6, 1000 = 0 etc
+    * @param _twitterStrings [0] = twitterHandleFrom, [1] = twitterHandleTo, [2] = thirdPartyName
+        [3] = _platformName:
             "twitter"
             "instagram
             etc
-        [1] = _txnType lstring indicating type of transaction:
+        [4] = _txnType lstring indicating type of transaction:
                 "launch" = new toke n launch
                 "transfer" =  token transfer
-        [2] = _fromImgUrl The Twitter img of initiating user
-        [3] = _data bytes value for ERC721 & 1155 txns
+        [5] = _fromImgUrl The Twitter img of initiating user
+        [6] = map account L1 Address
+        
+    * @param _metaData: 
+        [0] = _data bytes value for ERC721 & 1155 txns
+    * @param _functionData = proxy function calldata. Calldata type must be defined in function params
     */ 
     function initCommand(
-        uint256[] memory _twitterIds,
-        string[] memory _twitterNames,
-        uint256[] memory _values,
-        string[] memory _metaData,
+        uint256[] memory _twitterInts,
+        string[] memory _twitterStrings,
+        bytes[] memory _metaData,
         bytes calldata _functionData
     ) onlyAdmin public returns(bool){
         /* reference
-        string memory _platformName = _metaData[0];
-        string memory _txnType = _metaData[1];
-        string memory _fromImageUrl = _metaData[2];
-        string memory _data = _metaData[3];
+        string memory _platformName = _twitterStrings[3];
+        string memory _txnType = _twitterStrings[4];
+        string memory _fromImageUrl = _twitterStrings[5];
+        string memory _data = _metaData[0];
         */
         
         /*
         * L1 signerd transaction proxy
         * redefined params for this function:
-        * @param _twitterNames[0] = ERCxxx contract of signed function. Approve = ERC20/721 deposit/ withdraw = ERC1155
-        * @param _metadata[1] = 'proxy'
-        * @param _twitterNames[1] = calldata generated from website
-        * @param _twitterNames[2] = signed meta tx signature
+        * @param _twitterStrings[0] = ERCxxx contract of signed function. Approve = ERC20/721 deposit/ withdraw = ERC1155
+        * @param _twitterStrings[4] = 'proxy'
+        * @param _twitterStrings[1] = calldata generated from website
+        * @param _twitterStrings[2] = signed meta tx signature
         * 
         */
-        if(keccak256(bytes(_metaData[1])) == keccak256(bytes("proxy"))){
-            bytes memory _addrBytes = bytes(_twitterNames[0]);
+        if(keccak256(bytes(_twitterStrings[4])) == keccak256(bytes("proxy"))){
+            bytes memory _addrBytes = bytes(_twitterStrings[0]);
             address _addr = _bytesToAddress(_addrBytes);
             
-             _forward(_addr, _functionData, bytes(_metaData[3]));
+             _forward(_addr, _functionData, _metaData[0]);
         }
         
         //launch criteria
-        if(keccak256(bytes(_metaData[1])) == keccak256(bytes("launch"))){
-            _initCryptoDrop(_twitterIds[0], _twitterNames[0], _metaData[2]);
+        if(keccak256(bytes(_twitterStrings[4])) == keccak256(bytes("launch"))){
+            _initCryptoDrop(_twitterInts[0], _twitterStrings[0], _twitterStrings[5]);
         }
         
         //map layer 1 account
-        if(keccak256(bytes(_metaData[1])) == keccak256(bytes("mapaccount"))){
+        if(keccak256(bytes(_twitterStrings[4])) == keccak256(bytes("mapaccount"))){
             IUserManager _userManagement = IUserManager(_userManagementContractAddress);
-            address _fromAddress = _userManagement.userAccountCheck(_twitterIds[0], _twitterNames[0], _metaData[2]);
-            address _layer1Address = AdminToolsLibrary.parseAddr(_metaData[3]);
+            address _fromAddress = _userManagement.userAccountCheck(_twitterInts[0], _twitterStrings[0], _twitterStrings[5]);
+            address _layer1Address = AdminToolsLibrary.parseAddr(_twitterStrings[6]);
             require(_layer1Address != address(0), 'Invalid address given for L1 account mapping');
             _userManagement.mapLayerOneAccount(_fromAddress, _layer1Address);
             
@@ -122,29 +123,29 @@ contract TransactionManagement is AdministrationContract {
         }
         
         //hybrid launch and map
-        if(keccak256(bytes(_metaData[1])) == keccak256(bytes("launchAndMap"))){
-            address _layer1Address = AdminToolsLibrary.parseAddr(_metaData[3]);
+        if(keccak256(bytes(_twitterStrings[4])) == keccak256(bytes("launchAndMap"))){
+            address _layer1Address = AdminToolsLibrary.parseAddr(_twitterStrings[6]);
             require(_layer1Address != address(0), 'Invalid address given for L1 account mapping');
             
-            _initCryptoDrop(_twitterIds[0], _twitterNames[0], _metaData[2]);
+            _initCryptoDrop(_twitterInts[0], _twitterStrings[0], _twitterStrings[3]);
             
              IUserManager _userManagement = IUserManager(_userManagementContractAddress);
-            address _fromAddress = _userManagement.getUserAccount(_twitterIds[0]);
+            address _fromAddress = _userManagement.getUserAccount(_twitterInts[0]);
             _userManagement.mapLayerOneAccount(_fromAddress, _layer1Address);
             
             emit HeresMyAddress(_layer1Address, _fromAddress);
         }
         
         //transfers
-        if(keccak256(bytes(_metaData[1])) == keccak256(bytes("transfer"))){
+        if(keccak256(bytes(_twitterStrings[4])) == keccak256(bytes("transfer"))){
             
             IUserManager _userManagement = IUserManager(_userManagementContractAddress);
             
-            require(_userManagement.isUser(_twitterIds[0]), 'Initiating Twitter user is not a Cryptoraves user');
+            require(_userManagement.isUser(_twitterInts[0]), 'Initiating Twitter user is not a Cryptoraves user');
             
             //get addresses
-            address _fromAddress = _userManagement.userAccountCheck(_twitterIds[0], _twitterNames[0], _metaData[2]);
-            address _toAddress = _userManagement.userAccountCheck(_twitterIds[1], _twitterNames[1], '');
+            address _fromAddress = _userManagement.userAccountCheck(_twitterInts[0], _twitterStrings[0], _twitterStrings[5]);
+            address _toAddress = _userManagement.userAccountCheck(_twitterInts[1], _twitterStrings[1], '');
             
             uint256 _tokenId;
             address _userAccount;
@@ -152,18 +153,18 @@ contract TransactionManagement is AdministrationContract {
             ITokenManager _tokenManagement = ITokenManager(_tokenManagementContractAddress);
             
             //transfer type check
-            if(_twitterIds[2] == 0){
+            if(_twitterInts[2] == 0){
                 
-                _userAccount = _userManagement.getUserAccount(_twitterIds[0]);
+                _userAccount = _userManagement.getUserAccount(_twitterInts[0]);
                 
                 //check if a ticker is being used
-                bytes memory ticker = bytes(_twitterNames[2]); // Uses memory
+                bytes memory ticker = bytes(_twitterStrings[2]); // Uses memory
                 
                 if (ticker.length != 0) {
                     
 
                     //get token by ticker name
-                    address _addr = _tokenManagement.getAddressBySymbol(_twitterNames[2]);
+                    address _addr = _tokenManagement.getAddressBySymbol(_twitterStrings[2]);
                     _tokenId = _tokenManagement.getManagedTokenIdByAddress(_addr);
                     
                     
@@ -175,9 +176,9 @@ contract TransactionManagement is AdministrationContract {
             } else {
                 
                 //user transfer using non-cryptoraves tokens
-                _userAccount = _userManagement.getUserAccount(_twitterIds[2]);
+                _userAccount = _userManagement.getUserAccount(_twitterInts[2]);
                 
-                require(_userAccount!=address(0), 'Third party token given--with username method--does not exist in system');
+                require(_userAccount!=address(0), 'Third party token given--with platform user id method--does not exist in system');
                     //not a dropped token attempted to be transferred. Check for 
                 _tokenId = _tokenManagement.getManagedTokenIdByAddress(_userAccount);
                 
@@ -187,13 +188,13 @@ contract TransactionManagement is AdministrationContract {
             
             //nft id adjustment
             if(_tokenManagement.getERCtype(_tokenId) == 721){
-                _tokenId = _tokenId + _values[0];
+                _tokenId = _tokenId + _twitterInts[3];
                 _adjustedValue = 1;
             }else{
-                _adjustedValue = _adjustValueByUnits(_tokenId, _values[0], _values[1]);
+                _adjustedValue = _adjustValueByUnits(_tokenId, _twitterInts[3], _twitterInts[4]);
             }
 
-            bytes memory mData = AdminToolsLibrary.stringToBytes(_metaData[3]);
+            bytes memory mData = _metaData[0];
             _tokenManagement.managedTransfer(_fromAddress, _toAddress, _tokenId, _adjustedValue, mData);
         }
     }

@@ -51,11 +51,9 @@ contract ValidatorInterfaceContract is AdministrationContract {
     /*
     * check incoming parsed Tweet data for valid command
     * @param _twitterIds [0] = twitterIdFrom, [1] = twitterIdTo, [2] = twitterIdThirdParty
-    * @param _twitterNames [0] = twitterHandleFrom, [1] = twitterHandleTo, [2] = thirdPartyName
-    * @param _values 
-        [0] amount or id of token to transfer -- integers of any decimal value. eg 1.31 = 131, 12321.989293 = 12321989293, 1000 = 1000 etc
-        [1] where the decimal place lies: 1.31 = 2, 12321.989293 = 6, 1000 = 0 etc
-    * @param _metaData: 
+        [3] amount or id of token to transfer -- integers of any decimal value. eg 1.31 = 131, 12321.989293 = 12321989293, 1000 = 1000 etc
+        [4] where the decimal place lies: 1.31 = 2, 12321.989293 = 6, 1000 = 0 etc
+    * @param _twitterStrings [0] = twitterHandleFrom, [1] = twitterHandleTo, [2] = thirdPartyName
         [0] = _platformName:
             "twitter"
             "instagram
@@ -65,19 +63,20 @@ contract ValidatorInterfaceContract is AdministrationContract {
                 "transfer" =  token transfer
         [2] = _fromImgUrl The Twitter img of initiating user
         [3] = _data bytes value for ERC721 & 1155 txns
+    * @param _metaData: 
+        
     * @param _functionData = proxy function calldata. Calldata type must be defined in function params
     */ 
     function validateCommand(
-        uint256[] memory _twitterIds,
-        string[] memory _twitterNames,
-        uint256[] memory _values,
-        string[] memory _metaData,
+        uint256[] memory _twitterInts,
+        string[] memory _twitterStrings,
+        bytes[] memory _metaData,
         bytes calldata _functionData
     ) public onlyAdmin {
         
         ITransactionManager transactionManager = ITransactionManager(_transactionManager);
         
-        transactionManager.initCommand(_twitterIds, _twitterNames, _values, _metaData, _functionData);
+        transactionManager.initCommand(_twitterInts, _twitterStrings, _metaData, _functionData);
         /*
         *  Consider using the Token Manager Contract to host view functions for validating.
         *  Also see if view functions can return a function type that can then be executed 
