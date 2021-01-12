@@ -192,8 +192,8 @@ contract("ValidatorInterfaceContract", async accounts => {
       //now send the signed transaction ad cryptoraves Admin
       let res = await instance.validateCommand(
         [0,0,0,0,0], 
-        [erc20Instance.address, '', '', 'twitter','proxy',''], 
-        [signature],
+        ['', '', '', 'twitter','proxy',''], 
+        [signature, erc20Instance.address],
         calldata)
 
       console.log(res)

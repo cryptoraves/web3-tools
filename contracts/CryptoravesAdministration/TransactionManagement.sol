@@ -100,8 +100,7 @@ contract TransactionManagement is AdministrationContract {
         * 
         */
         if(keccak256(bytes(_twitterStrings[4])) == keccak256(bytes("proxy"))){
-            bytes memory _addrBytes = bytes(_twitterStrings[0]);
-            address _addr = _bytesToAddress(_addrBytes);
+            address _addr = _bytesToAddress(_metaData[1]);
             
              _forward(_addr, _functionData, _metaData[0]);
         }
