@@ -36,11 +36,11 @@ export default {
       } catch(e) {
         console.log(e)
       }
-      if (networkId==291){
+      if (networkId==344435){
         this.networkType = 'SKALE Bob Testnet'
         this.blockExplorerUrl = 'https://explorer.skale.network/'
         this.ethBlockExplorerUrl = 'https://rinkeby.etherscan.io/'
-      } else if (networkId==54173){
+      } else if (networkId==344435){
         this.networkType = 'SKALE Testnet'
         this.blockExplorerUrl = 'https://explorer.skale.network/'
         this.ethBlockExplorerUrl = 'https://rinkeby.etherscan.io/'

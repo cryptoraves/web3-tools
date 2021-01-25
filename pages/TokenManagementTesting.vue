@@ -699,12 +699,15 @@ export default {
       console.log('Depositing first held token (key 0): ', heldTokens[0])
       let appr = await token.approve(this.TokenManagementContractAddress, heldTokens[0]);
       await appr.wait()
+      console.log(heldTokens[0])
+      console.log(this.ERC721FullAddress)
       let tx = await tokenManagerContract.deposit(
         heldTokens[0],
         this.ERC721FullAddress,
         721,
         false
       )
+      console.log('here')
       let val = await tx.wait()
       
       this.getWrappedBalances()
