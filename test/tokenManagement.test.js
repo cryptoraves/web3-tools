@@ -19,11 +19,20 @@ contract("TokenManagement", async accounts => {
           to: ethers.Wallet.createRandom().address,
           value: 1
       };
-      console.log(await web3.eth.getBalance(accounts[0]))
-      start()
+      
+      let balance1 = await web3.eth.getBalance(accounts[0])
+      balance1 =parseInt(balance1.substr(-5))
+      //start()
       await web3.eth.sendTransaction(params)
-      end()
-      console.log(await web3.eth.getBalance(accounts[0]))
+      //end()
+      let balance2 = await web3.eth.getBalance(accounts[0])
+      balance2 =parseInt(balance2.substr(-5))
+     
+      assert.equal(
+        balance1,
+        balance2 + 1,
+        "ETH balances not equal"
+      )
   })
   it("Drop 1 billion to admin", async () => {
     let instanceTokenManagement = await TokenManagement.deployed()
@@ -215,12 +224,14 @@ contract("TokenManagement", async accounts => {
     	instanceTokenManagement.address,
     	0
     )
+    console.log('here')
     await instanceTokenManagement.deposit(
     	0,
     	erc721Instance.address,
       721, //indicates ERC721
       false
     )
+    console.log('here2')
     let tokenId1155 = await instanceTokenManagement.getManagedTokenIdByAddress(erc721Instance.address)
     let instanceCryptoravesToken = await CryptoravesToken.at(
       await instanceTokenManagement.getCryptoravesTokenAddress()
