@@ -21,13 +21,14 @@ contract("TokenManagement", async accounts => {
       };
       
       let balance1 = await web3.eth.getBalance(accounts[0])
+      
       balance1 =parseInt(balance1.substr(-5))
       //start()
       await web3.eth.sendTransaction(params)
       //end()
       let balance2 = await web3.eth.getBalance(accounts[0])
       balance2 =parseInt(balance2.substr(-5))
-     
+
       assert.equal(
         balance1,
         balance2 + 1,
@@ -220,13 +221,19 @@ contract("TokenManagement", async accounts => {
   it("deposits ERC721", async () => {
   	let instanceTokenManagement = await TokenManagement.deployed()
     let erc721Instance = await ERC721Full.deployed()
+    let erc721Id=0
+
+    let b1 = await erc721Instance.balanceOf(accounts[0])
+    
     let appr = await erc721Instance.approve(
-    	instanceTokenManagement.address,
-    	0
+      instanceTokenManagement.address,
+      erc721Id
     )
-    console.log('here')
+    //console.log(await erc721Instance.safeTransferFrom(accounts[0], instanceTokenManagement.address, 0))
+    console.log('herex')
+
     await instanceTokenManagement.deposit(
-    	0,
+    	erc721Id,
     	erc721Instance.address,
       721, //indicates ERC721
       false
