@@ -85,7 +85,8 @@ module.exports = {
         gas: 40000000,
         network_id: "*",
         timeout: 100000,
-        ChainID: 344435
+        ChainID: 344435,
+        skipDryRun: true
       },
       skaleTestBob: {
         provider: () => new HDWalletProvider(privateKey, 'https://dev-testnet-v1-1.skalelabs.com'),
@@ -93,7 +94,8 @@ module.exports = {
         gas: 40000000,
         network_id: "*",
         timeout: 100000,
-        ChainID: 344435
+        ChainID: 344435,
+        skipDryRun: true
       },
       maticTest: {
         provider: () => new HDWalletProvider(privateKey, `https://rpc-mumbai.matic.today`),

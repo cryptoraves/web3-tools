@@ -222,14 +222,15 @@ contract("TokenManagement", async accounts => {
     let erc721Instance = await ERC721Full.deployed()
     let erc721Id=0
 
-    let b1 = await erc721Instance.balanceOf(accounts[0])
-    console.log(b1.toString())
+    //let b1 = await erc721Instance.balanceOf(accounts[0])
+    //console.log(b1.toString())
     let appr = await erc721Instance.approve(
       instanceTokenManagement.address,
       erc721Id
     )
-    //console.log(await erc721Instance.safeTransferFrom(accounts[0], instanceTokenManagement.address, 0))
-    console.log('herex')
+    //console.log(await erc721Instance.safeTransferFrom(accounts[0], instanceTokenManagement.address, erc721Id))
+    
+    //console.log(erc721Instance.address)
 
     await instanceTokenManagement.deposit(
     	erc721Id,
@@ -249,6 +250,7 @@ contract("TokenManagement", async accounts => {
     	'ERC721 balance does not match after deposit'
     )
   })
+  /*
   it("withdraws ERC721", async () => {
   	let instanceTokenManagement = await TokenManagement.deployed()
     let erc721Instance = await ERC721Full.deployed()
@@ -448,7 +450,7 @@ contract("TokenManagement", async accounts => {
       23210000000000000000,
       '1155 decimal adjustment failure'
     )
-  })
+  })*/
 })  
 
 
