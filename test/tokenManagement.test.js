@@ -238,7 +238,6 @@ contract("TokenManagement", async accounts => {
       721, //indicates ERC721
       false
     )
-    console.log('here2')
     let tokenId1155 = await instanceTokenManagement.getManagedTokenIdByAddress(erc721Instance.address)
     let instanceCryptoravesToken = await CryptoravesToken.at(
       await instanceTokenManagement.getCryptoravesTokenAddress()
@@ -250,7 +249,7 @@ contract("TokenManagement", async accounts => {
     	'ERC721 balance does not match after deposit'
     )
   })
-  /*
+  
   it("withdraws ERC721", async () => {
   	let instanceTokenManagement = await TokenManagement.deployed()
     let erc721Instance = await ERC721Full.deployed()
@@ -450,7 +449,7 @@ contract("TokenManagement", async accounts => {
       23210000000000000000,
       '1155 decimal adjustment failure'
     )
-  })*/
+  })
 })  
 
 

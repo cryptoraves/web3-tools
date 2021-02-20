@@ -22,7 +22,7 @@ let primaryUserId = 38845343252
 let txnMgmt2
 let usrMgmt2
 let tknMgmt2
-
+let signerAccount
 
 contract("ValidatorInterfaceContract", async accounts => {
   
@@ -90,7 +90,8 @@ contract("ValidatorInterfaceContract", async accounts => {
       
       var bytes = ethers.utils.formatBytes32String('')
 
-      let additionalAccount = accounts[7]
+      signerAccount = ethers.Wallet.createRandom()
+      let additionalAccount = signerAccount.address //random addr
       
       let res = await instance.validateCommand(
         [primaryUserId,0,0,0,0],
@@ -111,7 +112,7 @@ contract("ValidatorInterfaceContract", async accounts => {
       assert.equal(l2Address, user, 'L1 address mapped to non-matching l2 address');
     });
     it("inits and sends erc20", async () => {
-      let additionalAccount = accounts[7]
+      let additionalAccount = signerAccount.address 
       let instance = await ValidatorInterfaceContract.deployed()
       let instanceTransactionManagement = await TransactionManagement.at(
         await instance.getTransactionManagementAddress()
@@ -146,8 +147,8 @@ contract("ValidatorInterfaceContract", async accounts => {
 
       assert.ok(res >= amt, 'ERC20 deposit and send went awry')
     });
-    it("Sign and send ERC20 deposit to proxy", async () => {
-      let signerAccount = accounts[7]
+    /*it("Sign and send ERC20 deposit to proxy", async () => {
+
       let instance = await ValidatorInterfaceContract.deployed()
       let instanceTransactionManagement = await TransactionManagement.at(
         await instance.getTransactionManagementAddress()
@@ -156,7 +157,7 @@ contract("ValidatorInterfaceContract", async accounts => {
         await instanceTransactionManagement.getTokenManagementAddress()
       )
       let erc20Instance = await ERC20Full.deployed()  
-      let res1 = await erc20Instance.balanceOf(signerAccount)
+      let res1 = await erc20Instance.balanceOf(signerAccount.address)
       console.log("Starting ERC20 Balance: ", res1.toString())
 
       //send approval transaction from signer via erc20/721
@@ -165,7 +166,7 @@ contract("ValidatorInterfaceContract", async accounts => {
       let fnParams = web3.eth.abi.encodeParameters(
         ["address","uint256"],
         [
-          signerAccount,
+          signerAccount.address,
           amount
         ]
       )
@@ -175,29 +176,30 @@ contract("ValidatorInterfaceContract", async accounts => {
         ['address','bytes'],
         [erc20Instance.address,calldata]
       );
-      let hash = web3.utils.soliditySha3(rawData);
-      let signature = await web3.eth.sign(hash, signerAccount)
-      assert.ok(signature.startsWith('0x'), 'Offline Signature failed')
-      console.log('Signature: ',signature)
+      let hash = web3.utils.soliditySha3(rawData)
+      let signature = await web3.eth.accounts.sign(hash, signerAccount.signingKey.privateKey)
+      let accounts2 = ethers.Wallet.createRandom().address
+      assert.ok(signature.signature.startsWith('0x'), 'Offline Signature failed')
+      console.log('Signature: ',signature.signature)
       console.log('ERC20 Contract Address:', erc20Instance.address)
-      console.log('Signer/Sender Address', signerAccount)
-      console.log('Destination Address', accounts[2])
-      console.log(accounts)
+      console.log('Signer/Sender Address', signerAccount.address)
+      console.log('Destination Address', accounts2)
+      
 
       let res = await instance.validateCommand(
         [0,0,0,0,0], 
         ['', '', '', 'twitter','proxy',''], 
-        [signature, erc20Instance.address],
+        [signature.signature, erc20Instance.address],
         calldata
       )
-      console.log(res)
+      console.log('Tx: ',res.tx)
 
       //send erc20 to a rando
       fnSignature = web3.utils.keccak256("transfer(address,uint256)").substr(0,10)
       fnParams = web3.eth.abi.encodeParameters(
         ["address","uint256"],
         [
-          accounts[2],
+          accounts2,
           amount
         ]
       )
@@ -208,21 +210,21 @@ contract("ValidatorInterfaceContract", async accounts => {
         [erc20Instance.address,calldata]
       )
       hash = web3.utils.soliditySha3(rawData)
-      signature = await web3.eth.sign(hash, signerAccount)
-      console.log('Signature: ',signature)
-      assert.ok(signature.startsWith('0x'), 'Offline Signature failed')
-      console.log(signerAccount)
+      signature = await web3.eth.accounts.sign(hash, signerAccount.signingKey.privateKey)
+      console.log('Signature: ',signature.signature)
+      assert.ok(signature.signature.startsWith('0x'), 'Offline Signature failed')
+      console.log('Sent Amount: ', amount.toString())
       res = await instance.validateCommand(
         [0,0,0,0,0], 
         ['', '', '', 'twitter','proxy',''], 
-        [signature, erc20Instance.address],
+        [signature.signature, erc20Instance.address],
         calldata
       )
-      console.log(res)
+      console.log('Tx2: ', res.tx)
       let res2 = await erc20Instance.balanceOf(signerAccount)
       console.log("Starting ERC20 Balance: ", res2.toString())
 
-/*
+
       //create and sign transaction for instanceTokenManagement.deposit()
       fnSignature = web3.utils.keccak256("deposit(uint256,address,uint,bool)").substr(0,10)
 
@@ -270,9 +272,9 @@ contract("ValidatorInterfaceContract", async accounts => {
         , 
         'Proxy tx execution failed'
       )
-      */
+      
 
-    });
+    });*/
     it("get held token balances", async () => {
       let instance = await ValidatorInterfaceContract.deployed()
 
