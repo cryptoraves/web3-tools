@@ -46,7 +46,9 @@ module.exports = function (deployer, network, accounts) {
 	    console.log('Amount:',amount)
 	    console.log('\n*************************************************************************\n')
 
-	    output = 'Account: '+account+' Token: '+token+' Amount: '+amount+"\n"
+	    balance = await instance.balanceOf(account)
+
+	    output = 'Account: '+account+' Token: '+token+' Balance: '+ethers.utils.formatUnits(balance.toString(), 18)+"\n"
 	  	await fs.appendFile(outputPath, output, function (err) {
 	  		console.log(output)
 			if (err) throw err
@@ -61,17 +63,19 @@ module.exports = function (deployer, network, accounts) {
   		
   		account = ethers.Wallet.createRandom().address
   		
-  		await deployer.deploy(ERC721Full, accounts[0], 'TokenY', 'TKY')
+  		await deployer.deploy(ERC721Full, account, 'Token'+token, token)
 	    const instance = await ERC721Full.deployed()
 	        
-	    instance.mint(account, 'abc')
+	    await instance.mint(account, 'http:/abc.com')
 	    
 	    console.log('\n*************************************************************************\n')
 	    console.log('ERC721 Address:',instance.address)
 	    console.log('To Account:',account)
 	    console.log('\n*************************************************************************\n')
 
-	    output = 'Account: '+account+' Token: '+token+"\n"
+	    balance = await instance.balanceOf(account)
+
+	    output = 'Account: '+account+' Token: '+token+' Balance: '+balance.toString()+"\n"
 	  	await fs.appendFile(outputPath, output, function (err) {
 	  		console.log(output)
 			if (err) throw err
