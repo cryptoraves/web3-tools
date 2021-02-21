@@ -54,15 +54,30 @@ module.exports = function (deployer, network, accounts) {
   	}
   })
 
-  /*deployer.then(async () => {
+  //ERC721's
+  deployer.then(async () => {
   	
-    await deployer.deploy(ERC721Full, accounts[0], 'TokenY', 'TKY')
-    const instance = await ERC721Full.deployed()
-        
-    console.log('\n*************************************************************************\n')
-    console.log('ERC721 Address: '+instance.address)
-    console.log('\n*************************************************************************\n')
-  })*/
+  	for await (token of erc721s){
+  		
+  		account = ethers.Wallet.createRandom().address
+  		
+  		await deployer.deploy(ERC721Full, accounts[0], 'TokenY', 'TKY')
+	    const instance = await ERC721Full.deployed()
+	        
+	    instance.mint(account, 'abc')
+	    
+	    console.log('\n*************************************************************************\n')
+	    console.log('ERC721 Address:',instance.address)
+	    console.log('To Account:',account)
+	    console.log('\n*************************************************************************\n')
+
+	    output = 'Account: '+account+' Token: '+token+"\n"
+	  	await fs.appendFile(outputPath, output, function (err) {
+	  		console.log(output)
+			if (err) throw err
+		})
+  	}
+  })
   
 }
 
