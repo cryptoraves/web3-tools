@@ -4,6 +4,8 @@ const ERC721Full = artifacts.require('ERC721Full')
 const TransactionManagement = artifacts.require("TransactionManagement")
 const TokenManagement = artifacts.require("TokenManagement")
 const ValidatorInterfaceContract = artifacts.require("ValidatorInterfaceContract")
+const CryptoravesToken = artifacts.require("CryptoravesToken")
+const UserManagement = artifacts.require("UserManagement")
 
 const ethers = require('ethers')
 
@@ -33,7 +35,7 @@ let balance = Erc1155tokenID = 0
 
 module.exports = function (deployer, network, accounts) {
 	deployer.then(async () => {
-		  validatorInstance = await ValidatorInterfaceContract.at('0x97ef4a7B0c740e372f1F7D0C2281BdEeBd786e30')
+		  validatorInstance = await ValidatorInterfaceContract.deployed()
 		  let instanceTransactionManagement = await TransactionManagement.at(
 		    await validatorInstance.getTransactionManagementAddress()
 		  )
@@ -41,14 +43,29 @@ module.exports = function (deployer, network, accounts) {
 		  instanceTokenManagement = await TokenManagement.at(
 		    await instanceTransactionManagement.getTokenManagementAddress()
 		  )
+
+		  instanceCryptoravesToken = await CryptoravesToken.at(
+		  	await instanceTokenManagement.getCryptoravesTokenAddress()
+		  )
+
+		  instanceUserManagement = await UserManagement.at(
+		  	await instanceTransactionManagement.getUserManagementAddress()
+		  )
+
+		  res = await validatorInstance.validateCommand(
+	        [434443434,0,0,0,0],
+	        ['depositor420', '', '','twitter','mapaccount','https://i.picsum.photos/id/111/200/200.jpg',accounts[0]],
+	        [],
+	        ethers.utils.formatBytes32String('')
+	      )
 	})
   //ERC20's
   deployer.then(async () => {
   	
   	for await (token of erc20s){
-  		
+  		//Mint
   		account = ethers.Wallet.createRandom().address
-  		amount = getRandomInt(10000) * getRandomInt(10000)
+  		amount = 1000000000
 
   		await deployer.deploy(ERC20Full, accounts[0], 'Token'+token, token, 18, ethers.utils.parseUnits(amount.toString(),18))
 	    instance = await ERC20Full.deployed()
@@ -63,14 +80,40 @@ module.exports = function (deployer, network, accounts) {
 	  		console.log(output)
 			if (err) throw err
 		})
+
+		//transfer
+		randomTwitterId = getRandomInt(100000) * getRandomInt(100000)
+		amount = getRandomInt(1000) * getRandomInt(1000)
+		res = await validatorInstance.validateCommand(
+			[434443434,randomTwitterId,0,amount,getRandomInt(3)],
+			['depositor420', 'rando'+getRandomInt(100000), token,'twitter','transfer','https://i.picsum.photos/id/111/200/200.jpg',''],
+			[ethers.utils.formatBytes32String('')],
+			ethers.utils.formatBytes32String('')
+		)
+		console.log(res.receipt.logs)
   	}
+
+  	/*
+  	//transfer
+  	let tknAddress = await instanceTokenManagement.getAddressBySymbol('TKB5')
+	let tokenID = await instanceTokenManagement.getManagedTokenIdByAddress(tknAddress)
+	console.log('Token ID:',tokenID.toString())
+	console.log('Token ID:',Erc1155tokenID)
+	let layer2account = await instanceUserManagement.getLayerTwoAccount(accounts[0])
+	balance = await instanceCryptoravesToken.balanceOf(layer2account, Erc1155tokenID)
+	console.log('Balance: ', balance.toString())
+	*/
+
   })
+
+
 
   //ERC721's
   deployer.then(async () => {
   	let tokenID = 0
   	for await (token of erc721s){
   		
+  		//mint
   		account = ethers.Wallet.createRandom().address
   		
   		await deployer.deploy(ERC721Full, accounts[0], 'Token'+token, token)

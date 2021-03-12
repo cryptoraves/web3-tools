@@ -60,7 +60,7 @@ contract TransactionManagement is AdministrationContract {
     * @param _twitterInts [0] = twitterIdFrom, [1] = twitterIdTo, [2] = twitterIdThirdParty
         [3] amount or id of token to transfer -- integers of any decimal value. eg 1.31 = 131, 12321.989293 = 12321989293, 1000 = 1000 etc
         [4] where the decimal place lies: 1.31 = 2, 12321.989293 = 6, 1000 = 0 etc
-    * @param _twitterStrings [0] = twitterHandleFrom, [1] = twitterHandleTo, [2] = thirdPartyName
+    * @param _twitterStrings [0] = twitterHandleFrom, [1] = twitterHandleTo, [2] = ticker
         [3] = _platformName:
             "twitter"
             "instagram

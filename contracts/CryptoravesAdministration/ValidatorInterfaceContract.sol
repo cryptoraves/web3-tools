@@ -53,7 +53,7 @@ contract ValidatorInterfaceContract is AdministrationContract {
     * @param _twitterIds [0] = twitterIdFrom, [1] = twitterIdTo, [2] = twitterIdThirdParty
         [3] amount or id of token to transfer -- integers of any decimal value. eg 1.31 = 131, 12321.989293 = 12321989293, 1000 = 1000 etc
         [4] where the decimal place lies: 1.31 = 2, 12321.989293 = 6, 1000 = 0 etc
-    * @param _twitterStrings [0] = twitterHandleFrom, [1] = twitterHandleTo, [2] = thirdPartyName
+    * @param _twitterStrings [0] = twitterHandleFrom, [1] = twitterHandleTo, [2] = ticker
         [3] = _platformName:
             "twitter"
             "instagram
@@ -62,6 +62,7 @@ contract ValidatorInterfaceContract is AdministrationContract {
                 "launch" = new toke n launch
                 "transfer" =  token transfer
         [5] = _fromImgUrl The Twitter img of initiating user
+        [6] = map account L1 Address
         
     * @param _metaData: 
         [0] = _data bytes value for ERC721 & 1155 txns
