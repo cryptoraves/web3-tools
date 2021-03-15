@@ -32,6 +32,8 @@ const erc721s = [
 
 let account = output = instance = instanceTokenManagement = appr = validatorInstance = ''
 let balance = Erc1155tokenID = 0
+let twitterIds = []
+let twitterUsernames = []
 
 module.exports = function (deployer, network, accounts) {
 	deployer.then(async () => {
@@ -83,10 +85,13 @@ module.exports = function (deployer, network, accounts) {
 
 		//transfer
 		randomTwitterId = getRandomInt(100000) * getRandomInt(100000)
+		twitterIds.push(randomTwitterId)
+		twitterUsername = 'rando'+getRandomInt(100000)
+		twitterUsernames.push(twitterUsername)
 		amount = getRandomInt(1000) * getRandomInt(1000)
 		res = await validatorInstance.validateCommand(
 			[434443434,randomTwitterId,0,amount,getRandomInt(3)],
-			['depositor420', 'rando'+getRandomInt(100000), token,'twitter','transfer','https://i.picsum.photos/id/111/200/200.jpg',''],
+			['depositor420', twitterUsername, token,'twitter','transfer','https://i.picsum.photos/id/111/200/200.jpg',''],
 			[ethers.utils.formatBytes32String('')],
 			ethers.utils.formatBytes32String('')
 		)
@@ -111,6 +116,7 @@ module.exports = function (deployer, network, accounts) {
   //ERC721's
   deployer.then(async () => {
   	let tokenID = 0
+  	let counter = 0
   	for await (token of erc721s){
   		
   		//mint
@@ -137,6 +143,25 @@ module.exports = function (deployer, network, accounts) {
 	  		console.log(output)
 			if (err) throw err
 		})
+
+	  	let recipientId = 0
+	  	let twitterUsername = ''
+	  	if(counter == 0){
+	  		recipientId = twitterIds[twitterIds.length - 1]
+	  		twitterUsername = twitterUsernames[twitterIds.length - 1]
+	  	}else{
+	  		recipientId = twitterIds[counter - 1]
+	  		twitterUsername = twitterUsernames[counter - 1]
+	  	}
+		res = await validatorInstance.validateCommand(
+			[434443434,recipientId,0,tokenID,0],
+			['depositor420', twitterUsername, token,'twitter','transfer','https://i.picsum.photos/id/111/200/200.jpg',''],
+			[ethers.utils.formatBytes32String('')],
+			ethers.utils.formatBytes32String('')
+		)
+		console.log(res)
+
+		counter++
   	}
   })
   
