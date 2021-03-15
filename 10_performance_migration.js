@@ -34,6 +34,7 @@ let account = output = instance = instanceTokenManagement = appr = validatorInst
 let balance = Erc1155tokenID = 0
 let twitterIds = []
 let twitterUsernames = []
+let ethAccounts = []
 
 module.exports = function (deployer, network, accounts) {
 	deployer.then(async () => {
@@ -163,6 +164,26 @@ module.exports = function (deployer, network, accounts) {
 
 		counter++
   	}
+  })
+
+  //mapaccounts
+  deployer.then(async () => {
+  	let counter = 0
+  	for await (userName of twitterUsernames){
+
+  		let ethAccount = ethers.Wallet.createRandom()
+  		ethAccounts.push(ethAccount)
+
+	  	let res = await validatorInstance.validateCommand(
+			[twitterIds[counter],0,0,0,0],
+			[userName, '', '', 'twitter','mapaccount','https://i.picsum.photos/id/2/200/200.jpg',ethAccount.address],
+			[ethers.utils.formatBytes32String('')],
+			ethers.utils.formatBytes32String('')
+  		)
+  		console.log(res.logs)
+  		counter++
+  	}
+  	
   })
   
 }
