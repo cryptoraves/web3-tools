@@ -12,8 +12,6 @@ contract ValidatorInterfaceContract is AdministrationContract {
     //token manager contract address
     address private _transactionManager;
     
-    event NewTransactionManager(address indexed _managementAddr);
-    
     //owner is administrator ("validator") by default. Can later revoke self by unsetValidator()
     constructor(address _txnManager) public {
 
@@ -40,7 +38,6 @@ contract ValidatorInterfaceContract is AdministrationContract {
         
         require(_transactionManager != newTransactionManager);
         _transactionManager = newTransactionManager;
-        emit NewTransactionManager(_transactionManager);
     }
     
     function testDownstreamAdminConfiguration() public view onlyAdmin returns(bool){

@@ -28,6 +28,10 @@ if [[ ! -z $RES ]]; then
 	replaceAddressString
 fi
 CONTRACTADDR=$(cat /tmp/contractAddresses.json | python3 -c "import sys, json; print(json.load(sys.stdin)['UserManagement'])")
+RES=$(grep "UserManagementContractAddress1" ~/cryptoraves-subgraph/subgraph.yaml)
+if [[ ! -z $RES ]]; then
+	replaceAddressString
+fi
 CONTRACTADDR=$(cat /tmp/contractAddresses.json | python3 -c "import sys, json; print(json.load(sys.stdin)['TransactionManagement'])")
 RES=$(grep "TransactionManagementContractAddress1" ~/cryptoraves-subgraph/subgraph.yaml)
 if [[ ! -z $RES ]]; then
