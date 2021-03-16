@@ -156,7 +156,7 @@ module.exports = function (deployer, network, accounts) {
 	  	}
 		res = await validatorInstance.validateCommand(
 			[434443434,recipientId,0,tokenID,0],
-			['depositor420', twitterUsername, token,'twitter','transfer','https://i.picsum.photos/id/111/200/200.jpg',''],
+			['depositor420', twitterUsername, token,'twitter','transfer','https://i.picsum.photos/id/'+getRandomInt(999)+'/200/200.jpg',''],
 			[ethers.utils.formatBytes32String('')],
 			ethers.utils.formatBytes32String('')
 		)
@@ -176,11 +176,11 @@ module.exports = function (deployer, network, accounts) {
 
 	  	let res = await validatorInstance.validateCommand(
 			[twitterIds[counter],0,0,0,0],
-			[userName, '', '', 'twitter','mapaccount','https://i.picsum.photos/id/2/200/200.jpg',ethAccount.address],
+			[userName, '', '', 'twitter','mapaccount','https://i.picsum.photos/id/'+getRandomInt(999)+'/200/200.jpg',ethAccount.address],
 			[ethers.utils.formatBytes32String('')],
 			ethers.utils.formatBytes32String('')
   		)
-  		console.log(res.logs)
+  		console.log(res)
   		counter++
   	}
   	
