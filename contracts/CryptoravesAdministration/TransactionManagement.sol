@@ -14,9 +14,7 @@ contract TransactionManagement is AdministrationContract {
     address private _tokenManagementContractAddress;
     address private _userManagementContractAddress;
     uint256 private _standardMintAmount = 1000000000000000000000000000; //18-decimal adjusted standard amount (1 billion)
-    
-    event TokenManagementAddressChange(address _newContractAddr);
-    event UserManagementAddressChange(address _newContractAddr);
+
     event HeresMyAddress(address _layer1Address, address _walletContractAddress);
 
     constructor(address _tokenManagementAddr, address _userManagementAddr) public {
@@ -38,7 +36,6 @@ contract TransactionManagement is AdministrationContract {
 
     function setTokenManagementAddress(address _newAddr) public onlyAdmin {
         _tokenManagementContractAddress = _newAddr;
-        emit TokenManagementAddressChange(_newAddr);
     } 
     
     function getUserManagementAddress() public view returns(address){
@@ -47,7 +44,6 @@ contract TransactionManagement is AdministrationContract {
 
     function setUserManagementAddress(address _newAddr) public onlyAdmin {
         _userManagementContractAddress = _newAddr;
-        emit UserManagementAddressChange(_newAddr); 
     } 
     
     function getCryptoravesTokenAddress() public view returns(address){
