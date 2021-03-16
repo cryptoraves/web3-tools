@@ -41,8 +41,6 @@ RES=$(grep "TransactionManagementContractAddress1" ~/cryptoraves-subgraph/subgra
 if [[ ! -z $RES ]]; then
 	replaceAddressString
 fi
-CONTRACTADDR=$(cat /tmp/contractAddresses.json | python3 -c "import sys, json; print(json.load(sys.stdin)['ValidatorInterfaceContract'])")
-
 
 
 if [[ -z $NETWORK ]]; then

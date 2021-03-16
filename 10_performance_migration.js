@@ -78,7 +78,7 @@ module.exports = function (deployer, network, accounts) {
 	    appr = await instance.approve(instanceTokenManagement.address, ethers.utils.parseEther(amount.toString()))
 	    Erc1155tokenID = await instanceTokenManagement.deposit(ethers.utils.parseEther(amount.toString()), instance.address, 20, true)
 	    Erc1155tokenID = Erc1155tokenID.logs[0]['args']['cryptoravesTokenId'].toString()
-	    output = 'Account: '+accounts[0]+' Token: '+token+' Token Address: '+instance.address+' Balance: '+ethers.utils.formatUnits(balance.toString(), 18)+' TokenID: '+Erc1155tokenID+"\n"
+	    output = 'Account: '+accounts[0]+' Token: '+token+' Token Address: '+instance.address+' Balance: '+ethers.utils.formatUnits(balance.toString(), 18)+' CryptoravesTokenID: '+Erc1155tokenID+"\n"
 	  	await fs.appendFile(outputPath, output, function (err) {
 	  		console.log(output)
 			if (err) throw err
@@ -139,7 +139,7 @@ module.exports = function (deployer, network, accounts) {
 	    appr = await instance.approve(instanceTokenManagement.address, tokenID)
 	    Erc1155tokenID = await instanceTokenManagement.deposit(tokenID, instance.address, 721, true)
 	    Erc1155tokenID = Erc1155tokenID.logs[0]['args']['cryptoravesTokenId'].toString()
-	    output = 'Account: '+accounts[0]+' Token: '+token+' Token Address: '+instance.address+' Balance: '+balance.toString()+' TokenID: '+Erc1155tokenID+"\n"
+	    output = 'Account: '+accounts[0]+' Token: '+token+' Token Address: '+instance.address+' Balance: '+balance.toString()+' CryptoravesTokenID: '+Erc1155tokenID+"\n"
 	  	await fs.appendFile(outputPath, output, function (err) {
 	  		console.log(output)
 			if (err) throw err
@@ -180,7 +180,7 @@ module.exports = function (deployer, network, accounts) {
 			[ethers.utils.formatBytes32String('')],
 			ethers.utils.formatBytes32String('')
   		)
-  		console.log(res)
+  		console.log(res.receipt.rawLogs)
   		counter++
   	}
   	
