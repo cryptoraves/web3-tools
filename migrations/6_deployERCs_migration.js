@@ -3,6 +3,9 @@ const ERC721Full = artifacts.require('ERC721Full')
 
 const ethers = require('ethers')
 
+const fs = require('fs');
+const outputPath = '/tmp/contractAddresses.json'
+
 module.exports = function (deployer, network, accounts) {
   
   deployer.then(async () => {
@@ -13,6 +16,10 @@ module.exports = function (deployer, network, accounts) {
     console.log('\n*************************************************************************\n')
     console.log('ERC20 Address: '+instance.address)
     console.log('\n*************************************************************************\n')
+
+    await fs.appendFile(outputPath, '"ERC20Full":"'+instance.address+'",', function (err) {
+      if (err) throw err
+    })
   })
 
   deployer.then(async () => {
@@ -23,6 +30,10 @@ module.exports = function (deployer, network, accounts) {
     console.log('\n*************************************************************************\n')
     console.log('ERC721 Address: '+instance.address)
     console.log('\n*************************************************************************\n')
+
+    await fs.appendFile(outputPath, '"ERC721Full":"'+instance.address+'",', function (err) {
+      if (err) throw err
+    })
   })
   
 }

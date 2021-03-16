@@ -3,6 +3,9 @@ const AdminToolsLibrary = artifacts.require('AdminToolsLibrary')
 
 const TransactionManagement = artifacts.require('TransactionManagement')
 
+const fs = require('fs');
+const outputPath = '/tmp/contractAddresses.json'
+
 module.exports = function (deployer) {
   
   deployer.then(async () => {
@@ -20,5 +23,9 @@ module.exports = function (deployer) {
     console.log('\n*************************************************************************\n')
     console.log('ValidatorInterfaceContract Address: '+instance.address)
     console.log('\n*************************************************************************\n')
+
+    await fs.appendFile(outputPath, '"ValidatorInterfaceContract":"'+instance.address+'"}', function (err) {
+      if (err) throw err
+    })
   })
 }
