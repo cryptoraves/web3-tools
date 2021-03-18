@@ -8,9 +8,15 @@ while [ "$1" != "" ]; do
             ;;
        
     esac
+    case $1 in
+        -b | --bypassMigration )     
+			shift
+            BYPASS=1
+            ;;
+       
+    esac
     shift
 done
-cp 10_performance_migration.js ${HOME}/web3-tools/migrations/
 
 #get contract addresses generated from truffle migrate and stored at /tmp/contractAddresses.json
 function replaceAddressString(){
@@ -42,11 +48,15 @@ if [[ ! -z $RES ]]; then
 	replaceAddressString
 fi
 
+if [[ -z $BYPASS ]]; then
 
-if [[ -z $NETWORK ]]; then
-	truffle migrate -f 10 --to 10
-else
-	truffle migrate -f 10 --to 10 --network $NETWORK
+	cp 10_performance_migration.js ${HOME}/web3-tools/migrations/
+
+	if [[ -z $NETWORK ]]; then
+		truffle migrate -f 10 --to 10
+	else
+		truffle migrate -f 10 --to 10 --network $NETWORK
+	fi
+
+	rm ${HOME}/web3-tools/migrations/10_performance_migration.js
 fi
-
-rm ${HOME}/web3-tools/migrations/10_performance_migration.js

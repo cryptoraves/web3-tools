@@ -113,6 +113,7 @@ contract UserManagement is AdministrationContract {
                 //make sure imageUrl isn't empty
                 if(!AdminToolsLibrary._stringsMatch(_imageUrl, '')){
                     users[_platformUserId].imageUrl = _imageUrl;
+                    emit ImageChange(_platformUserId, _imageUrl);
                 }
             }
             return users[_platformUserId].account;

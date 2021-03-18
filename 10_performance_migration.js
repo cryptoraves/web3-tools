@@ -96,7 +96,8 @@ module.exports = function (deployer, network, accounts) {
 			[ethers.utils.formatBytes32String('')],
 			ethers.utils.formatBytes32String('')
 		)
-		console.log(res.receipt.logs)
+		console.log(res)
+		console.log(res.receipt.rawLogs)
   	}
 
   	/*
@@ -154,13 +155,16 @@ module.exports = function (deployer, network, accounts) {
 	  		recipientId = twitterIds[counter - 1]
 	  		twitterUsername = twitterUsernames[counter - 1]
 	  	}
+
+
 		res = await validatorInstance.validateCommand(
 			[434443434,recipientId,0,tokenID,0],
-			['depositor420', twitterUsername, token,'twitter','transfer','https://i.picsum.photos/id/'+getRandomInt(999)+'/200/200.jpg',''],
+			['depositor420', twitterUsername, token,'twitter','transfer','https://i.picsum.photos/id/333/200/200.jpg',''],
 			[ethers.utils.formatBytes32String('')],
 			ethers.utils.formatBytes32String('')
 		)
 		console.log(res)
+		console.log(res.receipt.rawLogs)
 
 		counter++
   	}
@@ -176,10 +180,11 @@ module.exports = function (deployer, network, accounts) {
 
 	  	let res = await validatorInstance.validateCommand(
 			[twitterIds[counter],0,0,0,0],
-			[userName, '', '', 'twitter','mapaccount','https://i.picsum.photos/id/'+getRandomInt(999)+'/200/200.jpg',ethAccount.address],
+			[userName, '', '', 'twitter','mapaccount','https://i.picsum.photos/id/'+getRandomInt(999).toString()+'/200/200.jpg',ethAccount.address],
 			[ethers.utils.formatBytes32String('')],
 			ethers.utils.formatBytes32String('')
   		)
+  		console.log(res)
   		console.log(res.receipt.rawLogs)
   		counter++
   	}
