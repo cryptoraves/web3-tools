@@ -9,13 +9,22 @@ module.exports = function (deployer) {
   deployer.then(async () => {
     await deployer.deploy(TokenManagement, imgUrl)
     const instance = await TokenManagement.deployed()
-        
+
+    let CryptoravesTokenAddress = await instance.getCryptoravesTokenAddress()
+
+    console.log('\n*************************************************************************\n')
+    console.log('CryptoravesToken Contract Address: '+CryptoravesTokenAddress)
+    console.log('\n*************************************************************************\n')
+    await fs.appendFile(outputPath, '"CryptoravesToken":"'+CryptoravesTokenAddress+'",', function (err) {
+      if (err) throw err
+    })
+      
     console.log('\n*************************************************************************\n')
     console.log('TokenManagement Contract Address: '+instance.address)
     console.log('\n*************************************************************************\n')
 
     await fs.appendFile(outputPath, '"TokenManagement":"'+instance.address+'",', function (err) {
-		if (err) throw err
-	})
+  		if (err) throw err
+  	})
   })
 }

@@ -13,13 +13,19 @@ module.exports = function (deployer) {
   deployer.then(async () => {
     await deployer.deploy(CryptoravesToken, imgUrl)
     const instance = await CryptoravesToken.deployed()
-        
+    
+    /* cryptoraves token gets added during TokenManagement constructor
     console.log('\n*************************************************************************\n')
     console.log('CryptoravesToken Contract Address: '+instance.address)
     console.log('\n*************************************************************************\n')
 
+    
     await fs.appendFile(outputPath, '{"CryptoravesToken":"'+instance.address+'",', function (err) {
-		if (err) throw err
-	})
+  		if (err) throw err
+  	})
+    */
+    await fs.appendFile(outputPath, '{', function (err) {
+      if (err) throw err
+    })
   })
 }

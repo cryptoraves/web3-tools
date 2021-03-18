@@ -143,14 +143,14 @@ contract("TokenManagement", async accounts => {
     	'ETH balance does not match after withdrawal'
     )
   })
-  it("deposits ERC20", async () => {
+  it("deposits ERC20 and sends one", async () => {
   	let instanceTokenManagement = await TokenManagement.deployed()
     let erc20Instance = await ERC20Full.deployed()	
     let appr = await erc20Instance.approve(
     	instanceTokenManagement.address,
     	ethers.utils.parseUnits('987654321',18)
     )
-    await instanceTokenManagement.deposit(
+    let res0 = await instanceTokenManagement.deposit(
     	ethers.utils.parseUnits('987654321',18), 
     	erc20Instance.address,
       20, //indicates ERC20
@@ -167,6 +167,14 @@ contract("TokenManagement", async accounts => {
     	ethers.utils.parseUnits('987654321',18).toString(),
     	'ERC20 balance does not match after deposit'
     )
+    res = await instanceCryptoravesToken.safeTransferFrom(accounts[0], ethers.Wallet.createRandom().address, tokenId1155, '1000000000000000000', ethers.utils.formatBytes32String(''))
+
+    assert.equal(
+      res.logs[0].event,
+      'TransferSingle',
+      'CryptoravesToken transfer failed'
+    )
+
   })
 
   it("checks symbol & emoji lookup", async () => {
@@ -213,7 +221,7 @@ contract("TokenManagement", async accounts => {
     let balance = await instanceCryptoravesToken.balanceOf(accounts[0], tokenId1155)
     assert.equal(
     	balance.toString(),
-    	ethers.utils.parseUnits('900000000',18).toString(),
+    	ethers.utils.parseUnits('899999999',18).toString(),
     	'ERC20 balance does not match after withdrawal'
     )
   })
