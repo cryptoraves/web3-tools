@@ -11,6 +11,11 @@ const ethers = require('ethers')
 
 const fs = require('fs');
 const outputPath = '/tmp/tokenDistro.txt'
+
+const homedir = require('os').homedir();
+const handlesFile = fs.readFileSync(homedir+"/token-game/lambda-functions/TwitterEndpointV1/test-data/sampleHandles.json")
+let handles = JSON.parse(handlesFile)
+
 try {
   fs.unlinkSync(outputPath)
   //file removed
@@ -20,20 +25,23 @@ const erc20s = [
 	'TKA','TKB','TKC','TKD','TKE','TKF','TKG','TKH','TKI','TKJ',
 	'TKK','TKL','TKM','TKN','TKO','TKP','TKQ','TKR','TKS','TKT',
 	'TKU','TKV','TKW','TKX','TKY','TKZ','TKA1','TKA2','TKA3','TKA4',
-	'TKA5','TKA6','TKA7','TKA8','TKA9','TKB1','TKB2','TKB3','TKB4','TKB5'
+	'TKA5','TKA6','TKA7','TKA8','TKA9','TKB1','TKB2','TKB3','TKB4','TKB5',
+	'TKB6','TKB7','TKB8','TKB9','TKB10','TKB11','TKB12','TKB13','TKB14','TKB15',
+	'TKC1','TKC2','TKC3','TKC4','TKC5','TKC6','TKC7','TKC8','TKC9','TKC10'
 ]
 
 const erc721s = [
 	'NFTA','NFTB','NFTC','NFTD','NFTE','NFTF','NFTG','NFTH','NFTI','NFTJ',
 	'NFTK','NFTL','NFTM','NFTN','NFTO','NFTP','NFTQ','NFTR','NFTS','NFTT',
 	'NFTU','NFTV','NFTW','NFTX','NFTY','NFTZ','NFTA1','NFTA2','NFTA3','NFTA4',
-	'NFTA5','NFTA6','NFTA7','NFTA8','NFTA9','NFTB1','NFTB2','NFTB3','NFTB4','NFTB5'
+	'NFTA5','NFTA6','NFTA7','NFTA8','NFTA9','NFTB1','NFTB2','NFTB3','NFTB4','NFTB5',
+	'NFTB6','NFTB7','NFTB8','NFTB9','NFTB10','NFTB11','NFTB12','NFTB13','NFTB14','NFTB15',
+	'NFTC1','NFTC2','NFTC3','NFTC4','NFTC5','NFTC6','NFTC7','NFTC8','NFTC9','NFTC10'
 ]
 
 let account = output = instance = instanceTokenManagement = appr = validatorInstance = ''
 let balance = Erc1155tokenID = 0
 let twitterIds = []
-let twitterUsernames = []
 let ethAccounts = []
 
 module.exports = function (deployer, network, accounts) {
@@ -64,7 +72,7 @@ module.exports = function (deployer, network, accounts) {
 	})
   //ERC20's
   deployer.then(async () => {
-  	
+  	let counter = 0
   	for await (token of erc20s){
   		//Mint
   		account = ethers.Wallet.createRandom().address
@@ -88,16 +96,16 @@ module.exports = function (deployer, network, accounts) {
 		randomTwitterId = getRandomInt(100000) * getRandomInt(100000)
 		twitterIds.push(randomTwitterId)
 		twitterUsername = 'rando'+getRandomInt(100000)
-		twitterUsernames.push(twitterUsername)
 		amount = getRandomInt(1000) * getRandomInt(1000)
 		res = await validatorInstance.validateCommand(
 			[434443434,randomTwitterId,0,amount,getRandomInt(3)],
-			['depositor420', twitterUsername, token,'twitter','transfer','https://i.picsum.photos/id/111/200/200.jpg',''],
+			['depositor420', twitterUsername, token,'twitter','transfer','',''],
 			[ethers.utils.formatBytes32String('')],
 			ethers.utils.formatBytes32String('')
 		)
 		console.log(res)
 		console.log(res.receipt.rawLogs)
+		counter++
   	}
 
   	/*
@@ -146,20 +154,9 @@ module.exports = function (deployer, network, accounts) {
 			if (err) throw err
 		})
 
-	  	let recipientId = 0
-	  	let twitterUsername = ''
-	  	if(counter == 0){
-	  		recipientId = twitterIds[twitterIds.length - 1]
-	  		twitterUsername = twitterUsernames[twitterIds.length - 1]
-	  	}else{
-	  		recipientId = twitterIds[counter - 1]
-	  		twitterUsername = twitterUsernames[counter - 1]
-	  	}
-
-
-		res = await validatorInstance.validateCommand(
-			[434443434,recipientId,0,tokenID,0],
-			['depositor420', twitterUsername, token,'twitter','transfer','https://i.picsum.photos/id/333/200/200.jpg',''],
+	  	res = await validatorInstance.validateCommand(
+			[434443434,twitterIds[counter],0,tokenID,0],
+			['depositor420', handles[counter], token,'twitter','transfer','https://i.picsum.photos/id/333/200/200.jpg',''],
 			[ethers.utils.formatBytes32String('')],
 			ethers.utils.formatBytes32String('')
 		)
@@ -173,15 +170,15 @@ module.exports = function (deployer, network, accounts) {
   //mapaccounts
   deployer.then(async () => {
   	let counter = 0
-  	for await (userName of twitterUsernames){
+  	for await (userName of handles){
 
   		let ethAccount = ethers.Wallet.createRandom()
   		ethAccounts.push(ethAccount)
-
+  		let url = "https://sample-imgs.s3.amazonaws.com/"+userName+".png"
 	  	let res = await validatorInstance.validateCommand(
 			[twitterIds[counter],0,0,0,0],
-			[userName, '', '', 'twitter','mapaccount','https://i.picsum.photos/id/'+getRandomInt(999).toString()+'/200/200.jpg',ethAccount.address],
-			[ethers.utils.formatBytes32String('')],
+			[userName, '', '', 'twitter','mapaccount',url,ethAccount.address],
+			[],
 			ethers.utils.formatBytes32String('')
   		)
   		console.log(res)
