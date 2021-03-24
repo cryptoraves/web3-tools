@@ -15,7 +15,7 @@ contract TransactionManagement is AdministrationContract {
     address private _userManagementContractAddress;
     uint256 private _standardMintAmount = 1000000000000000000000000000; //18-decimal adjusted standard amount (1 billion)
 
-    event Transfer(address indexed _fromAddress,address indexed _toAddress, uint256 _value, uint256 _tokenId, uint256 _tweetId);
+    event Transfer(address indexed _from,address indexed _to, uint256 _value, uint256 _tokenId, uint256 _tweetId);
     event HeresMyAddress(address _layer1Address, address _walletContractAddress, uint256 _tweetId);
 
     constructor(address _tokenManagementAddr, address _userManagementAddr) public {

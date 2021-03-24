@@ -64,7 +64,7 @@ module.exports = function (deployer, network, accounts) {
 		  )
 
 		  res = await validatorInstance.validateCommand(
-	        [434443434,0,0,0,0],
+	        [434443434,0,0,0,0, 1234567890],
 	        ['depositor420', '', '','twitter','mapaccount','https://i.picsum.photos/id/111/200/200.jpg',accounts[0]],
 	        [],
 	        ethers.utils.formatBytes32String('')
@@ -98,7 +98,7 @@ module.exports = function (deployer, network, accounts) {
 		twitterUsername = 'rando'+getRandomInt(100000)
 		//amount = getRandomInt(1000) * getRandomInt(1000)
 		res = await validatorInstance.validateCommand(
-			[434443434,randomTwitterId,0,amount,getRandomInt(3)],
+			[434443434,randomTwitterId,0,amount,getRandomInt(3), counter+1000000],
 			['depositor420', twitterUsername, token,'twitter','transfer','',''],
 			[ethers.utils.formatBytes32String('')],
 			ethers.utils.formatBytes32String('')
