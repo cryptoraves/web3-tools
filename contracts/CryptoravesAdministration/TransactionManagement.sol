@@ -15,7 +15,8 @@ contract TransactionManagement is AdministrationContract {
     address private _userManagementContractAddress;
     uint256 private _standardMintAmount = 1000000000000000000000000000; //18-decimal adjusted standard amount (1 billion)
 
-    event HeresMyAddress(address _layer1Address, address _walletContractAddress);
+    event Transfer(address indexed _fromAddress,address indexed _toAddress, uint256 _value, uint256 _tokenId, uint256 _tweetId);
+    event HeresMyAddress(address _layer1Address, address _walletContractAddress, uint256 _tweetId);
 
     constructor(address _tokenManagementAddr, address _userManagementAddr) public {
         
@@ -56,6 +57,7 @@ contract TransactionManagement is AdministrationContract {
     * @param _twitterInts [0] = twitterIdFrom, [1] = twitterIdTo, [2] = twitterIdThirdParty
         [3] amount or id of token to transfer -- integers of any decimal value. eg 1.31 = 131, 12321.989293 = 12321989293, 1000 = 1000 etc
         [4] where the decimal place lies: 1.31 = 2, 12321.989293 = 6, 1000 = 0 etc
+        [5] tweet ID from twitter
     * @param _twitterStrings [0] = twitterHandleFrom, [1] = twitterHandleTo, [2] = ticker
         [3] = _platformName:
             "twitter"
@@ -84,6 +86,9 @@ contract TransactionManagement is AdministrationContract {
         string memory _data = _metaData[0];
         */
         
+        uint256 _tweetId = _twitterInts[5];
+        require(_tweetId > 0, "Tweet ID invalid.");
+
         /*
         * L1 signerd transaction proxy
         * redefined params for this function:
@@ -113,7 +118,7 @@ contract TransactionManagement is AdministrationContract {
             require(_layer1Address != address(0), 'Invalid address given for L1 account mapping');
             _userManagement.mapLayerOneAccount(_fromAddress, _layer1Address);
             
-            emit HeresMyAddress(_layer1Address, _fromAddress);
+            emit HeresMyAddress(_layer1Address, _fromAddress, _twitterInts[5]);
         }
         
         //hybrid launch and map
@@ -127,7 +132,7 @@ contract TransactionManagement is AdministrationContract {
             address _fromAddress = _userManagement.getUserAccount(_twitterInts[0]);
             _userManagement.mapLayerOneAccount(_fromAddress, _layer1Address);
             
-            emit HeresMyAddress(_layer1Address, _fromAddress);
+            emit HeresMyAddress(_layer1Address, _fromAddress,_twitterInts[5]);
         }
         
         //transfers
@@ -185,11 +190,16 @@ contract TransactionManagement is AdministrationContract {
                 _tokenId = _tokenId + _twitterInts[3];
                 _adjustedValue = 1;
             }else{
-                _adjustedValue = _adjustValueByUnits(_tokenId, _twitterInts[3], _twitterInts[4]);
+                uint256 _dec = _twitterInts[4];
+                uint256 _amt = _twitterInts[3];
+                _adjustedValue = _adjustValueByUnits(_tokenId, _amt, _dec );
             }
 
             bytes memory mData = _metaData[0];
             _tokenManagement.managedTransfer(_fromAddress, _toAddress, _tokenId, _adjustedValue, mData);
+
+            //TODO: emit platformId and change _from & _to vars to userIds and/or handles on given platform
+            emit Transfer(_fromAddress, _toAddress, _adjustedValue, _tokenId, _tweetId); 
         }
     }
     

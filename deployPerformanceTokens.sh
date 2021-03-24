@@ -18,34 +18,61 @@ while [ "$1" != "" ]; do
     shift
 done
 
+DATAJSONPATH=/tmp/contractAddresses.json
+YAMLPATH=~/cryptoraves-subgraph/subgraph.yaml
+LAMBDACREDPATH=~/token-game/lambda-functions/skaleOracle/credentials.py
+
 #get contract addresses generated from truffle migrate and stored at /tmp/contractAddresses.json
-function replaceAddressString(){
+function replaceAddressStringYAML(){
 	EXTRACTEDSTR=$(echo $RES | cut -d' ' -f2 | cut -d"'" -f2)
 	#echo $EXTRACTEDSTR
 	NEWSTRING=$(echo "${RES/$EXTRACTEDSTR/$CONTRACTADDR}")
 	#echo $NEWSTRING
-	sed -i "s/$RES/$NEWSTRING/g" ~/cryptoraves-subgraph/subgraph.yaml
+	sed -i "s/$RES/$NEWSTRING/g" $YAMLPATH
+}
+function replaceAddressStringLAMBDA(){
+	EXTRACTEDSTR=$(echo $RES | cut -d' ' -f3 | cut -d"'" -f2)
+	#echo $EXTRACTEDSTR
+	NEWSTRING=$(echo "${RES/$EXTRACTEDSTR/$CONTRACTADDR}")
+	#echo $NEWSTRING
+	sed -i "s/$RES/$NEWSTRING/g" $LAMBDACREDPATH
 }
 #get contract addresses generated from truffle migrate and stored at /tmp/contractAddresses.json
-CONTRACTADDR=$(cat /tmp/contractAddresses.json | python3 -c "import sys, json; print(json.load(sys.stdin)['CryptoravesToken'])")
-RES=$(grep "CryptoravesTokenContractAddress1" ~/cryptoraves-subgraph/subgraph.yaml)
+CONTRACTADDR=$(cat ${DATAJSONPATH} | python3 -c "import sys, json; print(json.load(sys.stdin)['CryptoravesToken'])")
+RES=$(grep "CryptoravesTokenContractAddress1" ${YAMLPATH})
 if [[ ! -z $RES ]]; then
-	replaceAddressString
+	replaceAddressStringYAML
 fi
-CONTRACTADDR=$(cat /tmp/contractAddresses.json | python3 -c "import sys, json; print(json.load(sys.stdin)['TokenManagement'])")
-RES=$(grep "TokenManagementContractAddress1" ~/cryptoraves-subgraph/subgraph.yaml)
+RES=$(grep "CryptoravesTokenContractAddress1localhost" ${LAMBDACREDPATH})
 if [[ ! -z $RES ]]; then
-	replaceAddressString
+	replaceAddressStringLAMBDA
 fi
-CONTRACTADDR=$(cat /tmp/contractAddresses.json | python3 -c "import sys, json; print(json.load(sys.stdin)['UserManagement'])")
-RES=$(grep "UserManagementContractAddress1" ~/cryptoraves-subgraph/subgraph.yaml)
+CONTRACTADDR=$(cat ${DATAJSONPATH} | python3 -c "import sys, json; print(json.load(sys.stdin)['TokenManagement'])")
+RES=$(grep "TokenManagementContractAddress1" ${YAMLPATH})
 if [[ ! -z $RES ]]; then
-	replaceAddressString
+	replaceAddressStringYAML
 fi
-CONTRACTADDR=$(cat /tmp/contractAddresses.json | python3 -c "import sys, json; print(json.load(sys.stdin)['TransactionManagement'])")
-RES=$(grep "TransactionManagementContractAddress1" ~/cryptoraves-subgraph/subgraph.yaml)
+RES=$(grep "TokenManagementContractAddress1localhost" ${LAMBDACREDPATH})
 if [[ ! -z $RES ]]; then
-	replaceAddressString
+	replaceAddressStringLAMBDA
+fi
+CONTRACTADDR=$(cat ${DATAJSONPATH} | python3 -c "import sys, json; print(json.load(sys.stdin)['UserManagement'])")
+RES=$(grep "UserManagementContractAddress1" ${YAMLPATH})
+if [[ ! -z $RES ]]; then
+	replaceAddressStringYAML
+fi
+RES=$(grep "UserManagementContractAddress1localhost" ${LAMBDACREDPATH})
+if [[ ! -z $RES ]]; then
+	replaceAddressStringLAMBDA
+fi
+CONTRACTADDR=$(cat ${DATAJSONPATH} | python3 -c "import sys, json; print(json.load(sys.stdin)['TransactionManagement'])")
+RES=$(grep "TransactionManagementContractAddress1" ${YAMLPATH})
+if [[ ! -z $RES ]]; then
+	replaceAddressStringYAML
+fi
+RES=$(grep "TransactionManagementContractAddress1localhost" ${LAMBDACREDPATH})
+if [[ ! -z $RES ]]; then
+	replaceAddressStringLAMBDA
 fi
 
 if [[ -z $BYPASS ]]; then

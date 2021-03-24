@@ -96,7 +96,7 @@ module.exports = function (deployer, network, accounts) {
 		randomTwitterId = getRandomInt(100000) * getRandomInt(100000)
 		twitterIds.push(randomTwitterId)
 		twitterUsername = 'rando'+getRandomInt(100000)
-		amount = getRandomInt(1000) * getRandomInt(1000)
+		//amount = getRandomInt(1000) * getRandomInt(1000)
 		res = await validatorInstance.validateCommand(
 			[434443434,randomTwitterId,0,amount,getRandomInt(3)],
 			['depositor420', twitterUsername, token,'twitter','transfer','',''],
@@ -104,7 +104,7 @@ module.exports = function (deployer, network, accounts) {
 			ethers.utils.formatBytes32String('')
 		)
 		console.log(res)
-		console.log(res.receipt.rawLogs)
+		//console.log(res.receipt.rawLogs)
 		counter++
   	}
 
@@ -155,13 +155,13 @@ module.exports = function (deployer, network, accounts) {
 		})
 
 	  	res = await validatorInstance.validateCommand(
-			[434443434,twitterIds[counter],0,tokenID,0],
+			[434443434,twitterIds[counter],0,tokenID,0, counter+100],
 			['depositor420', handles[counter], token,'twitter','transfer','https://i.picsum.photos/id/333/200/200.jpg',''],
 			[ethers.utils.formatBytes32String('')],
 			ethers.utils.formatBytes32String('')
 		)
 		console.log(res)
-		console.log(res.receipt.rawLogs)
+		//console.log(res.receipt.rawLogs)
 
 		counter++
   	}
@@ -176,13 +176,14 @@ module.exports = function (deployer, network, accounts) {
   		ethAccounts.push(ethAccount)
   		let url = "https://sample-imgs.s3.amazonaws.com/"+userName+".png"
 	  	let res = await validatorInstance.validateCommand(
-			[twitterIds[counter],0,0,0,0],
+			[twitterIds[counter],0,0,0,0,counter+1000],
 			[userName, '', '', 'twitter','mapaccount',url,ethAccount.address],
 			[],
 			ethers.utils.formatBytes32String('')
   		)
   		console.log(res)
-  		console.log(res.receipt.rawLogs)
+  		//console.log(res.receipt.rawLogs)
+
   		counter++
   	}
   	

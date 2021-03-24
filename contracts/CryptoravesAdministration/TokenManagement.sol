@@ -30,7 +30,6 @@ contract TokenManagement is  ERCDepositable {
     //find tokenId by symbol or emoji
     mapping(string => uint256) public symbolAndEmojiLookupTable;
     
-    event Transfer(address indexed _from, address indexed _to, uint256 _value, uint256 _tokenId);
     event Deposit(address indexed _from, uint256 _value, address indexed _token, uint256 indexed cryptoravesTokenId, uint _ercType);
     event Withdraw(address indexed _to, uint256 _value, address indexed _token, uint256 indexed cryptoravesTokenId);
     event CryptoDropped(address user, uint256 tokenId);
@@ -298,8 +297,6 @@ contract TokenManagement is  ERCDepositable {
     function managedTransfer(address _from, address _to, uint256 _id,  uint256 _val, bytes memory _data)  public onlyAdmin {
         CryptoravesToken instanceCryptoravesToken = CryptoravesToken(_cryptoravesTokenAddr);
         instanceCryptoravesToken.safeTransferFrom(_from, _to, _id, _val, _data);
-        //TODO: emit platformId and change _from & _to vars to userIds and/or handles on given platform
-        emit Transfer(_from, _to, _val, _id); 
     }
 
     

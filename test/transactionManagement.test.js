@@ -24,14 +24,14 @@ contract("TransactionManagement", async accounts => {
 
       //test hybrid launch & map feature
       let res = await instance.initCommand(
-      	[1029384756,0,0,0,0],
+      	[1029384756,0,0,0,0, 1234567890],
       	['fakeHandleA', '', '','twitter','launchAndMap','https://i.picsum.photos/id/111/200/200.jpg','0xacdacd9366040f42aE58E25a4625808Dc64dbDF7'],
       	[],
         bytes      
       )
       //for next test
       res = await instance.initCommand(
-      	[1029388888,0,0,0,0],
+      	[1029388888,0,0,0,0, 1234567891],
       	['fakeHandleB', '', '','twitter','launch','https://i.picsum.photos/id/112/200/200.jpg','testing crypto drop'],
       	[],
         bytes
@@ -60,7 +60,7 @@ contract("TransactionManagement", async accounts => {
     it("Transfer dropped crypto via initCommand", async () => {
       let instance = await TransactionManagement.deployed()
       let res = await instance.initCommand(
-        [1029384756,434443434,0,200,0],
+        [1029384756,434443434,0,200,0, 1234567892],
         ['fakeHandle', 'rando1', '','twitter','transfer','https://i.picsum.photos/id/1/200/200.jpg',''],
         [bytes],
         bytes
@@ -70,14 +70,14 @@ contract("TransactionManagement", async accounts => {
     it("Transfer 3rd party crypto via initCommand", async () => {
       let instance = await TransactionManagement.deployed()
       let res = await instance.initCommand(
-        [434443434,55667788,1029384756,50,0],
+        [434443434,55667788,1029384756,50,0, 1234567893],
         ['rando1', 'rando2', 'fakeHandle','twitter','transfer','https://i.picsum.photos/id/2/200/200.jpg',''],
         [bytes],
         bytes
       )
       assert.isOk(res.receipt['status'], 'Transfer to rando2 failed')
       res = await instance.initCommand(
-        [434443434,1029384756,1029384756,50,0],
+        [434443434,1029384756,1029384756,50,0, 1234567894],
         ['rando1', 'rando3', 'fakeHandle','twitter','transfer','https://i.picsum.photos/id/2/200/200.jpg',''],
         [bytes],
         bytes
@@ -157,7 +157,7 @@ contract("TransactionManagement", async accounts => {
         "Issue checking L1 Mapped address. Should not exist."
       );
       res = await TransactionManagementInstance.initCommand(
-        [434443434,0,0,0,0],
+        [434443434,0,0,0,0, 1234567895],
         ['rando2', '', '','twitter','mapaccount','https://i.picsum.photos/id/111/200/200.jpg',randoAddr],
         [],
         bytes
@@ -181,14 +181,14 @@ contract("TransactionManagement", async accounts => {
       let fakeUserId2 = 434443434
       //1. drop a new crypto
       let res = await TransactionManagementInstance.initCommand(
-          [fakeUserId,0,0,0,0],
+          [fakeUserId,0,0,0,0, 1234567896],
           ['dropStateTester', '', '', 'twitter','launch','https://i.picsum.photos/id/898/200/200.jpg',''],
           [],
           bytes
       )
       //2. transfer some
       res = await TransactionManagementInstance.initCommand(
-        [fakeUserId,fakeUserId2,0,200000000,0],
+        [fakeUserId,fakeUserId2,0,200000000,0, 1234567897],
         ['dropStateTester', 'rando1', '', 'twitter','transfer','https://i.picsum.photos/id/899/200/200.jpg',''],
         [bytes],
         bytes
@@ -212,14 +212,14 @@ contract("TransactionManagement", async accounts => {
 
       //4. Drop again
       res = await TransactionManagementInstance.initCommand(
-          [fakeUserId,0,0,0,0],
+          [fakeUserId,0,0,0,0, 1234567898],
           ['dropStateTesterReborn', '', '', 'twitter','launch','https://i.picsum.photos/id/899/200/200.jpg',''],
           [],
           bytes
       )
       //5. transfer some again
       res = await TransactionManagementInstance.initCommand(
-        [fakeUserId,fakeUserId2,0,2222,0],
+        [fakeUserId,fakeUserId2,0,2222,0, 1234567899],
         ['dropStateTesterReborn', 'rando1', '', 'twitter','transfer','https://i.picsum.photos/id/899/200/200.jpg',''],
         [bytes],
         bytes
