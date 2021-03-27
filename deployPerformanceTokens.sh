@@ -74,6 +74,16 @@ RES=$(grep "TransactionManagementContractAddress1localhost" ${LAMBDACREDPATH})
 if [[ ! -z $RES ]]; then
 	replaceAddressStringLAMBDA
 fi
+CONTRACTADDR=$(cat ${DATAJSONPATH} | python3 -c "import sys, json; print(json.load(sys.stdin)['ValidatorInterfaceContract'])")
+RES=$(grep "ValidatorInterfaceContractAddress1localhost" ${LAMBDACREDPATH})
+if [[ ! -z $RES ]]; then
+	replaceAddressStringLAMBDA
+fi
+CONTRACTADDR=$(cat ${DATAJSONPATH} | python3 -c "import sys, json; print(json.load(sys.stdin)['pubkey'])")
+RES=$(grep "pubkey1localhost" ${LAMBDACREDPATH})
+if [[ ! -z $RES ]]; then
+	replaceAddressStringLAMBDA
+fi
 
 if [[ -z $BYPASS ]]; then
 

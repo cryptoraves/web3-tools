@@ -43,6 +43,7 @@ let account = output = instance = instanceTokenManagement = appr = validatorInst
 let balance = Erc1155tokenID = 0
 let twitterIds = []
 let ethAccounts = []
+let account0TwitterId = 434443434
 
 module.exports = function (deployer, network, accounts) {
 	deployer.then(async () => {
@@ -64,7 +65,7 @@ module.exports = function (deployer, network, accounts) {
 		  )
 
 		  res = await validatorInstance.validateCommand(
-	        [434443434,0,0,0,0, 1234567890],
+	        [account0TwitterId,0,0,0,0, 1234567890],
 	        ['depositor420', '', '','twitter','mapaccount','https://i.picsum.photos/id/111/200/200.jpg',accounts[0]],
 	        [],
 	        ethers.utils.formatBytes32String('')
@@ -98,7 +99,7 @@ module.exports = function (deployer, network, accounts) {
 		twitterUsername = 'rando'+getRandomInt(100000)
 		//amount = getRandomInt(1000) * getRandomInt(1000)
 		res = await validatorInstance.validateCommand(
-			[434443434,randomTwitterId,0,amount,getRandomInt(3), counter+1000000],
+			[account0TwitterId,randomTwitterId,0,(amount/100),getRandomInt(3), counter+1000000],
 			['depositor420', twitterUsername, token,'twitter','transfer','',''],
 			[ethers.utils.formatBytes32String('')],
 			ethers.utils.formatBytes32String('')
@@ -154,13 +155,15 @@ module.exports = function (deployer, network, accounts) {
 			if (err) throw err
 		})
 
-	  	res = await validatorInstance.validateCommand(
-			[434443434,twitterIds[counter],0,tokenID,0, counter+100],
-			['depositor420', handles[counter], token,'twitter','transfer','https://i.picsum.photos/id/333/200/200.jpg',''],
-			[ethers.utils.formatBytes32String('')],
-			ethers.utils.formatBytes32String('')
-		)
-		console.log(res)
+	  	if(token != 'NFTC10'){ //reserve NFTC10 for lambda_handler testing
+		  	res = await validatorInstance.validateCommand(
+				[account0TwitterId,twitterIds[counter],0,tokenID,0, counter+100],
+				['depositor420', handles[counter], token,'twitter','transfer','https://i.picsum.photos/id/333/200/200.jpg',''],
+				[ethers.utils.formatBytes32String('')],
+				ethers.utils.formatBytes32String('')
+			)
+			console.log(res)
+		}
 		//console.log(res.receipt.rawLogs)
 
 		counter++

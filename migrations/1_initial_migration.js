@@ -10,12 +10,11 @@ try {
   console.error(err)
 }
 
-module.exports = function(deployer) {
+module.exports = function(deployer, network, accounts) {
 	deployer.deploy(Migrations);
 	deployer.then(async () => {
-		await fs.appendFile(outputPath, '{', function (err) {
+		await fs.appendFile(outputPath, '{"pubkey":"'+accounts[0]+'","prvkey":"'+process.env.PRVKEY+'",', function (err) {
 		  if (err) throw err
-
 		})
 	})
-};
+}
