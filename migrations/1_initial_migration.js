@@ -6,9 +6,7 @@ const outputPath = '/tmp/contractAddresses.json'
 try {
   fs.unlinkSync(outputPath)
   //file removed
-} catch(err) {
-  console.error(err)
-}
+} catch(e) {}
 
 module.exports = function(deployer, network, accounts) {
 	deployer.deploy(Migrations);
