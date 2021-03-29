@@ -73,13 +73,11 @@ module.exports = function (deployer, network, accounts) {
 	        ethers.utils.formatBytes32String('')
 	      )
 	      
-		  let layer2account = await instanceUserManagement.getLayerTwoAccount(accounts[0])
-		  console.log(layer2account)
+		  
 	      userPortfolios[account0TwitterId] = {
 	      	"twitterUsername":'depositor420',
 	      	"cryptoravesAddress":'0x'+res.receipt['rawLogs'][0]['topics'][1].substr(26),
 	      	"layer1account":accounts[0],
-	      	"layer2account":layer2account,
 	      	'imageUrl':'https://i.picsum.photos/id/111/200/200.jpg',
 	      	"balances":{}
 	      }
@@ -118,7 +116,7 @@ module.exports = function (deployer, network, accounts) {
 			ethers.utils.formatBytes32String('')
 		)
 
-		balance = await instanceCryptoravesToken.balanceOf(userPortfolios[account0TwitterId]['layer2account'] , Erc1155tokenID)
+		balance = await instanceCryptoravesToken.balanceOf(userPortfolios[account0TwitterId]['cryptoravesAddress'] , Erc1155tokenID)
 	    output = 'Account: '+accounts[0]+' Token: '+token+' Token Address: '+instance.address+' Balance: '+ethers.utils.formatUnits(balance.toString(), 18)+' CryptoravesTokenID: '+Erc1155tokenID+"\n"
 	  	await fs.appendFile(outputPath, output, function (err) {
 	  		console.log(output)
@@ -185,7 +183,7 @@ module.exports = function (deployer, network, accounts) {
 	    appr = await instance.approve(instanceTokenManagement.address, tokenID)
 	    Erc1155tokenID = await instanceTokenManagement.deposit(tokenID, instance.address, 721, true)
 	    Erc1155tokenID = Erc1155tokenID.logs[0]['args']['cryptoravesTokenId'].toString()
-		balance = await instanceCryptoravesToken.balanceOf(userPortfolios[account0TwitterId]['layer2account'] , Erc1155tokenID)
+		balance = await instanceCryptoravesToken.balanceOf(userPortfolios[account0TwitterId]['cryptoravesAddress'] , Erc1155tokenID)
 	    output = 'Account: '+accounts[0]+' Token: '+token+' Token Address: '+instance.address+' Balance: '+balance.toString()+' CryptoravesTokenID: '+Erc1155tokenID+"\n"
 	    await fs.appendFile(outputPath, output, function (err) {
 	  		console.log(output)
@@ -212,7 +210,7 @@ module.exports = function (deployer, network, accounts) {
 	    appr = await instance.approve(instanceTokenManagement.address, tokenID)
 	    Erc1155tokenID = await instanceTokenManagement.deposit(tokenID, instance.address, 721, true)
 	    Erc1155tokenID = Erc1155tokenID.logs[0]['args']['cryptoravesTokenId'].toString()
-		balance = await instanceCryptoravesToken.balanceOf(userPortfolios[account0TwitterId]['layer2account'] , Erc1155tokenID)
+		balance = await instanceCryptoravesToken.balanceOf(userPortfolios[account0TwitterId]['cryptoravesAddress'] , Erc1155tokenID)
 	    output = 'Account: '+accounts[0]+' Token: '+token+' Token Address: '+instance.address+' Balance: '+balance.toString()+' CryptoravesTokenID: '+Erc1155tokenID+"\n"
 	    await fs.appendFile(outputPath, output, function (err) {
 	  		console.log(output)
@@ -229,7 +227,7 @@ module.exports = function (deployer, network, accounts) {
 
 		//console.log(res.receipt.rawLogs)
 		console.log(userPortfolios[twitterIds[counter]])
-		balance = await instance.balanceOf(userPortfolios[twitterIds[counter]]['cryptoravesAddress'])
+		balance = await instanceCryptoravesToken.balanceOf(userPortfolios[twitterIds[counter]]['cryptoravesAddress'], Erc1155tokenID)
 
 		userPortfolios[twitterIds[counter]]['balances'][Erc1155tokenID.toString()] = {
 			'ticker':token,
