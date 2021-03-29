@@ -48,7 +48,7 @@ contract("ValidatorInterfaceContract", async accounts => {
       let instance = await ValidatorInterfaceContract.deployed()
   	  var bytes = ethers.utils.formatBytes32String('')
       let res = await instance.validateCommand(
-      	[primaryUserId,434443434,0,20074,2, 1234567891], //20074,2 represents a user-input value of 200.74 
+      	[primaryUserId,99434443434,0,20074,2, 1234567891], //20074,2 represents a user-input value of 200.74 
       	['@fakeHandle', '@rando1', '','twitter','transfer','https://i.picsum.photos/id/1/200/200.jpg'],
       	[bytes],
         bytes
@@ -59,14 +59,14 @@ contract("ValidatorInterfaceContract", async accounts => {
       let instance = await ValidatorInterfaceContract.deployed()
       var bytes = ethers.utils.formatBytes32String('')
       let res = await instance.validateCommand(
-      	[434443434,55667788,0,50,0, 1234567892],
+      	[99434443434,55667788,0,50,0, 1234567892],
       	['@rando1', '@rando2', '','twitter','transfer','https://i.picsum.photos/id/2/200/200.jpg'],
       	[bytes],
         bytes
       )
       assert.isOk(res.receipt['status']);
       res = await instance.validateCommand(
-      	[434443434,primaryUserId,0,50,0, 1234567893],
+      	[99434443434,primaryUserId,0,50,0, 1234567893],
       	['@rando1', '@rando2', '','twitter','transfer','https://i.picsum.photos/id/2/200/200.jpg'],
       	[bytes],
         bytes

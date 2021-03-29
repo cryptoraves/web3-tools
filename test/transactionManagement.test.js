@@ -60,7 +60,7 @@ contract("TransactionManagement", async accounts => {
     it("Transfer dropped crypto via initCommand", async () => {
       let instance = await TransactionManagement.deployed()
       let res = await instance.initCommand(
-        [1029384756,434443434,0,200,0, 1234567892],
+        [1029384756,99434443434,0,200,0, 1234567892],
         ['fakeHandle', 'rando1', '','twitter','transfer','https://i.picsum.photos/id/1/200/200.jpg',''],
         [bytes],
         bytes
@@ -70,14 +70,14 @@ contract("TransactionManagement", async accounts => {
     it("Transfer 3rd party crypto via initCommand", async () => {
       let instance = await TransactionManagement.deployed()
       let res = await instance.initCommand(
-        [434443434,55667788,1029384756,50,0, 1234567893],
+        [99434443434,55667788,1029384756,50,0, 1234567893],
         ['rando1', 'rando2', 'fakeHandle','twitter','transfer','https://i.picsum.photos/id/2/200/200.jpg',''],
         [bytes],
         bytes
       )
       assert.isOk(res.receipt['status'], 'Transfer to rando2 failed')
       res = await instance.initCommand(
-        [434443434,1029384756,1029384756,50,0, 1234567894],
+        [99434443434,1029384756,1029384756,50,0, 1234567894],
         ['rando1', 'rando3', 'fakeHandle','twitter','transfer','https://i.picsum.photos/id/2/200/200.jpg',''],
         [bytes],
         bytes
@@ -148,7 +148,7 @@ contract("TransactionManagement", async accounts => {
         "L1 Mapped address should exist"
       );
       //set token management contract back to original
-      res = await userManagementInstance.getUser(434443434);
+      res = await userManagementInstance.getUser(99434443434);
       addr = res['account']
       let randoAddr = ethers.Wallet.createRandom().address
       res = await userManagementInstance.userHasL1AddressMapped(addr)
@@ -157,12 +157,12 @@ contract("TransactionManagement", async accounts => {
         "Issue checking L1 Mapped address. Should not exist."
       );
       res = await TransactionManagementInstance.initCommand(
-        [434443434,0,0,0,0, 1234567895],
+        [99434443434,0,0,0,0, 1234567895],
         ['rando2', '', '','twitter','mapaccount','https://i.picsum.photos/id/111/200/200.jpg',randoAddr],
         [],
         bytes
       )
-      res = await userManagementInstance.getUser(434443434);
+      res = await userManagementInstance.getUser(99434443434);
       res = await userManagementInstance.userHasL1AddressMapped(addr)
       assert.isOk(
         res,
@@ -178,7 +178,7 @@ contract("TransactionManagement", async accounts => {
     it("sets an existing user's drop state and drops a new crypto", async () => {
       let TransactionManagementInstance = await TransactionManagement.deployed()
       let fakeUserId = 328928374
-      let fakeUserId2 = 434443434
+      let fakeUserId2 = 99434443434
       //1. drop a new crypto
       let res = await TransactionManagementInstance.initCommand(
           [fakeUserId,0,0,0,0, 1234567896],
