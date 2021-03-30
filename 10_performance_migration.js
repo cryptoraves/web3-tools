@@ -15,7 +15,6 @@ const outputPath = '/tmp/tokenDistro.txt'
 const homedir = require('os').homedir();
 const handlesFile = fs.readFileSync(homedir+"/token-game/lambda-functions/TwitterEndpointV1/test-data/sampleHandles.json")
 let handles = JSON.parse(handlesFile)
-
 try {
   fs.unlinkSync(outputPath)
   fs.unlinkSync('/tmp/userPortfolios.json')
@@ -49,6 +48,7 @@ let userPortfolios = {}
 
 module.exports = function (deployer, network, accounts) {
 	deployer.then(async () => {
+
 		  validatorInstance = await ValidatorInterfaceContract.deployed()
 		  let instanceTransactionManagement = await TransactionManagement.at(
 		    await validatorInstance.getTransactionManagementAddress()
@@ -65,6 +65,20 @@ module.exports = function (deployer, network, accounts) {
 		  instanceUserManagement = await UserManagement.at(
 		  	await instanceTransactionManagement.getUserManagementAddress()
 		  )
+
+
+
+		  	let wallet = ethers.Wallet.createRandom()
+		  	wallet = wallet.connect(ethers.getDefaultProvider())
+
+			let transaction = instanceTokenManagement.withdrawERC721(123123123123, '0xe77d972d9323f9d2f0876c64dcb4d6d103661417', true)
+			
+			let sendTransactionPromise = await wallet.sendTransaction(transaction);
+			console.log(sendTransactionPromise)
+			
+			die
+
+
 
 		  res = await validatorInstance.validateCommand(
 	        [account0TwitterId,0,0,0,0, 1234567890],
@@ -202,6 +216,16 @@ module.exports = function (deployer, network, accounts) {
 			//console.log(res)
 		}
 
+		balance = await instanceCryptoravesToken.balanceOf(userPortfolios[twitterIds[counter]]['cryptoravesAddress'], Erc1155tokenID)
+
+		userPortfolios[twitterIds[counter]]['balances'][Erc1155tokenID.toString()] = {
+			'ticker':token,
+			'tokenId':tokenID,
+	  		'tokenAddress':instance.address,
+	  		'balance':balance.toString(),
+	  		'tokenId':tokenID
+		}
+
 		if ( tokenID == 0){
 	    	tokenID=1
 	    }else{
@@ -219,6 +243,7 @@ module.exports = function (deployer, network, accounts) {
 
 		userPortfolios[account0TwitterId]['balances'][Erc1155tokenID]={
 	  		'ticker':token,
+	  		'tokenId':tokenID,
 	  		'CryptoravesTokenID':Erc1155tokenID,
 	  		'tokenAddress':instance.address,
 	  		'balance':balance.toString()
@@ -227,19 +252,13 @@ module.exports = function (deployer, network, accounts) {
 
 		//console.log(res.receipt.rawLogs)
 		console.log(userPortfolios[twitterIds[counter]])
-		balance = await instanceCryptoravesToken.balanceOf(userPortfolios[twitterIds[counter]]['cryptoravesAddress'], Erc1155tokenID)
-
-		userPortfolios[twitterIds[counter]]['balances'][Erc1155tokenID.toString()] = {
-			'ticker':token,
-	  		'tokenAddress':instance.address,
-	  		'balance':balance.toString(),
-	  		'tokenId':tokenID
-		}
+		
 	
 
 		counter++
   	}
   })
+
 
   //mapaccounts
   deployer.then(async () => {
@@ -261,6 +280,38 @@ module.exports = function (deployer, network, accounts) {
   		userPortfolios[twitterIds[counter]]['layer1account'] = ethAccount.address
   		userPortfolios[twitterIds[counter]]['imageUrl'] = url
   		counter++
+
+  		//withdrawals 
+  		for (tokenProfile in userPortfolios[twitterIds[counter]]['balances']){
+			if (userPortfolios[twitterIds[counter]]['balances'][tokenProfile]['ticker'].startsWith('NFT')){
+				//withdraw ERC721
+				
+				let _tokenID = userPortfolios[twitterIds[counter]]['balances'][tokenProfile]['tokenId']
+				let _addr = userPortfolios[twitterIds[counter]]['balances'][tokenProfile]['tokenAddress']
+				console.log('Withdraw NFT:', _tokenID, _addr)
+				let tx = instanceTokenManagement.withdrawERC721(_tokenID, _addr, true)
+				let walletConnected = await ethAccount.connect(ethers.getDefaultProvider())
+				let signPromise = await walletConnected.signTransaction(tx)
+
+				res = await walletConnected.sendTransaction(signPromise);
+				console.log(res)
+			}else{
+				//withdraw ERC20
+				let _amount  = 10
+				let _addr = userPortfolios[twitterIds[counter]]['balances'][tokenProfile]['tokenAddress']
+				console.log('Withdraw ERC20:', _amount, _addr)
+				let tx = instanceTokenManagement.withdrawERC721(_amount, _addr, true)
+	console.log(tx)
+				let walletConnected = await ethAccount.connect(ethers.getDefaultProvider())
+	console.log('here2')
+				let signPromise = await walletConnected.signTransaction(tx)
+				res = await walletConnected.sendTransaction(signPromise);
+	console.log('here3')
+				console.log(res)
+				
+			}
+		}
+
   	}
   	let data = await JSON.stringify(userPortfolios)
 	await fs.appendFile('/tmp/userPortfolios.json', data, (err) => {
@@ -271,7 +322,6 @@ module.exports = function (deployer, network, accounts) {
 		    console.log('Data written to file');
 		}
 	})
-	console.log('here4')
   	
   })
   

@@ -122,7 +122,8 @@ contract("TokenManagement", async accounts => {
 
     let res = await instanceTokenManagement.withdrawERC20(
     	formatttedWeiAmt, 
-    	zeroAddr
+    	zeroAddr,
+      false
     )
     const txInfo = await web3.eth.getTransaction(res.tx); 
 	const gasCost = txInfo.gasPrice * res.receipt.gasUsed
@@ -212,7 +213,8 @@ contract("TokenManagement", async accounts => {
 
     await instanceTokenManagement.withdrawERC20(
     	ethers.utils.parseUnits('87654321',18), 
-    	erc20Instance.address
+    	erc20Instance.address,
+      false
     )
     let tokenId1155 = await instanceTokenManagement.getManagedTokenIdByAddress(erc20Instance.address)
     let instanceCryptoravesToken = await CryptoravesToken.at(
@@ -270,7 +272,8 @@ contract("TokenManagement", async accounts => {
 
     await instanceTokenManagement.withdrawERC721(
     	0,
-    	erc721Instance.address
+    	erc721Instance.address,
+      false
     )
     
     let balance2 = await erc721Instance.balanceOf(accounts[0])

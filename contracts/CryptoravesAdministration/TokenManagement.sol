@@ -31,7 +31,7 @@ contract TokenManagement is  ERCDepositable {
     mapping(string => uint256) public symbolAndEmojiLookupTable;
     
     event Deposit(address indexed _from, uint256 _value, address indexed _token, uint256 indexed cryptoravesTokenId, uint _ercType);
-    event Withdraw(address indexed _to, uint256 _value, address indexed _token, uint256 indexed cryptoravesTokenId);
+    event Withdraw(address indexed _to, uint256 _value, address indexed _token, uint256 indexed cryptoravesTokenId, uint _ercType);
     event CryptoDropped(address user, uint256 tokenId);
     
     constructor(string memory _uri) public {
@@ -88,7 +88,7 @@ contract TokenManagement is  ERCDepositable {
         //1. lookup msg.sender's L2 account 
         address _l2Addr = iTxnMgmt.getUserL2AccountFromL1Account(msg.sender);
         //2. require they are mapped to an L2 account
-        require(_l2Addr != address(0), 'Depositor\'s L1 account not mapped to cryptoraves (L2) account');
+        require(_l2Addr != address(0), 'Depositor/Withdrawer\'s L1 account not mapped to cryptoraves (L2) account');
         return _l2Addr;
     }
     
@@ -135,26 +135,38 @@ contract TokenManagement is  ERCDepositable {
     }
 
     
-    function withdrawERC20(uint256 _amount, address _contract) public payable returns(uint256){
+    function withdrawERC20(uint256 _amount, address _contract, bool _isManagedWithdraw) public payable returns(uint256){
         _withdrawERC20(_amount, _contract);
         
         uint256 _1155tokenId = getManagedTokenIdByAddress(_contract);
-        _burn(msg.sender, _1155tokenId, _amount);
-        
-        Withdraw(msg.sender, _amount, _contract, _1155tokenId);
+        address _burnAddr;
+        if (_isManagedWithdraw) {
+            _burnAddr = getL2AddressForManagedDeposit();
+        } else {
+            _burnAddr = msg.sender;   
+        }
+
+        _burn(_burnAddr, _1155tokenId, _amount);
+        emit Withdraw(msg.sender, _amount, _contract, _1155tokenId, 20);
         
         return _1155tokenId;
 
     }
     
-    function withdrawERC721(uint256 _tokenId, address _contract) public payable returns(uint256){
+    function withdrawERC721(uint256 _tokenId, address _contract, bool _isManagedWithdraw) public payable returns(uint256){
         _withdrawERC721(_tokenId, _contract);
         
         uint256 _1155tokenId = getManagedTokenIdByAddress(_contract) + _tokenId;
-        _burn(msg.sender, _1155tokenId, 1);
-        
-        Withdraw(msg.sender, _tokenId, _contract, _1155tokenId);
-        
+        address _burnAddr;
+        if (_isManagedWithdraw) {
+            _burnAddr = getL2AddressForManagedDeposit();
+        } else {
+            _burnAddr = msg.sender;   
+        }
+
+        _burn(_burnAddr, _1155tokenId, 1);
+        emit Withdraw(msg.sender, _tokenId, _contract, _1155tokenId, 721);
+
         return _1155tokenId;
         
     }
