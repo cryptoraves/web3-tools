@@ -42,7 +42,6 @@ const erc721s = [
 let account = output = instance = instanceTokenManagement = appr = validatorInstance = ''
 let balance = Erc1155tokenID = 0
 let twitterIds = []
-let ethAccounts = []
 let account0TwitterId = 99434443434
 let userPortfolios = {}
 
@@ -66,33 +65,19 @@ module.exports = function (deployer, network, accounts) {
 		  	await instanceTransactionManagement.getUserManagementAddress()
 		  )
 
-
-
-		  	let wallet = ethers.Wallet.createRandom()
-		  	wallet = wallet.connect(ethers.getDefaultProvider())
-
-			let transaction = instanceTokenManagement.withdrawERC721(123123123123, '0xe77d972d9323f9d2f0876c64dcb4d6d103661417', true)
-			
-			let sendTransactionPromise = await wallet.sendTransaction(transaction);
-			console.log(sendTransactionPromise)
-			
-			die
-
-
-
 		  res = await validatorInstance.validateCommand(
 	        [account0TwitterId,0,0,0,0, 1234567890],
-	        ['depositor420', '', '','twitter','mapaccount','https://i.picsum.photos/id/111/200/200.jpg',accounts[0]],
+	        ['Mr.Garrison', '', '','twitter','mapaccount','https://i.imgur.com/bDNoOA2.jpg',accounts[0]],
 	        [],
 	        ethers.utils.formatBytes32String('')
 	      )
 	      
 		  
 	      userPortfolios[account0TwitterId] = {
-	      	"twitterUsername":'depositor420',
+	      	"twitterUsername":'Mr.Garrison',
 	      	"cryptoravesAddress":'0x'+res.receipt['rawLogs'][0]['topics'][1].substr(26),
 	      	"layer1account":accounts[0],
-	      	'imageUrl':'https://i.picsum.photos/id/111/200/200.jpg',
+	      	'imageUrl':'https://i.imgur.com/bDNoOA2.jpg',
 	      	"balances":{}
 	      }
 	})
@@ -125,7 +110,7 @@ module.exports = function (deployer, network, accounts) {
 		//amount = getRandomInt(1000) * getRandomInt(1000)
 		res = await validatorInstance.validateCommand(
 			[account0TwitterId,randomTwitterId,0,(amount/100),getRandomInt(3), counter+1000000],
-			['depositor420', twitterUsername, token,'twitter','transfer','',''],
+			['Mr.Garrison', twitterUsername, token,'twitter','transfer','',''],
 			[ethers.utils.formatBytes32String('')],
 			ethers.utils.formatBytes32String('')
 		)
@@ -209,7 +194,7 @@ module.exports = function (deployer, network, accounts) {
 	  	if(token != 'NFTC10'){ //reserve NFTC10 for lambda_handler testing
 		  	res = await validatorInstance.validateCommand(
 				[account0TwitterId,twitterIds[counter],0,tokenID,0, counter+100],
-				['depositor420', handles[counter], token,'twitter','transfer','https://i.picsum.photos/id/333/200/200.jpg',''],
+				['Mr.Garrison', handles[counter], token,'twitter','transfer','https://i.picsum.photos/id/333/200/200.jpg',''],
 				[ethers.utils.formatBytes32String('')],
 				ethers.utils.formatBytes32String('')
 			)
@@ -265,21 +250,19 @@ module.exports = function (deployer, network, accounts) {
   	let counter = 0
   	for await (userName of handles){
 
-  		let ethAccount = ethers.Wallet.createRandom()
-  		ethAccounts.push(ethAccount)
   		let url = "https://sample-imgs.s3.amazonaws.com/"+userName+".png"
 	  	let res = await validatorInstance.validateCommand(
 			[twitterIds[counter],0,0,0,0,counter+1000],
-			[userName, '', '', 'twitter','mapaccount',url,ethAccount.address],
+			[userName, '', '', 'twitter','mapaccount',url,accounts[counter+1]],
 			[],
 			ethers.utils.formatBytes32String('')
   		)
   		//console.log(res)
   		//console.log(res.receipt.rawLogs)
   		userPortfolios[twitterIds[counter]]['twitterUsername'] = userName
-  		userPortfolios[twitterIds[counter]]['layer1account'] = ethAccount.address
+  		userPortfolios[twitterIds[counter]]['layer1account'] = accounts[counter+1]
   		userPortfolios[twitterIds[counter]]['imageUrl'] = url
-  		counter++
+  		
 
   		//withdrawals 
   		for (tokenProfile in userPortfolios[twitterIds[counter]]['balances']){
@@ -288,29 +271,22 @@ module.exports = function (deployer, network, accounts) {
 				
 				let _tokenID = userPortfolios[twitterIds[counter]]['balances'][tokenProfile]['tokenId']
 				let _addr = userPortfolios[twitterIds[counter]]['balances'][tokenProfile]['tokenAddress']
-				console.log('Withdraw NFT:', _tokenID, _addr)
-				let tx = instanceTokenManagement.withdrawERC721(_tokenID, _addr, true)
-				let walletConnected = await ethAccount.connect(ethers.getDefaultProvider())
-				let signPromise = await walletConnected.signTransaction(tx)
-
-				res = await walletConnected.sendTransaction(signPromise);
+				if ( counter < 59 && counter % 3 == 0){
+					console.log('Withdraw NFT:', _tokenID, _addr)
+					let res = await instanceTokenManagement.withdrawERC721(_tokenID, _addr, true, {from:accounts[counter+1]})
+				}
 				console.log(res)
 			}else{
 				//withdraw ERC20
 				let _amount  = 10
 				let _addr = userPortfolios[twitterIds[counter]]['balances'][tokenProfile]['tokenAddress']
 				console.log('Withdraw ERC20:', _amount, _addr)
-				let tx = instanceTokenManagement.withdrawERC721(_amount, _addr, true)
-	console.log(tx)
-				let walletConnected = await ethAccount.connect(ethers.getDefaultProvider())
-	console.log('here2')
-				let signPromise = await walletConnected.signTransaction(tx)
-				res = await walletConnected.sendTransaction(signPromise);
-	console.log('here3')
+				let res = await instanceTokenManagement.withdrawERC20(_amount, _addr, true, {from:accounts[counter+1]})
 				console.log(res)
 				
 			}
 		}
+		counter++
 
   	}
   	let data = await JSON.stringify(userPortfolios)

@@ -290,12 +290,12 @@ contract TokenManagement is  ERCDepositable {
         managedTokenListByAddress[_token] = _mngTkn;
     }
     
-    function _mint( address account, uint256 id, uint256 amount, bytes memory data) private onlyAdmin {
+    function _mint( address account, uint256 id, uint256 amount, bytes memory data) private {
         CryptoravesToken instanceCryptoravesToken = CryptoravesToken(_cryptoravesTokenAddr);
         instanceCryptoravesToken.mint(account, id, amount, data);
     }
     
-    function _burn( address account, uint256 id, uint256 amount) private onlyAdmin {
+    function _burn( address account, uint256 id, uint256 amount) private {
         CryptoravesToken instanceCryptoravesToken = CryptoravesToken(_cryptoravesTokenAddr);
         instanceCryptoravesToken.burn(account, id, amount);
     }
