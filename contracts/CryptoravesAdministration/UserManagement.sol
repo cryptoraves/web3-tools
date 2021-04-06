@@ -20,8 +20,8 @@ contract UserManagement is AdministrationContract {
     }
 
     event NewUser(uint256 _userId, string _userName, address _address, string imageUrl);
-    event UsernameChange(uint256 _userId, string _handle);
-    event ImageChange(uint256 _userId, string imageUrl);
+    event UsernameChange(uint256 _userId, string _handle, uint256 blockNumber);
+    event ImageChange(uint256 _userId, string imageUrl, uint256 blockNumber);
     
     //maps platform user id to User object
     mapping(uint256 => User) public users;
@@ -106,14 +106,14 @@ contract UserManagement is AdministrationContract {
                 //update user handle if no match
                 users[_platformUserId].twitterHandle = _twitterHandle;
                 userIDs[_twitterHandle] = _platformUserId;
-                emit UsernameChange(_platformUserId, _twitterHandle);
+                emit UsernameChange(_platformUserId, _twitterHandle, block.number);
             }
             //check if imageUrl has changed
             if(!AdminToolsLibrary._stringsMatch(_imageUrl, users[_platformUserId].imageUrl)){
                 //make sure imageUrl isn't empty
                 if(!AdminToolsLibrary._stringsMatch(_imageUrl, '')){
                     users[_platformUserId].imageUrl = _imageUrl;
-                    emit ImageChange(_platformUserId, _imageUrl);
+                    emit ImageChange(_platformUserId, _imageUrl, block.number);
                 }
             }
             return users[_platformUserId].account;
