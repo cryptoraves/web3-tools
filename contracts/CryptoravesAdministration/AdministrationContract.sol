@@ -18,7 +18,7 @@ interface ITokenManager {
     function getUserManagementAddress() external view returns(address);
     function getAddressBySymbol(string memory) external view returns(address);
     function getManagedTokenIdByAddress(address) external view returns(uint256);
-    function dropCrypto(string memory, address, uint256, uint256, bytes memory) external;
+    function dropCrypto(string memory, address, uint256, bytes memory) external;
     function managedTransfer(address, address, uint256, uint256, bytes memory) external;
     function setIsManagedToken(address, bool) external;
     function adjustValueByUnits(uint256, uint256, uint256) external view returns(uint256);

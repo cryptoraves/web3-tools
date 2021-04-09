@@ -46,7 +46,6 @@ contract("TokenManagement", async accounts => {
       'fakeUser1',
       accounts[0],
       amount,
-      amount,
       ethers.utils.formatBytes32String('test')
     )
     
@@ -158,7 +157,6 @@ contract("TokenManagement", async accounts => {
       false
     )
     let tokenId1155 = await instanceTokenManagement.getManagedTokenIdByAddress(erc20Instance.address)
-
     let instanceCryptoravesToken = await CryptoravesToken.at(
       await instanceTokenManagement.getCryptoravesTokenAddress()
     )
@@ -239,9 +237,7 @@ contract("TokenManagement", async accounts => {
       erc721Id
     )
     //console.log(await erc721Instance.safeTransferFrom(accounts[0], instanceTokenManagement.address, erc721Id))
-    
     //console.log(erc721Instance.address)
-
     await instanceTokenManagement.deposit(
     	erc721Id,
     	erc721Instance.address,
@@ -249,10 +245,13 @@ contract("TokenManagement", async accounts => {
       false
     )
     let tokenId1155 = await instanceTokenManagement.getManagedTokenIdByAddress(erc721Instance.address)
+    
     let instanceCryptoravesToken = await CryptoravesToken.at(
       await instanceTokenManagement.getCryptoravesTokenAddress()
     )
+    
     let balance = await instanceCryptoravesToken.balanceOf(accounts[0], tokenId1155)
+    
     assert.equal(
     	balance.toString(),
     	1,

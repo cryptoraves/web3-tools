@@ -25,7 +25,7 @@ contract("TransactionManagement", async accounts => {
       //test hybrid launch & map feature
       let res = await instance.initCommand(
       	[1029384756,0,0,0,0, 1234567890],
-      	['fakeHandleA', '', '','twitter','launchAndMap','https://i.picsum.photos/id/111/200/200.jpg','0xacdacd9366040f42aE58E25a4625808Dc64dbDF7'],
+      	['fakeHandleA', '', '','twitter','launchAndMap','https://i.picsum.photos/id/111/200/200.jpg','0xacdacd9366040f42aE58E25a4625808Dc64dbDF7'], //random address
       	[],
         bytes      
       )

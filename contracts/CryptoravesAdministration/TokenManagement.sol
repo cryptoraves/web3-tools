@@ -15,16 +15,7 @@ contract TokenManagement is  ERCDepositable {
     //Inceremental base token id list
     address[] public tokenListByBaseId;
     
-    //mapping for token ids and their origin addresses
-    struct ManagedToken {
-        uint256 managedTokenBaseId;
-        bool isManagedToken;
-        uint ercType;
-        uint256 totalSupply;
-        string symbol;
-        uint256 decimals;
-        string emoji;
-    }
+    
     mapping(address => ManagedToken) public managedTokenListByAddress;
 
     //find tokenId by symbol or emoji
@@ -32,6 +23,7 @@ contract TokenManagement is  ERCDepositable {
     
     event Deposit(address indexed _from, uint256 _value, address indexed _token, uint256 indexed cryptoravesTokenId, uint _ercType);
     event Withdraw(address indexed _to, uint256 _value, address indexed _token, uint256 indexed cryptoravesTokenId, uint _ercType);
+    event Token(ManagedToken);
     event CryptoDropped(address user, uint256 tokenId);
     
     constructor(string memory _uri) public {
@@ -56,10 +48,10 @@ contract TokenManagement is  ERCDepositable {
         This will reduce false account creation attacks, while allowing dapp-only launches
         
     */
-    function dropCrypto(string memory _twitterHandleFrom, address account, uint256 amount, uint256 _totalSupply, bytes memory data) public virtual onlyAdmin {
-        
+    function dropCrypto(string memory _twitterHandleFrom, address account, uint256 amount, bytes memory data) public virtual onlyAdmin {
+       
         if(!managedTokenListByAddress[account].isManagedToken) {
-            _addTokenToManagedTokenList(account, 1155, _totalSupply);
+            _addTokenToManagedTokenList(account, 1155);
         }
 
         uint256 _1155tokenId = getManagedTokenIdByAddress(account);
@@ -95,17 +87,9 @@ contract TokenManagement is  ERCDepositable {
     function deposit(uint256 _amountOrId, address _contract, uint _ercType, bool _managedTransfer) public payable returns(uint256){
         
         if(!managedTokenListByAddress[_contract].isManagedToken) {
-            _addTokenToManagedTokenList(_contract, _ercType, 0);
+            _addTokenToManagedTokenList(_contract, _ercType);
         }
-        
-        if(_contract != address(0)){ //clause for ETH
-            managedTokenListByAddress[_contract].totalSupply = getTotalSupplyOf3rdPartyToken(_contract);
-        } else {
-            if (!AdminToolsLibrary._stringsMatch(managedTokenListByAddress[_contract].symbol , 'ETH')) {
-                managedTokenListByAddress[_contract].symbol = 'ETH';
-            }
-        }
-        
+          
         uint256 _1155tokenId;
         
         address _mintTo;
@@ -261,33 +245,27 @@ contract TokenManagement is  ERCDepositable {
         return tokenListByBaseId.length;
     }
     
-    function _addTokenToManagedTokenList(address _token, uint ercType, uint256 _totalSupply) private onlyAdmin{
+    function _addTokenToManagedTokenList(address _token, uint ercType) private onlyAdmin{
         tokenListByBaseId.push(_token);
         
         ManagedToken memory _mngTkn;
-        
-        _mngTkn.managedTokenBaseId = tokenListByBaseId.length - 1;
-        _mngTkn.isManagedToken = true;
-        _mngTkn.ercType = ercType;
-        if(_totalSupply > 0){
-            _mngTkn.totalSupply = _totalSupply;
-        }
-        
         if(ercType == 20 || ercType == 721){
-            //need clause for ETH
+            //need clause for ETH?
             if(address(0) != _token){
-                _mngTkn.totalSupply = getTotalSupplyOf3rdPartyToken(_token);
-                string memory symbol = getSymbolOf3rdPartyToken(_token);
-                _mngTkn.symbol = symbol;
-                symbolAndEmojiLookupTable[symbol] = _mngTkn.managedTokenBaseId << 128;
+                _mngTkn = getERCspecs(_token, ercType);
             }
+
         } else {
             //assign symbol of erc1155
-            
-            
         }
+
+        _mngTkn.managedTokenBaseId = tokenListByBaseId.length - 1;
+        symbolAndEmojiLookupTable[_mngTkn.symbol] = _mngTkn.managedTokenBaseId << 128;
+        _mngTkn.isManagedToken = true;
+        _mngTkn.ercType = ercType;
         
         managedTokenListByAddress[_token] = _mngTkn;
+        emit Token(_mngTkn);
     }
     
     function _mint( address account, uint256 id, uint256 amount, bytes memory data) private {

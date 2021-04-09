@@ -1,22 +1,40 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.6.10;
+pragma experimental ABIEncoderV2;
 
 import "/home/cartosys/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import "./AdministrationContract.sol";
 import "/home/cartosys/openzeppelin-contracts/contracts/token/ERC721/IERC721Receiver.sol";
 
 contract ERCDepositable is IERC721Receiver, AdministrationContract {
-    
-    function getTotalSupplyOf3rdPartyToken(address _tknAddr) public view returns (uint256) {
-        IERCuni token = IERCuni(_tknAddr);
-        return token.totalSupply();
+
+    //mapping for token ids and their origin addresses
+    struct ManagedToken {
+        uint256 managedTokenBaseId;
+        bool isManagedToken;
+        uint ercType;
+        uint256 totalSupply;
+        string name;
+        string symbol;
+        uint256 decimals;
+        string emoji;
     }
-    
-    function getSymbolOf3rdPartyToken(address _tknAddr) public view returns (string memory) {
+
+    function getERCspecs(address _tknAddr, uint _ercType)  public view returns (ManagedToken memory){
         IERCuni token = IERCuni(_tknAddr);
-        return token.symbol();
+
+        ManagedToken memory _tknData;
+
+        _tknData.name = token.name();
+        _tknData.symbol = token.symbol();
+        _tknData.totalSupply = token.totalSupply(); //ERC721 openzeppelin version 3.0.0 (the one used here at his time) has a totalSupply() function. Newer version don't
+
+        if(_ercType == 20){
+            _tknData.decimals = token.decimals();
+            
+        }
+        return _tknData;
     }
-    
     
     /**
     * @dev Allows a user to deposit ETH or an ERC20 into the contract.
@@ -70,7 +88,9 @@ contract ERCDepositable is IERC721Receiver, AdministrationContract {
 interface IERCuni is IERC20 {
     //adding erc721 function for minimilaization of inhereitances
     function safeTransferFrom(address from, address to, uint256 tokenId) external;
+    function name() external view returns(string memory);
     function symbol() external view returns(string memory);
+    function tokenURI(uint256) external view returns(string memory);
     function totalSupply() external view override returns (uint256);
     function decimals() external view returns (uint8);
 }
