@@ -174,6 +174,21 @@ contract("TokenManagement", async accounts => {
       'CryptoravesToken transfer failed'
     )
 
+    //get specs from ERC721 contract
+    let specs = await instanceTokenManagement.getERCspecs(erc20Instance.address, 20)
+
+    assert.isOk(
+      specs['managedTokenBaseId'] == '0' &&
+      specs['isManagedToken'] == false &&
+      specs['ercType'] == '0' &&
+      specs['totalSupply'] == '1000000000000000000000000000' &&
+      specs['name'] == 'TokenX' &&
+      specs['symbol'] == 'TKX' &&
+      specs['decimals'] == '18' &&
+      specs['emoji'] == '',
+      'Metadata error from ERC721 contract'
+    )
+
   })
 
   it("checks symbol & emoji lookup", async () => {
@@ -256,6 +271,20 @@ contract("TokenManagement", async accounts => {
     	balance.toString(),
     	1,
     	'ERC721 balance does not match after deposit'
+    )
+
+    //get specs from ERC721 contract
+    let specs = await instanceTokenManagement.getERCspecs(erc721Instance.address, 721)
+    assert.isOk(
+      specs['managedTokenBaseId'] == '0' &&
+      specs['isManagedToken'] == false &&
+      specs['ercType'] == '0' &&
+      specs['totalSupply'] == '1' &&
+      specs['name'] == 'TokenY' &&
+      specs['symbol'] == 'TKY' &&
+      specs['decimals'] == '0' &&
+      specs['emoji'] == '',
+      'Metadata error from ERC721 contract'
     )
   })
   
