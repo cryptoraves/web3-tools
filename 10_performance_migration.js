@@ -144,9 +144,10 @@ module.exports = function (deployer, network, accounts) {
 
 
 		//set emoji
-		try{
+
+		if (Erc1155tokenID != '1000000000000000000000000000000000001'){
 			await instanceTokenManagement.setEmoji(Erc1155tokenID, '😑')
-		}catch{}
+		}
 		
 		//console.log(userPortfolios[randomTwitterId])
 		counter++

@@ -19,9 +19,9 @@ contract UserManagement is AdministrationContract {
         uint256 tokenId;
     }
 
-    event NewUser(uint256 _userId, string _userName, address _address, string imageUrl);
-    event UsernameChange(uint256 _userId, string _handle, uint256 blockNumber);
-    event ImageChange(uint256 _userId, string imageUrl, uint256 blockNumber);
+    event UserData(uint256 _userId, string _userName, address _address, string imageUrl);
+    event UsernameChange(uint256 _userId, string _handle);
+    event ImageChange(uint256 _userId, string imageUrl);
     
     //maps platform user id to User object
     mapping(uint256 => User) public users;
@@ -69,7 +69,7 @@ contract UserManagement is AdministrationContract {
         userAccounts[address(receiver)] = _userId;
         userIDs[_twitterHandleFrom] = _userId;
         
-        emit NewUser(_userId, _twitterHandleFrom, address(receiver), _imageUrl);
+        emit UserData(_userId, _twitterHandleFrom, address(receiver), _imageUrl);
         
         return address(receiver);
     }
@@ -106,14 +106,14 @@ contract UserManagement is AdministrationContract {
                 //update user handle if no match
                 users[_platformUserId].twitterHandle = _twitterHandle;
                 userIDs[_twitterHandle] = _platformUserId;
-                emit UsernameChange(_platformUserId, _twitterHandle, block.number);
+                emit UsernameChange(_platformUserId, _twitterHandle);
             }
             //check if imageUrl has changed
             if(!AdminToolsLibrary._stringsMatch(_imageUrl, users[_platformUserId].imageUrl)){
                 //make sure imageUrl isn't empty
                 if(!AdminToolsLibrary._stringsMatch(_imageUrl, '')){
                     users[_platformUserId].imageUrl = _imageUrl;
-                    emit ImageChange(_platformUserId, _imageUrl, block.number);
+                    emit ImageChange(_platformUserId, _imageUrl);
                 }
             }
             return users[_platformUserId].account;
