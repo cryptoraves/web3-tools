@@ -10,6 +10,7 @@ contract UserManagement is AdministrationContract {
     using Address for address;
     
     struct User {
+        uint256 twitterUserId;
         address account;
         string twitterHandle;
         string imageUrl;
@@ -19,7 +20,7 @@ contract UserManagement is AdministrationContract {
         uint256 tokenId;
     }
 
-    event UserData(uint256 _userId, string _userName, address _address, string imageUrl);
+    event UserData(User);
     event UsernameChange(uint256 _userId, string _handle);
     event ImageChange(uint256 _userId, string imageUrl);
     
@@ -57,7 +58,7 @@ contract UserManagement is AdministrationContract {
         
          //create a new user
         User memory user;
-
+        user.twitterUserId = _userId;
         user.account = address(receiver);
         user.imageUrl = _imageUrl;
         user.twitterHandle = _twitterHandleFrom;
@@ -69,7 +70,7 @@ contract UserManagement is AdministrationContract {
         userAccounts[address(receiver)] = _userId;
         userIDs[_twitterHandleFrom] = _userId;
         
-        emit UserData(_userId, _twitterHandleFrom, address(receiver), _imageUrl);
+        emit UserData(user);
         
         return address(receiver);
     }
