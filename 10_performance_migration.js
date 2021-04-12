@@ -96,7 +96,7 @@ module.exports = function (deployer, network, accounts) {
 
 	    appr = await instance.approve(instanceTokenManagement.address, ethers.utils.parseEther(amount.toString()))
 	    Erc1155tokenID = await instanceTokenManagement.deposit(ethers.utils.parseEther(amount.toString()), instance.address, 20, true)
-	    Erc1155tokenID = Erc1155tokenID.logs[0]['args']['cryptoravesTokenId'].toString()
+	    Erc1155tokenID = Erc1155tokenID.logs[1]['args']['cryptoravesTokenId'].toString()
 
 	    if(Erc1155tokenID==0){
 	    	Erc1155tokenID='10000000000000000000000000000000000000001'
@@ -141,7 +141,7 @@ module.exports = function (deployer, network, accounts) {
 	  		'tokenAddress':instance.address,
 	  		'balance':ethers.utils.formatUnits(balance.toString(), 18)
 		}
-		console.log(userPortfolios[randomTwitterId])
+		//console.log(userPortfolios[randomTwitterId])
 		counter++
   	}
 
@@ -181,7 +181,7 @@ module.exports = function (deployer, network, accounts) {
 	    }
 	    appr = await instance.approve(instanceTokenManagement.address, tokenID)
 	    Erc1155tokenID = await instanceTokenManagement.deposit(tokenID, instance.address, 721, true)
-	    Erc1155tokenID = Erc1155tokenID.logs[0]['args']['cryptoravesTokenId'].toString()
+	    Erc1155tokenID = Erc1155tokenID.logs[1]['args']['cryptoravesTokenId'].toString()
 		balance = await instanceCryptoravesToken.balanceOf(userPortfolios[account0TwitterId]['cryptoravesAddress'] , Erc1155tokenID)
 	    output = 'Account: '+accounts[0]+' Token: '+token+' Token Address: '+instance.address+' Balance: '+balance.toString()+' CryptoravesTokenID: '+Erc1155tokenID+"\n"
 	    await fs.appendFile(outputPath, output, function (err) {
@@ -236,7 +236,7 @@ module.exports = function (deployer, network, accounts) {
 	  	
 
 		//console.log(res.receipt.rawLogs)
-		console.log(userPortfolios[twitterIds[counter]])
+		//console.log(userPortfolios[twitterIds[counter]])
 		
 	
 
@@ -275,14 +275,14 @@ module.exports = function (deployer, network, accounts) {
 					console.log('Withdraw NFT:', _tokenID, _addr)
 					let res = await instanceTokenManagement.withdrawERC721(_tokenID, _addr, true, {from:accounts[counter+1]})
 				}
-				console.log(res)
+				//console.log(res)
 			}else{
 				//withdraw ERC20
 				let _amount  = 10
 				let _addr = userPortfolios[twitterIds[counter]]['balances'][tokenProfile]['tokenAddress']
 				console.log('Withdraw ERC20:', _amount, _addr)
 				let res = await instanceTokenManagement.withdrawERC20(_amount, _addr, true, {from:accounts[counter+1]})
-				console.log(res)
+				//console.log(res)
 				
 			}
 		}
