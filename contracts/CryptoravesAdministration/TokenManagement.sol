@@ -24,6 +24,7 @@ contract TokenManagement is  ERCDepositable {
     event Deposit(address indexed _from, uint256 _value, address indexed _token, uint256 indexed cryptoravesTokenId, uint _ercType);
     event Withdraw(address indexed _to, uint256 _value, address indexed _token, uint256 indexed cryptoravesTokenId, uint _ercType);
     event Token(ManagedToken);
+    event Emoji(uint256 cryptoravesTokenId, string _emoji);
     event CryptoDropped(address user, uint256 tokenId);
     
     constructor(string memory _uri) public {
@@ -193,6 +194,7 @@ contract TokenManagement is  ERCDepositable {
         address _tokenAddr = tokenListByBaseId[_tokenId >> 128];
         managedTokenListByAddress[_tokenAddr].emoji = _emoji;
         symbolAndEmojiLookupTable[_emoji] = _tokenId;
+        emit Emoji(_tokenId, _emoji);
     }
     
     function getERCtype(uint256 _tokenId) public view  returns(uint){
@@ -260,7 +262,7 @@ contract TokenManagement is  ERCDepositable {
         }
 
         _mngTkn.managedTokenBaseId = tokenListByBaseId.length - 1;
-        symbolAndEmojiLookupTable[_mngTkn.symbol] = _mngTkn.managedTokenBaseId << 128;
+        symbolAndEmojiLookupTable[_mngTkn.symbol] = _mngTkn.cryptoravesTokenId =_mngTkn.managedTokenBaseId << 128;
         _mngTkn.isManagedToken = true;
         _mngTkn.ercType = ercType;
         

@@ -11,6 +11,7 @@ contract ERCDepositable is IERC721Receiver, AdministrationContract {
     //mapping for token ids and their origin addresses
     struct ManagedToken {
         uint256 managedTokenBaseId;
+        uint256 cryptoravesTokenId;
         bool isManagedToken;
         uint ercType;
         uint256 totalSupply;

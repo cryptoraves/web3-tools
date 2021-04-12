@@ -99,7 +99,7 @@ module.exports = function (deployer, network, accounts) {
 	    Erc1155tokenID = Erc1155tokenID.logs[1]['args']['cryptoravesTokenId'].toString()
 
 	    if(Erc1155tokenID==0){
-	    	Erc1155tokenID='10000000000000000000000000000000000000001'
+	    	Erc1155tokenID='1000000000000000000000000000000000001'
 	    }
 
 	    	  	
@@ -141,6 +141,13 @@ module.exports = function (deployer, network, accounts) {
 	  		'tokenAddress':instance.address,
 	  		'balance':ethers.utils.formatUnits(balance.toString(), 18)
 		}
+
+
+		//set emoji
+		try{
+			await instanceTokenManagement.setEmoji(Erc1155tokenID, '😑')
+		}catch{}
+		
 		//console.log(userPortfolios[randomTwitterId])
 		counter++
   	}
@@ -234,7 +241,8 @@ module.exports = function (deployer, network, accounts) {
 	  		'balance':balance.toString()
 		}
 	  	
-
+		//set emoji
+		await instanceTokenManagement.setEmoji(Erc1155tokenID, '💫')
 		//console.log(res.receipt.rawLogs)
 		//console.log(userPortfolios[twitterIds[counter]])
 		
