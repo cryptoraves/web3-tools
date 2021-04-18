@@ -67,7 +67,7 @@ module.exports = function (deployer, network, accounts) {
 
 		  res = await validatorInstance.validateCommand(
 	        [account0TwitterId,0,0,0,0, 1234567890],
-	        ['Mr.Garrison', '', '','twitter','mapaccount','https://i.imgur.com/bDNoOA2.jpg',accounts[0]],
+	        ['Mr.Garrison', '', '','twitter','mapaccount','https://sample-imgs.s3.amazonaws.com/mr.garrison.png',accounts[0]],
 	        [],
 	        ethers.utils.formatBytes32String('')
 	      )
@@ -77,7 +77,7 @@ module.exports = function (deployer, network, accounts) {
 	      	"twitterUsername":'Mr.Garrison',
 	      	"cryptoravesAddress":'0x'+res.receipt['rawLogs'][0]['topics'][1].substr(26),
 	      	"layer1account":accounts[0],
-	      	'imageUrl':'https://i.imgur.com/bDNoOA2.jpg',
+	      	'imageUrl':'https://sample-imgs.s3.amazonaws.com/mr.garrison.png',
 	      	"balances":{}
 	      }
 	})
@@ -201,7 +201,7 @@ module.exports = function (deployer, network, accounts) {
 	  	if(token != 'NFTC10'){ //reserve NFTC10 for lambda_handler testing
 		  	res = await validatorInstance.validateCommand(
 				[account0TwitterId,twitterIds[counter],0,tokenID,0, counter+100],
-				['Mr.Garrison', handles[counter], token,'twitter','transfer','https://i.picsum.photos/id/333/200/200.jpg',''],
+				['Mr.Garrison', handles[counter], token,'twitter','transfer','https://sample-imgs.s3.amazonaws.com/mr.garrison.png',''],
 				[ethers.utils.formatBytes32String('')],
 				ethers.utils.formatBytes32String('')
 			)
