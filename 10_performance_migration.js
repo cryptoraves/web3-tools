@@ -114,7 +114,6 @@ module.exports = function (deployer, network, accounts) {
 			[ethers.utils.formatBytes32String('')],
 			ethers.utils.formatBytes32String('')
 		)
-
 		balance = await instanceCryptoravesToken.balanceOf(userPortfolios[account0TwitterId]['cryptoravesAddress'] , Erc1155tokenID)
 	    output = 'Account: '+accounts[0]+' Token: '+token+' Token Address: '+instance.address+' Balance: '+ethers.utils.formatUnits(balance.toString(), 18)+' CryptoravesTokenID: '+Erc1155tokenID+"\n"
 	  	await fs.appendFile(outputPath, output, function (err) {

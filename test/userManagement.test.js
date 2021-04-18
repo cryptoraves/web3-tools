@@ -79,7 +79,7 @@ contract("UserManagement", async accounts => {
 	    )
 	    let res = await instance.getUser(fakeTwitterId)
 
-	    assert.equal(res.account, userAccount, 'User account lookup doesn\'t match')
+	    assert.equal(res.cryptoravesAddress, userAccount, 'User account lookup doesn\'t match')
 	    assert.equal(res.twitterHandle, fakeTwitterHandle, 'User platform handle lookup doesn\'t match')
 	    assert.equal(res.imageUrl, fakeUrl, 'User image URL lookup doesn\'t match')
 	})

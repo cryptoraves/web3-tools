@@ -141,7 +141,7 @@ contract("TransactionManagement", async accounts => {
       )
 
       let res = await userManagementInstance.getUser(1029384756);
-      let addr = res['account']
+      let addr = res['cryptoravesAddress']
       res = await userManagementInstance.userHasL1AddressMapped(addr)
       assert.isOk(
         res,
@@ -149,7 +149,7 @@ contract("TransactionManagement", async accounts => {
       );
       //set token management contract back to original
       res = await userManagementInstance.getUser(99434443434);
-      addr = res['account']
+      addr = res['cryptoravesAddress']
       let randoAddr = ethers.Wallet.createRandom().address
       res = await userManagementInstance.userHasL1AddressMapped(addr)
       assert.isFalse(
@@ -203,10 +203,10 @@ contract("TransactionManagement", async accounts => {
       ) 
       let user = await userManagementInstance.getUser(fakeUserId)
       let tokenId1155_A = await instanceTokenManagement.getManagedTokenIdByAddress(
-        user.account
+        user.cryptoravesAddress
       )
 
-      let orgUserAcct = user.account
+      let orgUserAcct = user.cryptoravesAddress
       //3. reset tokenDropState
       await TransactionManagementInstance.resetTokenDrop(fakeUserId)
 
@@ -230,7 +230,7 @@ contract("TransactionManagement", async accounts => {
       )
       
       let tokenId1155_B = await instanceTokenManagement.getManagedTokenIdByAddress(
-        user.account
+        user.cryptoravesAddress
       )
       user = await userManagementInstance.getUser(fakeUserId2)
       assert.notEqual(
@@ -238,7 +238,7 @@ contract("TransactionManagement", async accounts => {
         tokenId1155_B,
         'tokenId1155\'s should not match'
       )
-      let balance = await instanceCryptoravesToken.balanceOf(user.account, tokenId1155_B)
+      let balance = await instanceCryptoravesToken.balanceOf(user.cryptoravesAddress, tokenId1155_B)
       assert.equal(
         balance,
         2222000000000000000000,

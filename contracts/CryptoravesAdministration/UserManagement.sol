@@ -11,7 +11,7 @@ contract UserManagement is AdministrationContract {
     
     struct User {
         uint256 twitterUserId;
-        address account;
+        address cryptoravesAddress;
         string twitterHandle;
         string imageUrl;
         bool isManaged;
@@ -21,8 +21,8 @@ contract UserManagement is AdministrationContract {
     }
 
     event UserData(User);
-    event UsernameChange(uint256 _userId, string _handle);
-    event ImageChange(uint256 _userId, string imageUrl);
+    event UsernameChange(address _cryptoravesAddress, string _handle);
+    event ImageChange(address _cryptoravesAddress, string imageUrl);
     
     //maps platform user id to User object
     mapping(uint256 => User) public users;
@@ -49,17 +49,21 @@ contract UserManagement is AdministrationContract {
     }
     
     function getUserAccount(uint256 _platformUserId) public view returns(address) {
-        return users[_platformUserId].account;
+        return users[_platformUserId].cryptoravesAddress;
+    }
+
+    function getUserStruct(uint256 _platformUserId) public view returns(User memory) {
+        return users[_platformUserId];
     }
     
-    function launchL2Account(uint256 _userId, string memory _twitterHandleFrom, string memory _imageUrl) public onlyAdmin returns (address) {
+    function launchL2Account(uint256 _userId, string memory _twitterHandleFrom, string memory _imageUrl) public onlyAdmin returns (User memory) {
         //launch a managed wallet
         WalletFull receiver = new WalletFull(getTransactionManagerAddress());
         
          //create a new user
         User memory user;
         user.twitterUserId = _userId;
-        user.account = address(receiver);
+        user.cryptoravesAddress = address(receiver);
         user.imageUrl = _imageUrl;
         user.twitterHandle = _twitterHandleFrom;
         user.isManaged = true;
@@ -72,7 +76,7 @@ contract UserManagement is AdministrationContract {
         
         emit UserData(user);
         
-        return address(receiver);
+        return user;
     }
     
     function mapLayerOneAccount(address _l2Addr, address _l1Addr) public onlyAdmin {
@@ -99,7 +103,7 @@ contract UserManagement is AdministrationContract {
         return layerTwoAccounts[_l1Addr];
     }
     
-    function userAccountCheck(uint256 _platformUserId, string memory _twitterHandle, string memory _imageUrl) public onlyAdmin returns (address) {
+    function userAccountCheck(uint256 _platformUserId, string memory _twitterHandle, string memory _imageUrl) public onlyAdmin returns (User memory) {
         //create a new user
         if (isUser(_platformUserId)){
             //check if handle has changed
@@ -107,17 +111,17 @@ contract UserManagement is AdministrationContract {
                 //update user handle if no match
                 users[_platformUserId].twitterHandle = _twitterHandle;
                 userIDs[_twitterHandle] = _platformUserId;
-                emit UsernameChange(_platformUserId, _twitterHandle);
+                emit UsernameChange(users[_platformUserId].cryptoravesAddress, _twitterHandle);
             }
             //check if imageUrl has changed
             if(!AdminToolsLibrary._stringsMatch(_imageUrl, users[_platformUserId].imageUrl)){
                 //make sure imageUrl isn't empty
                 if(!AdminToolsLibrary._stringsMatch(_imageUrl, '')){
                     users[_platformUserId].imageUrl = _imageUrl;
-                    emit ImageChange(_platformUserId, _imageUrl);
+                    emit ImageChange(users[_platformUserId].cryptoravesAddress, _imageUrl);
                 }
             }
-            return users[_platformUserId].account;
+            return users[_platformUserId];
         } else {
             return launchL2Account(_platformUserId, _twitterHandle, _imageUrl);
         }

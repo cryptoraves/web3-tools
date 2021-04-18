@@ -47,10 +47,7 @@ contract ValidatorInterfaceContract is AdministrationContract {
     
     /*
     * check incoming parsed Tweet data for valid command
-    * @param _twitterIds [0] = twitterIdFrom, [1] = twitterIdTo, [2] = twitterIdThirdParty
-        [3] amount or id of token to transfer -- integers of any decimal value. eg 1.31 = 131, 12321.989293 = 12321989293, 1000 = 1000 etc
-        [4] where the decimal place lies: 1.31 = 2, 12321.989293 = 6, 1000 = 0 etc
-        [5] tweet ID from twitter
+    * @param _twitterInts - see struct twitterInts in transactionManagement.sol
     * @param _twitterStrings [0] = twitterHandleFrom, [1] = twitterHandleTo, [2] = ticker
         [3] = _platformName:
             "twitter"
@@ -67,7 +64,7 @@ contract ValidatorInterfaceContract is AdministrationContract {
     * @param _functionData = proxy function calldata. Calldata type must be defined in function params
     */ 
     function validateCommand(
-        uint256[] memory _twitterInts,
+        ITransactionManager.TwitterInts memory _twitterInts,
         string[] memory _twitterStrings,
         bytes[] memory _metaData,
         bytes calldata _functionData
