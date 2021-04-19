@@ -52,7 +52,7 @@ contract TokenManagement is  ERCDepositable {
     function dropCrypto(string memory _twitterHandleFrom, address account, uint256 amount, bytes memory data) public virtual onlyAdmin {
        
         if(!managedTokenListByAddress[account].isManagedToken) {
-            _addTokenToManagedTokenList(account, 1155);
+            _addTokenToManagedTokenList(account, 1155, 0);
         }
 
         uint256 _1155tokenId = getManagedTokenIdByAddress(account);
@@ -88,7 +88,12 @@ contract TokenManagement is  ERCDepositable {
     function deposit(uint256 _amountOrId, address _contract, uint _ercType, bool _managedTransfer) public payable returns(uint256){
         
         if(!managedTokenListByAddress[_contract].isManagedToken) {
-            _addTokenToManagedTokenList(_contract, _ercType);
+            if( _ercType == 721 ){
+                _addTokenToManagedTokenList(_contract, _ercType, _amountOrId);
+            }else{
+                _addTokenToManagedTokenList(_contract, _ercType, 0);
+            }
+            
         }
           
         uint256 _1155tokenId;
@@ -192,6 +197,7 @@ contract TokenManagement is  ERCDepositable {
     }
     function setEmoji(uint256 _tokenId, string memory _emoji) public onlyAdmin {
         address _tokenAddr = tokenListByBaseId[_tokenId >> 128];
+        require(managedTokenListByAddress[_tokenAddr].ercType != 721, "Cannot set emoji for NFTs");
         managedTokenListByAddress[_tokenAddr].emoji = _emoji;
         symbolAndEmojiLookupTable[_emoji] = _tokenId;
         emit Emoji(_tokenId, _emoji);
@@ -247,7 +253,7 @@ contract TokenManagement is  ERCDepositable {
         return tokenListByBaseId.length;
     }
     
-    function _addTokenToManagedTokenList(address _token, uint ercType) private onlyAdmin{
+    function _addTokenToManagedTokenList(address _token, uint ercType, uint256 _erc721Id) private onlyAdmin{
         tokenListByBaseId.push(_token);
         
         ManagedToken memory _mngTkn;
@@ -262,9 +268,11 @@ contract TokenManagement is  ERCDepositable {
         }
 
         _mngTkn.managedTokenBaseId = tokenListByBaseId.length - 1;
-        symbolAndEmojiLookupTable[_mngTkn.symbol] = _mngTkn.cryptoravesTokenId =_mngTkn.managedTokenBaseId << 128;
+        symbolAndEmojiLookupTable[_mngTkn.symbol] = _mngTkn.managedTokenBaseId << 128;
         _mngTkn.isManagedToken = true;
         _mngTkn.ercType = ercType;
+
+        _mngTkn.cryptoravesTokenId = symbolAndEmojiLookupTable[_mngTkn.symbol] + _erc721Id;
         
         managedTokenListByAddress[_token] = _mngTkn;
         emit Token(_mngTkn);

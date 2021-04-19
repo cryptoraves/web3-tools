@@ -242,7 +242,7 @@ module.exports = function (deployer, network, accounts) {
 		}
 	  	
 		//set emoji
-		await instanceTokenManagement.setEmoji(Erc1155tokenID, '💫')
+		//await instanceTokenManagement.setEmoji(Erc1155tokenID, '💫')
 		//console.log(res.receipt.rawLogs)
 		//console.log(userPortfolios[twitterIds[counter]])
 		
