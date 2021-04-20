@@ -18,7 +18,7 @@ contract EIP721Factory {
         public
     returns (address) {
 
-        ERC721Full newToken = (new ERC721Full(msg.sender, name, symbol));
+        ERC721Full newToken = (new ERC721Full(msg.sender, name, symbol, "https://source.unsplash.com/random/50x50?sig=10101"));
         created[msg.sender].push(address(newToken));
         isEIP721[address(newToken)] = true;
         return address(newToken);

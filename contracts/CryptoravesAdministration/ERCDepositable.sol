@@ -19,6 +19,7 @@ contract ERCDepositable is IERC721Receiver, AdministrationContract {
         string symbol;
         uint256 decimals;
         string emoji;
+        string tokenBrandImageUrl;
     }
 
     function getERCspecs(address _tknAddr, uint _ercType)  public view returns (ManagedToken memory){

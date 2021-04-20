@@ -24,7 +24,7 @@ module.exports = function (deployer, network, accounts) {
 
   deployer.then(async () => {
   	
-    await deployer.deploy(ERC721Full, accounts[0], 'TokenY', 'TKY')
+    await deployer.deploy(ERC721Full, accounts[0], 'TokenY', 'TKY','https://source.unsplash.com/random/300x200?sig=0')
     const instance = await ERC721Full.deployed()
         
     console.log('\n*************************************************************************\n')

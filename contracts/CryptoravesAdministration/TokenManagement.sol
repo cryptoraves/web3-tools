@@ -263,6 +263,12 @@ contract TokenManagement is  ERCDepositable {
                 _mngTkn = getERCspecs(_token, ercType);
             }
 
+            if(ercType == 721){
+                //get baseUrl
+                IERCuni _tkn = IERCuni(_token);
+                _mngTkn.tokenBrandImageUrl = _tkn.tokenURI(_erc721Id);
+            }
+
         } else {
             //assign symbol of erc1155
         }

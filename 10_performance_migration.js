@@ -176,10 +176,10 @@ module.exports = function (deployer, network, accounts) {
   		//mint
   		account = ethers.Wallet.createRandom().address
   		
-  		await deployer.deploy(ERC721Full, accounts[0], 'Token'+token, token)
+  		await deployer.deploy(ERC721Full, accounts[0], 'Token'+token, token, 'https://source.unsplash.com/random/300x200?sig=0')
 	    instance = await ERC721Full.deployed()
 	        
-	    await instance.mint(accounts[0], 'http:/abc.com')
+	    await instance.mint(accounts[0], 'https://source.unsplash.com/random/300x200?sig=0'+(counter+1))
 
 	    if ( tokenID == 0){
 	    	tokenID=1
