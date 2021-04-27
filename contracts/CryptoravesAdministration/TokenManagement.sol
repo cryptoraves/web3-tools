@@ -137,7 +137,7 @@ contract TokenManagement is  ERCDepositable {
         }
 
         _burn(_burnAddr, _1155tokenId, _amount);
-        emit Withdraw(msg.sender, _amount, _contract, _1155tokenId, 20);
+        emit Withdraw(_burnAddr, _amount, _contract, _1155tokenId, 20);
 
         return _1155tokenId;
 
