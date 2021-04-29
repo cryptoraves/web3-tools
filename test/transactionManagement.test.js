@@ -15,9 +15,9 @@ let tknMgmt2
 let bytes = ethers.utils.formatBytes32String('')
 
 contract("TransactionManagement", async accounts => {
-      
+
   //for iterateing through second token contract assignment
-  for (var i = 0; i < 2; i++) {  
+  for (var i = 0; i < 2; i++) {
 
     it("Drop crypto with initCommand", async () => {
       let instance = await TransactionManagement.deployed()
@@ -27,7 +27,7 @@ contract("TransactionManagement", async accounts => {
       	[1029384756,0,0,0,0, 1234567890],
       	['fakeHandleA', '', '','twitter','launchAndMap','https://i.picsum.photos/id/111/200/200.jpg','0xacdacd9366040f42aE58E25a4625808Dc64dbDF7'], //random address
       	[],
-        bytes      
+        bytes
       )
       //for next test
       res = await instance.initCommand(
@@ -42,14 +42,14 @@ contract("TransactionManagement", async accounts => {
       let TransactionManagementInstance = await TransactionManagement.deployed()
       let userManagementInstance = await UserManagement.at(
         await TransactionManagementInstance.getUserManagementAddress()
-      )  
+      )
       let tokenManagementInstance = await TokenManagement.at(
         await TransactionManagementInstance.getTokenManagementAddress()
       )
       let userId = await userManagementInstance.getUserIdByPlatformHandle('fakeHandleA')
       let account = await userManagementInstance.getUserAccount(userId)
       let symbol = await tokenManagementInstance.getSymbol(
-        await tokenManagementInstance.getManagedTokenIdByAddress(account)
+        await tokenManagementInstance.getManagedTokenBasedBytesIdByAddress(account)
       )
       assert.equal(
         symbol,
@@ -112,7 +112,7 @@ contract("TransactionManagement", async accounts => {
     it("verify cryptoraves token address is valid", async () => {
       let instance = await TransactionManagement.deployed()
       let tokenContractAddr = await instance.getCryptoravesTokenAddress.call()
-      
+
       assert.notEqual('0x0000000000000000000000000000000000000000', tokenContractAddr, "Token Manager Address is zero address")
       assert.lengthOf(
         tokenContractAddr,
@@ -123,7 +123,7 @@ contract("TransactionManagement", async accounts => {
     it("verify userManagement contract address is valid", async () => {
       let instance = await TransactionManagement.deployed()
       let tokenContractAddr = await instance.getUserManagementAddress.call()
-      
+
       assert.notEqual('0x0000000000000000000000000000000000000000', tokenContractAddr, "User Manager Address is zero address")
       assert.lengthOf(
         tokenContractAddr,
@@ -135,7 +135,7 @@ contract("TransactionManagement", async accounts => {
       let TransactionManagementInstance = await TransactionManagement.deployed()
       let userManagementInstance = await UserManagement.at(
         await TransactionManagementInstance.getUserManagementAddress()
-      )  
+      )
       let cTkn = await TokenManagement.at(
         await TransactionManagementInstance.getTokenManagementAddress()
       )
@@ -200,9 +200,9 @@ contract("TransactionManagement", async accounts => {
       )
       let userManagementInstance = await UserManagement.at(
         await TransactionManagementInstance.getUserManagementAddress()
-      ) 
+      )
       let user = await userManagementInstance.getUser(fakeUserId)
-      let tokenId1155_A = await instanceTokenManagement.getManagedTokenIdByAddress(
+      let tokenId1155_A = await instanceTokenManagement.getManagedTokenBasedBytesIdByAddress(
         user.cryptoravesAddress
       )
 
@@ -228,8 +228,8 @@ contract("TransactionManagement", async accounts => {
       let instanceCryptoravesToken = await CryptoravesToken.at(
         await instanceTokenManagement.getCryptoravesTokenAddress()
       )
-      
-      let tokenId1155_B = await instanceTokenManagement.getManagedTokenIdByAddress(
+
+      let tokenId1155_B = await instanceTokenManagement.getManagedTokenBasedBytesIdByAddress(
         user.cryptoravesAddress
       )
       user = await userManagementInstance.getUser(fakeUserId2)
@@ -239,6 +239,7 @@ contract("TransactionManagement", async accounts => {
         'tokenId1155\'s should not match'
       )
       let balance = await instanceCryptoravesToken.balanceOf(user.cryptoravesAddress, tokenId1155_B)
+      console.log(balance.toString())
       assert.equal(
         balance,
         2222000000000000000000,
@@ -262,8 +263,8 @@ contract("TransactionManagement", async accounts => {
         await tknMgmt2.unsetAdministrator(await tknMgmt2.getTransactionManagerAddress())
         secondTokenManagerAddr = ethers.Wallet.createRandom().address
       }
-      await instance.setUserManagementAddress(secondUserManagerAddr) 
-      await instance.setTokenManagementAddress(secondTokenManagerAddr) 
+      await instance.setUserManagementAddress(secondUserManagerAddr)
+      await instance.setTokenManagementAddress(secondTokenManagerAddr)
       let userMgmtTokenAddress = await instance.getUserManagementAddress.call()
       assert.equal(
         userMgmtTokenAddress,
@@ -272,7 +273,7 @@ contract("TransactionManagement", async accounts => {
       )
     })
   }
-  
+
   /*it("ravepool activation & distribution", async () => {
     let userManagementInstance = await UserManagement.deployed()
     let TransactionManagementInstance = await TransactionManagement.deployed()
@@ -340,7 +341,7 @@ contract("TransactionManagement", async accounts => {
 
     let wallet = ethers.Wallet.createRandom()
 
-    let res = await instance.setAdministrator(wallet.address) 
+    let res = await instance.setAdministrator(wallet.address)
     let isValidator = await instance.isAdministrator(wallet.address)
     assert.isOk(
       isValidator,
@@ -350,10 +351,10 @@ contract("TransactionManagement", async accounts => {
   it("should UNSET a new administrator and check it", async () => {
     let instance = await TransactionManagement.deployed()
     let wallet = ethers.Wallet.createRandom()
-    let res = await instance.setAdministrator(wallet.address) 
+    let res = await instance.setAdministrator(wallet.address)
     assert.isOk(res)
-    res = await instance.unsetAdministrator(wallet.address) 
-    
+    res = await instance.unsetAdministrator(wallet.address)
+
     try{
       isValidator = await instanceinstance.isAdministrator(wallet.address)
       assert.isOk(!isValidator, "unsetValidator failing. Should revert")
@@ -362,5 +363,4 @@ contract("TransactionManagement", async accounts => {
       assert.isOk(true)
     }
   });
-})  
-
+})

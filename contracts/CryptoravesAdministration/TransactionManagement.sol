@@ -182,7 +182,7 @@ contract TransactionManagement is AdministrationContract {
 
             }
 
-            uint256 _cryptoravesTokenId = _tokenManagement.getManagedTokenIdByAddress(_addr);
+            uint256 _cryptoravesTokenId = _tokenManagement.getManagedTokenBasedBytesIdByAddress(_addr);
 
             uint256 _adjustedValue;
 
@@ -312,7 +312,7 @@ contract TransactionManagement is AdministrationContract {
 
         require(_userAccount != address(0), 'User account does not exist');
 
-        return _tokenManagement.getManagedTokenIdByAddress(_userAccount);
+        return _tokenManagement.getManagedTokenBasedBytesIdByAddress(_userAccount);
     }
 
     function getUserL1AccountFromL2Account(address _l2) public view returns(address) {

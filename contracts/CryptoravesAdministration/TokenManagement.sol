@@ -12,11 +12,12 @@ contract TokenManagement is  ERCDepositable {
 
     address private _cryptoravesTokenAddr;
 
-    //Inceremental base token id list
-    address[] public tokenListByBaseId;
+    //Bytes-based token ID scheme
+    uint256 numberOfTokens = 0;
+    mapping(uint256 =>address) public tokenAddressByFullBytesId;
+    mapping(address =>uint256) public tokenBaseBytesIdByAddress;
 
-
-    mapping(address => ManagedToken) public managedTokenListByAddress;
+    mapping(uint256 => ManagedToken) public managedTokenByFullBytesId;
 
     //find tokenId by symbol or emoji
     mapping(string => uint256) public symbolAndEmojiLookupTable;
@@ -32,6 +33,11 @@ contract TokenManagement is  ERCDepositable {
         setAdministrator(msg.sender);
         CryptoravesToken newCryptoravesToken = new CryptoravesToken(_uri);
         _cryptoravesTokenAddr = address(newCryptoravesToken);
+
+        //must add fake token to zero spot
+        tokenAddressByFullBytesId[numberOfTokens] = address(this);
+        numberOfTokens++;
+        //_addTokenToManagedTokenList(address(this), 1155, 0);
     }
 
     function getCryptoravesTokenAddress() public view returns(address) {
@@ -51,28 +57,28 @@ contract TokenManagement is  ERCDepositable {
     */
     function dropCrypto(string memory _twitterHandleFrom, address account, uint256 amount, bytes memory data) public virtual onlyAdmin {
 
-        if(!managedTokenListByAddress[account].isManagedToken) {
+        if(!managedTokenByFullBytesId[tokenBaseBytesIdByAddress[account]].isManagedToken) {
             _addTokenToManagedTokenList(account, 1155, 0);
         }
 
-        uint256 _1155tokenId = getManagedTokenIdByAddress(account);
+        uint256 _1155tokenId = getManagedTokenBasedBytesIdByAddress(account);
 
         //add username as symbol
         _checkSymbolAddress(_twitterHandleFrom, _1155tokenId);
 
         _mint(account, _1155tokenId, amount, data);
 
-        managedTokenListByAddress[account].symbol = _twitterHandleFrom;
+        managedTokenByFullBytesId[tokenBaseBytesIdByAddress[account]].symbol = _twitterHandleFrom;
         symbolAndEmojiLookupTable[_twitterHandleFrom] = _1155tokenId;
 
         emit CryptoDropped(account, _1155tokenId);
 
     }
 
-    function _checkSymbolAddress(string memory _sym, uint256 _tokenId) internal {
+    function _checkSymbolAddress(string memory _sym, uint256 _tokenBaseBytesId) internal {
         //only adds ticker if not yet taken
         if(symbolAndEmojiLookupTable[_sym] == 0){
-            symbolAndEmojiLookupTable[_sym] = _tokenId;
+            symbolAndEmojiLookupTable[_sym] = _tokenBaseBytesId;
         }
     }
     function getL2AddressForManagedDeposit() private view returns(address){
@@ -85,18 +91,19 @@ contract TokenManagement is  ERCDepositable {
         return _l2Addr;
     }
 
-    function deposit(uint256 _amountOrId, address _contract, uint _ercType, bool _managedTransfer) public payable returns(uint256){
+    function deposit(uint256 _amountOrId, address _tokenAddr, uint _ercType, bool _managedTransfer) public payable returns(uint256){
 
-        if(!managedTokenListByAddress[_contract].isManagedToken) {
+        if(!managedTokenByFullBytesId[tokenBaseBytesIdByAddress[_tokenAddr]].isManagedToken) {
             if( _ercType == 721 ){
-                _addTokenToManagedTokenList(_contract, _ercType, _amountOrId);
+                _addTokenToManagedTokenList(_tokenAddr, _ercType, _amountOrId);
             }else{
-                _addTokenToManagedTokenList(_contract, _ercType, 0);
+                _addTokenToManagedTokenList(_tokenAddr, _ercType, 0);
             }
 
         }
 
         uint256 _1155tokenId;
+        _1155tokenId = getManagedTokenBasedBytesIdByAddress(_tokenAddr);
 
         address _mintTo;
         if(_managedTransfer){
@@ -107,28 +114,29 @@ contract TokenManagement is  ERCDepositable {
 
         uint256 _amount;
         if(_ercType == 20){
-            _depositERC20(_amountOrId, _contract);
+            _depositERC20(_amountOrId, _tokenAddr);
             _amount = _amountOrId;
 
         }
         if(_ercType == 721){
-            _depositERC721(_amountOrId, _contract);
+            _1155tokenId = _1155tokenId + _amountOrId;
+            _depositERC721(_amountOrId, _tokenAddr);
             _amount = 1;
         }
-        _1155tokenId = getManagedTokenIdByAddress(_contract);
+
 
         _mint(_mintTo, _1155tokenId, _amount, '');
 
-        emit Deposit(_mintTo, _amountOrId, _contract, _1155tokenId, _ercType);
+        emit Deposit(_mintTo, _amountOrId, _tokenAddr, _1155tokenId, _ercType);
 
         return _1155tokenId;
     }
 
 
-    function withdrawERC20(uint256 _amount, address _contract, bool _isManagedWithdraw) public payable returns(uint256){
-        _withdrawERC20(_amount, _contract);
+    function withdrawERC20(uint256 _amount, address _tokenAddr, bool _isManagedWithdraw) public payable returns(uint256){
+        _withdrawERC20(_amount, _tokenAddr);
 
-        uint256 _1155tokenId = getManagedTokenIdByAddress(_contract);
+        uint256 _1155tokenId = getManagedTokenBasedBytesIdByAddress(_tokenAddr);
         address _burnAddr;
         if (_isManagedWithdraw) {
             _burnAddr = getL2AddressForManagedDeposit();
@@ -137,25 +145,25 @@ contract TokenManagement is  ERCDepositable {
         }
 
         _burn(_burnAddr, _1155tokenId, _amount);
-        emit Withdraw(_burnAddr, _amount, _contract, _1155tokenId, 20);
+        emit Withdraw(_burnAddr, _amount, _tokenAddr, _1155tokenId, 20);
 
         return _1155tokenId;
 
     }
 
-    function withdrawERC721(uint256 _tokenId, address _contract, bool _isManagedWithdraw) public payable returns(uint256){
-        _withdrawERC721(_tokenId, _contract);
+    function withdrawERC721(uint256 _tokenERC721Id, address _tokenAddr, bool _isManagedWithdraw) public payable returns(uint256){
+        _withdrawERC721(_tokenERC721Id, _tokenAddr);
 
-        uint256 _1155tokenId = getManagedTokenIdByAddress(_contract);
-        address _burnAddr;
+        uint256 _1155tokenId = getManagedTokenBasedBytesIdByAddress(_tokenAddr) + _tokenERC721Id;
+        address _burnFromAddr;
         if (_isManagedWithdraw) {
-            _burnAddr = getL2AddressForManagedDeposit();
+            _burnFromAddr = getL2AddressForManagedDeposit();
         } else {
-            _burnAddr = msg.sender;
+            _burnFromAddr = msg.sender;
         }
 
-        _burn(_burnAddr, _1155tokenId, 1);
-        emit Withdraw(msg.sender, _tokenId, _contract, _1155tokenId, 721);
+        _burn(_burnFromAddr, _1155tokenId, 1);
+        emit Withdraw(msg.sender, _tokenERC721Id, _tokenAddr, _1155tokenId, 721);
 
         return _1155tokenId;
 
@@ -174,47 +182,41 @@ contract TokenManagement is  ERCDepositable {
     }
     function getAddressBySymbol(string memory _symbol) public view returns (address) {
 
-        uint256 _tokenId = symbolAndEmojiLookupTable[_symbol];
-        return tokenListByBaseId[_tokenId >> 128];
+        uint256 _1155tokenBaseBytesId = symbolAndEmojiLookupTable[_symbol];
+        return tokenAddressByFullBytesId[_1155tokenBaseBytesId];
     }
-    function getTotalSupply(uint256 _tokenId) public view  returns(uint256){
-        address _tokenAddr = tokenListByBaseId[_tokenId >> 128];
-        return managedTokenListByAddress[_tokenAddr].totalSupply;
-    }
-
-    function getSymbol(uint256 _tokenId) public view  returns(string memory){
-        address _tokenAddr = tokenListByBaseId[_tokenId >> 128];
-        return managedTokenListByAddress[_tokenAddr].symbol;
-    }
-    function setSymbol(uint256 _tokenId, string memory _symbol) public onlyAdmin {
-        address _tokenAddr = tokenListByBaseId[_tokenId >> 128];
-        managedTokenListByAddress[_tokenAddr].symbol = _symbol;
-        symbolAndEmojiLookupTable[_symbol] = _tokenId;
-    }
-    function getEmoji(uint256 _tokenId) public view  returns(string memory){
-        address _tokenAddr = tokenListByBaseId[_tokenId >> 128];
-        return managedTokenListByAddress[_tokenAddr].emoji;
-    }
-    function setEmoji(uint256 _tokenId, string memory _emoji) public onlyAdmin {
-        address _tokenAddr = tokenListByBaseId[_tokenId >> 128];
-        require(managedTokenListByAddress[_tokenAddr].ercType != 721, "Cannot set emoji for NFTs");
-        managedTokenListByAddress[_tokenAddr].emoji = _emoji;
-        symbolAndEmojiLookupTable[_emoji] = _tokenId;
-        emit Emoji(_tokenId, _emoji);
+    function getTotalSupply(uint256 _1155tokenId) public view  returns(uint256){
+        return managedTokenByFullBytesId[_1155tokenId].totalSupply;
     }
 
-    function getERCtype(uint256 _tokenId) public view  returns(uint){
-        address _tokenAddr = tokenListByBaseId[_tokenId >> 128];
-        return managedTokenListByAddress[_tokenAddr].ercType;
+    function getSymbol(uint256 _1155tokenId) public view  returns(string memory){
+        return managedTokenByFullBytesId[_1155tokenId].symbol;
+    }
+    function setSymbol(uint256 _1155tokenId, string memory _symbol) public onlyAdmin {
+        managedTokenByFullBytesId[_1155tokenId].symbol = _symbol;
+        symbolAndEmojiLookupTable[_symbol] = _1155tokenId;
+    }
+    function getEmoji(uint256 _1155tokenId) public view  returns(string memory){
+        return managedTokenByFullBytesId[_1155tokenId].emoji;
+    }
+    function setEmoji(uint256 _1155tokenId, string memory _emoji) public onlyAdmin {
+        require(managedTokenByFullBytesId[_1155tokenId].ercType != 721, "Cannot set emoji for NFTs");
+        managedTokenByFullBytesId[_1155tokenId].emoji = _emoji;
+        symbolAndEmojiLookupTable[_emoji] = _1155tokenId;
+        emit Emoji(_1155tokenId, _emoji);
     }
 
-    function getNextBaseId(uint256 _tokenId) public pure returns(uint256){
-        return ((_tokenId >> 128) + 1) << 128;
+    function getERCtype(uint256 _1155tokenId) public view  returns(uint){
+        return managedTokenByFullBytesId[_1155tokenId].ercType;
+    }
+
+    function getNextBaseId(uint256 _1155tokenId) public pure returns(uint256){
+        return ((_1155tokenId >> 128) + 1) << 128;
     }
     //for adjusting incoming human-typed values to smart contract uint values
-    function adjustValueByUnits(uint256 _tokenId, uint256 _value, uint256 _decimalPlace) public view onlyAdmin returns(uint256){
-        address _tokenAddr = tokenListByBaseId[_tokenId >> 128];
-        ManagedToken memory _tknData = managedTokenListByAddress[_tokenAddr];
+    function adjustValueByUnits(uint256 _1155tokenId, uint256 _value, uint256 _decimalPlace) public view onlyAdmin returns(uint256){
+        address _tokenAddr = tokenAddressByFullBytesId[_1155tokenId];
+        ManagedToken memory _tknData = managedTokenByFullBytesId[_1155tokenId];
         if(_tknData.ercType == 721){
             require(_decimalPlace == 0, 'Attempted to send NFT with fractional value');
             return _value;
@@ -231,67 +233,73 @@ contract TokenManagement is  ERCDepositable {
         return _value * 10**(18 - _decimalPlace);
     }
 
-    function subtractFromTotalSupply(uint256 _tokenId, uint256 _amount) public onlyAdmin {
-        address _tokenAddr = tokenListByBaseId[_tokenId >> 128];
-        managedTokenListByAddress[_tokenAddr].totalSupply = managedTokenListByAddress[_tokenAddr].totalSupply - _amount;
+    function subtractFromTotalSupply(uint256 _1155tokenId, uint256 _amount) public onlyAdmin {
+        managedTokenByFullBytesId[_1155tokenId].totalSupply = managedTokenByFullBytesId[_1155tokenId].totalSupply - _amount;
     }
 
-    function isManagedToken(address _token) public view returns(bool) {
-        return managedTokenListByAddress[_token].isManagedToken;
+    function isManagedToken(address _tokenAddr) public view returns(bool) {
+        return managedTokenByFullBytesId[tokenBaseBytesIdByAddress[_tokenAddr]].isManagedToken;
     }
 
-    function setIsManagedToken(address _token, bool _state) public onlyAdmin {
-        managedTokenListByAddress[_token].isManagedToken = _state;
+    function setIsManagedToken(address _tokenAddr, bool _state) public onlyAdmin {
+        managedTokenByFullBytesId[tokenBaseBytesIdByAddress[_tokenAddr]].isManagedToken = _state;
     }
 
-    function getManagedTokenIdByAddress(address _tokenOriginAddr) public view returns(uint256) {
+    function getManagedTokenBasedBytesIdByAddress(address _tokenAddr) public view returns(uint256) {
         //split byte format
-        return managedTokenListByAddress[_tokenOriginAddr].cryptoravesTokenId;
+        return tokenBaseBytesIdByAddress[_tokenAddr];
     }
 
     function getTokenListCount() public view returns(uint count) {
-        return tokenListByBaseId.length;
+        return numberOfTokens;
     }
 
-    function _addTokenToManagedTokenList(address _token, uint ercType, uint256 _erc721Id) private onlyAdmin{
-        tokenListByBaseId.push(_token);
+    function _addTokenToManagedTokenList(address _tokenAddr, uint ercType, uint256 _erc721Id) private onlyAdmin{
+        uint baseBytesId = numberOfTokens << 128;
+        uint256 fullBytesId = baseBytesId + _erc721Id;
+
+        tokenAddressByFullBytesId[fullBytesId] = _tokenAddr;
+
 
         ManagedToken memory _mngTkn;
         if(ercType == 20 || ercType == 721){
             //need clause for ETH?
-            if(address(0) != _token){
-                _mngTkn = getERCspecs(_token, ercType);
+            if(address(0) != _tokenAddr){
+                _mngTkn = getERCspecs(_tokenAddr, ercType);
             }
-
             if(ercType == 721){
                 //get baseUrl
-                IERCuni _tkn = IERCuni(_token);
+                IERCuni _tkn = IERCuni(_tokenAddr);
                 _mngTkn.tokenBrandImageUrl = _tkn.tokenURI(_erc721Id);
             }
-
         } else {
             //assign symbol of erc1155
         }
-
-        _mngTkn.managedTokenBaseId = tokenListByBaseId.length - 1;
-        symbolAndEmojiLookupTable[_mngTkn.symbol] = _mngTkn.managedTokenBaseId << 128;
+        _mngTkn.managedTokenBaseId = baseBytesId;
+        //safety when dealing with ERC721's:
+        if (tokenBaseBytesIdByAddress[_tokenAddr] == 0){
+          tokenBaseBytesIdByAddress[_tokenAddr] = baseBytesId;
+        }
+        symbolAndEmojiLookupTable[_mngTkn.symbol] = baseBytesId;
         _mngTkn.isManagedToken = true;
         _mngTkn.ercType = ercType;
 
-        _mngTkn.cryptoravesTokenId = symbolAndEmojiLookupTable[_mngTkn.symbol] + _erc721Id;
+        _mngTkn.cryptoravesTokenId = fullBytesId;
 
-        managedTokenListByAddress[_token] = _mngTkn;
+        managedTokenByFullBytesId[fullBytesId] = _mngTkn;
         emit Token(_mngTkn);
+
+        numberOfTokens++;
     }
 
-    function _mint( address account, uint256 id, uint256 amount, bytes memory data) private {
+    function _mint( address account, uint256 _1155tokenId, uint256 amount, bytes memory data) private {
         CryptoravesToken instanceCryptoravesToken = CryptoravesToken(_cryptoravesTokenAddr);
-        instanceCryptoravesToken.mint(account, id, amount, data);
+        instanceCryptoravesToken.mint(account, _1155tokenId, amount, data);
     }
 
-    function _burn( address account, uint256 id, uint256 amount) private {
+    function _burn( address account, uint256 _1155tokenId, uint256 amount) private {
         CryptoravesToken instanceCryptoravesToken = CryptoravesToken(_cryptoravesTokenAddr);
-        instanceCryptoravesToken.burn(account, id, amount);
+        instanceCryptoravesToken.burn(account, _1155tokenId, amount);
     }
 
     /*****************************tokenId mgmt*************************
@@ -300,9 +308,9 @@ contract TokenManagement is  ERCDepositable {
      *
      */
 
-    function managedTransfer(address _from, address _to, uint256 _id,  uint256 _val, bytes memory _data)  public onlyAdmin {
+    function managedTransfer(address _from, address _to, uint256 _1155tokenId,  uint256 _val, bytes memory _data)  public onlyAdmin {
         CryptoravesToken instanceCryptoravesToken = CryptoravesToken(_cryptoravesTokenAddr);
-        instanceCryptoravesToken.safeTransferFrom(_from, _to, _id, _val, _data);
+        instanceCryptoravesToken.safeTransferFrom(_from, _to, _1155tokenId, _val, _data);
     }
 
 

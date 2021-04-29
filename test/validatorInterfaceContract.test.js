@@ -133,7 +133,7 @@ contract("ValidatorInterfaceContract", async accounts => {
         20, //indicates ERC20
         false
       )
-      let tokenId1155 = await instanceTokenManagement.getManagedTokenIdByAddress(erc20Instance.address)
+      let tokenId1155 = await instanceTokenManagement.getManagedTokenBasedBytesIdByAddress(erc20Instance.address)
       let amt = ethers.utils.parseUnits('111',18)
       appr = await erc20Instance.approve(
         additionalAccount,
@@ -311,7 +311,7 @@ contract("ValidatorInterfaceContract", async accounts => {
       let tokenId, userAddr;
       for(i=0; i < 5; i++){
         userAddr = await instanceUserManagement.getUserAccount(ids[i])
-        tokenId = await instanceTokenManagement.getManagedTokenIdByAddress(userAddr)
+        tokenId = await instanceTokenManagement.getManagedTokenBasedBytesIdByAddress(userAddr)
         switch(i){
           case 0: assert.equal(tokenId.toString(), heldIds[i+1].toString(), 'heldid corresponding to id0 does not match'); break;
           case 1: assert.equal(tokenId.toString(), heldIds[i+1].toString(), 'heldid corresponding to id1 does not match'); break;

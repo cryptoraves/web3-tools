@@ -764,7 +764,7 @@ export default {
       amount1 = await token.balanceOf(this.ethereumAddress)
       console.log('ERC20 Amount After deposit: '+this.ethers.utils.formatUnits(amount1, 18))
 
-      this.ERC1155tokenId = localStorage.ERC1155tokenId = await tokenManagerContract.getManagedTokenIdByAddress(this.ERC20FullAddress)
+      this.ERC1155tokenId = localStorage.ERC1155tokenId = await tokenManagerContract.getManagedTokenBasedBytesIdByAddress(this.ERC20FullAddress)
       console.log('ERC1155 Token ID: '+this.ERC1155tokenId)
       
       let finalBalance = await cryptoravesToken.balanceOf(this.ethereumAddress, this.ERC1155tokenId)
@@ -788,7 +788,7 @@ export default {
         abis['TokenManagement'].abi, 
         this.signer
       )
-      let addr = await tokenManagerContract.getManagedTokenIdByAddress(this.ERC20FullAddress)
+      let addr = await tokenManagerContract.getManagedTokenBasedBytesIdByAddress(this.ERC20FullAddress)
       let res = await tokenManagerContract.setEmoji(addr,'🔥')
       console.log(res)
 
@@ -810,7 +810,7 @@ export default {
         this.signer
       )
      
-      this.ERC1155tokenId = localStorage.ERC1155tokenId = await tokenManagerContract.getManagedTokenIdByAddress(this.ERC20FullAddress)
+      this.ERC1155tokenId = localStorage.ERC1155tokenId = await tokenManagerContract.getManagedTokenBasedBytesIdByAddress(this.ERC20FullAddress)
       let initialBalance = await cryptoravesToken.balanceOf(this.depositAndSendERC20address, this.ERC1155tokenId)
       let amount = 1000
       let appr = await token.approve(this.TokenManagementContractAddress, this.ethers.utils.parseEther(amount.toString()));

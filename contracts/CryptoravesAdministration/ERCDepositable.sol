@@ -33,11 +33,11 @@ contract ERCDepositable is IERC721Receiver, AdministrationContract {
 
         if(_ercType == 20){
             _tknData.decimals = token.decimals();
-            
+
         }
         return _tknData;
     }
-    
+
     /**
     * @dev Allows a user to deposit ETH or an ERC20 into the contract.
            If _token is 0 address, deposit ETH.
@@ -52,7 +52,7 @@ contract ERCDepositable is IERC721Receiver, AdministrationContract {
           require(token.transferFrom(msg.sender, address(this), _amount), 'transfer failed');
         }
     }
-    
+
     /**
     * @dev Withdraw funds to msg.sender
            and msg.sender is the beneficiary.
@@ -69,18 +69,18 @@ contract ERCDepositable is IERC721Receiver, AdministrationContract {
             require(token.transfer(msg.sender, _amount), 'transfer failed');
         }
     }
-    
+
     function _depositERC721(uint256 _tokenId, address _tokenAddr) internal {
         IERCuni token = IERCuni(_tokenAddr); //you can use ABI for ERC20 as IERC721.sol conflicts with IERC1155
         token.safeTransferFrom(msg.sender, address(this), _tokenId);
-        
+
     }
     function _withdrawERC721(uint256 _tokenId, address _tokenAddr) internal {
         IERCuni token = IERCuni(_tokenAddr);
         token.safeTransferFrom(address(this), msg.sender, _tokenId);
-        
+
     }
-        
+
     //required for use with safeTransfer in ERC721
     function onERC721Received(address, address, uint256, bytes memory) public virtual override returns (bytes4) {
         return this.onERC721Received.selector;

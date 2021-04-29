@@ -155,7 +155,7 @@ module.exports = function (deployer, network, accounts) {
   	/*
   	//transfer
   	let tknAddress = await instanceTokenManagement.getAddressBySymbol('TKB5')
-	let tokenID = await instanceTokenManagement.getManagedTokenIdByAddress(tknAddress)
+	let tokenID = await instanceTokenManagement.getManagedTokenBasedBytesIdByAddress(tknAddress)
 	console.log('Token ID:',tokenID.toString())
 	console.log('Token ID:',Erc1155tokenID)
 	let layer2account = await instanceUserManagement.getLayerTwoAccount(accounts[0])
