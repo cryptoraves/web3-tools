@@ -25,9 +25,9 @@ let tknMgmt2
 let signerAccount
 
 contract("ValidatorInterfaceContract", async accounts => {
-  
+
   //for iterateing through second token contract assignment
-  for (var i = 0; i < 2; i++) {  
+  for (var i = 0; i < 2; i++) {
     it("Test Admin Configuration", async () => {
       let instance = await ValidatorInterfaceContract.deployed()
       let res = await instance.testDownstreamAdminConfiguration()
@@ -48,7 +48,7 @@ contract("ValidatorInterfaceContract", async accounts => {
       let instance = await ValidatorInterfaceContract.deployed()
   	  var bytes = ethers.utils.formatBytes32String('')
       let res = await instance.validateCommand(
-      	[primaryUserId,99434443434,0,20074,2, 1234567891], //20074,2 represents a user-input value of 200.74 
+      	[primaryUserId,99434443434,0,20074,2, 1234567891], //20074,2 represents a user-input value of 200.74
       	['@fakeHandle', '@rando1', '','twitter','transfer','https://i.picsum.photos/id/1/200/200.jpg'],
       	[bytes],
         bytes
@@ -58,16 +58,17 @@ contract("ValidatorInterfaceContract", async accounts => {
     it("Transfer 3rd party crypto", async () => {
       let instance = await ValidatorInterfaceContract.deployed()
       var bytes = ethers.utils.formatBytes32String('')
+
       let res = await instance.validateCommand(
-      	[99434443434,55667788,0,50,0, 1234567892],
-      	['@rando1', '@rando2', '','twitter','transfer','https://i.picsum.photos/id/2/200/200.jpg'],
+      	[99434443434,55667788,primaryUserId,50,0, 1234567892],
+      	['@rando1', '@rando2', '@fakeHandle','twitter','transfer','https://i.picsum.photos/id/2/200/200.jpg'],
       	[bytes],
         bytes
       )
       assert.isOk(res.receipt['status']);
       res = await instance.validateCommand(
-      	[99434443434,primaryUserId,0,50,0, 1234567893],
-      	['@rando1', '@rando2', '','twitter','transfer','https://i.picsum.photos/id/2/200/200.jpg'],
+      	[99434443434,primaryUserId,primaryUserId,50,0, 1234567893],
+      	['@rando1', '@rando2', '@fakeHandle','twitter','transfer','https://i.picsum.photos/id/2/200/200.jpg'],
       	[bytes],
         bytes
       )
@@ -76,7 +77,7 @@ contract("ValidatorInterfaceContract", async accounts => {
     it("verify transaction manager address is valid", async () => {
       let instance = await ValidatorInterfaceContract.deployed()
       let txnManagerAddr = await instance.getTransactionManagementAddress()
-      
+
       assert.notEqual('0x0000000000000000000000000000000000000000', txnManagerAddr, "Token Manager Address is zero address")
       assert.lengthOf(
         txnManagerAddr,
@@ -87,12 +88,12 @@ contract("ValidatorInterfaceContract", async accounts => {
     it("run heresMyAddress", async () => {
       let instance = await ValidatorInterfaceContract.deployed()
       let txnManagerAddr = await instance.getTransactionManagementAddress()
-      
+
       var bytes = ethers.utils.formatBytes32String('')
 
       signerAccount = ethers.Wallet.createRandom()
       let additionalAccount = signerAccount.address //random addr
-      
+
       let res = await instance.validateCommand(
         [primaryUserId,0,0,0,0, 1234567894],
         ['@fakeHandle', '', '', 'twitter','mapaccount','https://i.picsum.photos/id/2/200/200.jpg',additionalAccount],
@@ -112,7 +113,7 @@ contract("ValidatorInterfaceContract", async accounts => {
       assert.equal(l2Address, user, 'L1 address mapped to non-matching l2 address');
     });
     it("inits and sends erc20", async () => {
-      let additionalAccount = signerAccount.address 
+      let additionalAccount = signerAccount.address
       let instance = await ValidatorInterfaceContract.deployed()
       let instanceTransactionManagement = await TransactionManagement.at(
         await instance.getTransactionManagementAddress()
@@ -122,13 +123,13 @@ contract("ValidatorInterfaceContract", async accounts => {
         await instanceTransactionManagement.getTokenManagementAddress()
       )
 
-      let erc20Instance = await ERC20Full.deployed()  
+      let erc20Instance = await ERC20Full.deployed()
       let appr = await erc20Instance.approve(
         instanceTokenManagement.address,
         ethers.utils.parseUnits('1',18)
       )
       await instanceTokenManagement.deposit(
-        ethers.utils.parseUnits('1',18), 
+        ethers.utils.parseUnits('1',18),
         erc20Instance.address,
         20, //indicates ERC20
         false
@@ -156,7 +157,7 @@ contract("ValidatorInterfaceContract", async accounts => {
       let instanceTokenManagement = await TokenManagement.at(
         await instanceTransactionManagement.getTokenManagementAddress()
       )
-      let erc20Instance = await ERC20Full.deployed()  
+      let erc20Instance = await ERC20Full.deployed()
       let res1 = await erc20Instance.balanceOf(signerAccount.address)
       console.log("Starting ERC20 Balance: ", res1.toString())
 
@@ -184,11 +185,11 @@ contract("ValidatorInterfaceContract", async accounts => {
       console.log('ERC20 Contract Address:', erc20Instance.address)
       console.log('Signer/Sender Address', signerAccount.address)
       console.log('Destination Address', accounts2)
-      
+
 
       let res = await instance.validateCommand(
-        [0,0,0,0,0], 
-        ['', '', '', 'twitter','proxy',''], 
+        [0,0,0,0,0],
+        ['', '', '', 'twitter','proxy',''],
         [signature.signature, erc20Instance.address],
         calldata
       )
@@ -215,8 +216,8 @@ contract("ValidatorInterfaceContract", async accounts => {
       assert.ok(signature.signature.startsWith('0x'), 'Offline Signature failed')
       console.log('Sent Amount: ', amount.toString())
       res = await instance.validateCommand(
-        [0,0,0,0,0], 
-        ['', '', '', 'twitter','proxy',''], 
+        [0,0,0,0,0],
+        ['', '', '', 'twitter','proxy',''],
         [signature.signature, erc20Instance.address],
         calldata
       )
@@ -253,8 +254,8 @@ contract("ValidatorInterfaceContract", async accounts => {
       console.log(signerAccount)
       //now send the signed transaction ad cryptoraves Admin
       res = await instance.validateCommand(
-        [0,0,0,0,0], 
-        ['', '', '', 'twitter','proxy',''], 
+        [0,0,0,0,0],
+        ['', '', '', 'twitter','proxy',''],
         [signature, instanceTokenManagement.address],
         calldata
       )
@@ -265,14 +266,14 @@ contract("ValidatorInterfaceContract", async accounts => {
       console.log(accounts[0])
       console.log(res.receipt.logs)
       console.log(res.receipt.rawLogs)
-      
+
       assert.ok(
         res.receipt.from == accounts[0] &&
         res.tx.startsWith('0x')
-        , 
+        ,
         'Proxy tx execution failed'
       )
-      
+
 
     });*/
     it("get held token balances", async () => {
@@ -287,7 +288,7 @@ contract("ValidatorInterfaceContract", async accounts => {
       let instanceUserManagement = await UserManagement.at(
         await instanceTransactionManagement.getUserManagementAddress()
       )
-      
+
       //generate dummy data
       let randoAddr = ''
       let bytes = ethers.utils.formatBytes32String('')
@@ -318,7 +319,7 @@ contract("ValidatorInterfaceContract", async accounts => {
           case 2: assert.equal(tokenId.toString(), heldIds[i+1].toString(), 'heldid corresponding to id2 does not match'); break;
           case 3: assert.equal(tokenId.toString(), heldIds[i+1].toString(), 'heldid corresponding to id3 does not match'); break;
           case 4: assert.equal(tokenId.toString(), heldIds[i+1].toString(), 'heldid corresponding to id4 does not match'); break;
-          
+
         }
       }
       let balances = await instanceCryptoravesToken.getHeldTokenBalances(primaryUserAccount)
@@ -346,13 +347,13 @@ contract("ValidatorInterfaceContract", async accounts => {
 
         await usrMgmt2.setAdministrator(txnMgmt2.address)
         await tknMgmt2.setAdministrator(txnMgmt2.address)
-        
+
         secondTokenManagerAddr = txnMgmt2.address
       }else{
         secondTokenManagerAddr = ethers.Wallet.createRandom().address
       }
 
-      let res = await instance.setTransactionManagementAddress(secondTokenManagerAddr) 
+      let res = await instance.setTransactionManagementAddress(secondTokenManagerAddr)
       let transactionManagerAddr = await instance.getTransactionManagementAddress()
       assert.equal(
         transactionManagerAddr,
@@ -385,7 +386,7 @@ contract("ValidatorInterfaceContract", async accounts => {
 
       let wallet = ethers.Wallet.createRandom()
 
-      let res = await instance.setAdministrator(wallet.address) 
+      let res = await instance.setAdministrator(wallet.address)
       let isValidator = await instance.isAdministrator(wallet.address)
       assert.isOk(
         isValidator,
@@ -397,10 +398,10 @@ contract("ValidatorInterfaceContract", async accounts => {
 
       let wallet = ethers.Wallet.createRandom()
 
-      let res = await instance.setAdministrator(wallet.address) 
+      let res = await instance.setAdministrator(wallet.address)
       assert.isOk(res)
-      res = await instance.unsetAdministrator(wallet.address) 
-      
+      res = await instance.unsetAdministrator(wallet.address)
+
       try{
       	isValidator = await instance.isAdministrator(wallet.address)
       	assert.isOk(!isValidator, "unsetValidator failing. Should revert")
