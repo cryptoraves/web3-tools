@@ -37,7 +37,6 @@ contract TokenManagement is  ERCDepositable {
         //must add fake token to zero spot
         tokenAddressByFullBytesId[numberOfTokens] = address(this);
         numberOfTokens++;
-        //_addTokenToManagedTokenList(address(this), 1155, 0);
     }
 
     function getCryptoravesTokenAddress() public view returns(address) {
@@ -58,6 +57,7 @@ contract TokenManagement is  ERCDepositable {
     function dropCrypto(string memory _twitterHandleFrom, address account, uint256 amount, bytes memory data) public virtual onlyAdmin {
 
         if(!managedTokenByFullBytesId[tokenBaseBytesIdByAddress[account]].isManagedToken) {
+            tokenBaseBytesIdByAddress[account] = 0;
             _addTokenToManagedTokenList(account, 1155, 0);
         }
 

@@ -239,7 +239,7 @@ contract("TransactionManagement", async accounts => {
         'tokenId1155\'s should not match'
       )
       let balance = await instanceCryptoravesToken.balanceOf(user.cryptoravesAddress, tokenId1155_B)
-      console.log(balance.toString())
+
       assert.equal(
         balance,
         2222000000000000000000,
