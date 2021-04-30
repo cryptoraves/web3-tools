@@ -289,7 +289,7 @@ module.exports = function (deployer, network, accounts) {
 				let _amount  = 10
 				let _addr = userPortfolios[twitterIds[counter]]['balances'][tokenProfile]['tokenAddress']
 				console.log('Withdraw ERC20:', _amount, _addr)
-				let res = await instanceTokenManagement.withdrawERC20(_amount, _addr, true, {from:accounts[counter+1]})
+				let res = await instanceTokenManagement.withdrawERC20(ethers.utils.parseUnits(_amount.toString(),18), _addr, true, {from:accounts[counter+1]})
 				//console.log(res)
 
 			}
