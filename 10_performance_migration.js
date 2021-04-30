@@ -71,8 +71,8 @@ module.exports = function (deployer, network, accounts) {
 	        [],
 	        ethers.utils.formatBytes32String('')
 	      )
-	      
-		  
+
+
 	      userPortfolios[account0TwitterId] = {
 	      	"twitterUsername":'Mr.Garrison',
 	      	"cryptoravesAddress":'0x'+res.receipt['rawLogs'][0]['topics'][1].substr(26),
@@ -81,18 +81,22 @@ module.exports = function (deployer, network, accounts) {
 	      	"balances":{}
 	      }
 	})
+
   //ERC20's
   deployer.then(async () => {
   	let counter = 0
   	for await (token of erc20s){
+      randomTwitterId = (getRandomInt(100000) * getRandomInt(100000) + 99000000000).toString()
+  		twitterIds.push(randomTwitterId.toString())
+
   		//Mint
   		account = ethers.Wallet.createRandom().address
   		amount = 1000000000
 
   		await deployer.deploy(ERC20Full, accounts[0], 'Token'+token, token, 18, ethers.utils.parseUnits(amount.toString(),18))
 	    instance = await ERC20Full.deployed()
-	        
-	    
+
+
 
 	    appr = await instance.approve(instanceTokenManagement.address, ethers.utils.parseEther(amount.toString()))
 	    Erc1155tokenID = await instanceTokenManagement.deposit(ethers.utils.parseEther(amount.toString()), instance.address, 20, true)
@@ -102,10 +106,9 @@ module.exports = function (deployer, network, accounts) {
 	    	Erc1155tokenID='1000000000000000000000000000000000001'
 	    }
 
-	    	  	
+
 		//transfer
-		randomTwitterId = (getRandomInt(100000) * getRandomInt(100000) + 99000000000).toString()
-		twitterIds.push(randomTwitterId.toString())
+
 		twitterUsername = 'rando'+counter
 		//amount = getRandomInt(1000) * getRandomInt(1000)
 		res = await validatorInstance.validateCommand(
@@ -120,14 +123,14 @@ module.exports = function (deployer, network, accounts) {
 	  		console.log(output)
 			if (err) throw err
 		})
-		
+
 		//console.log(res.receipt.rawLogs)
 		userPortfolios[account0TwitterId]['balances'][Erc1155tokenID]={
 	  		'ticker':token,
 	  		'tokenAddress':instance.address,
 	  		'balance':ethers.utils.formatUnits(balance.toString(), 18)
 	  	}
-	  	
+
 		userPortfolios[randomTwitterId.toString()] = {
 			"twitterUsername":twitterUsername,
 			"cryptoravesAddress": '0x'+res.receipt['rawLogs'][0]['topics'][1].substr(26),
@@ -147,10 +150,9 @@ module.exports = function (deployer, network, accounts) {
 		if (Erc1155tokenID != '1000000000000000000000000000000000001'){
 			await instanceTokenManagement.setEmoji(Erc1155tokenID, '😑')
 		}
-		
+
 		//console.log(userPortfolios[randomTwitterId])
-		counter++
-  	}
+
 
   	/*
   	//transfer
@@ -162,8 +164,9 @@ module.exports = function (deployer, network, accounts) {
 	balance = await instanceCryptoravesToken.balanceOf(layer2account, Erc1155tokenID)
 	console.log('Balance: ', balance.toString())
 	*/
-
-  })
+    counter++
+  }
+})
 
 
 
@@ -172,31 +175,30 @@ module.exports = function (deployer, network, accounts) {
   	let tokenID = 0
   	let counter = 0
   	for await (token of erc721s){
-  		
+
   		//mint
   		account = ethers.Wallet.createRandom().address
-  		
+
   		await deployer.deploy(ERC721Full, accounts[0], 'Token'+token, token, 'https://source.unsplash.com/random/300x200?sig=0')
 	    instance = await ERC721Full.deployed()
-	        
+
 	    await instance.mint(accounts[0], 'https://source.unsplash.com/random/300x200?sig=0'+(counter+1))
 
-	    if ( tokenID == 0){
+	    /*if ( tokenID == 0){
 	    	tokenID=1
 	    }else{
 	    	tokenID=0
-	    }
+	    }*/
 	    appr = await instance.approve(instanceTokenManagement.address, tokenID)
 	    Erc1155tokenID = await instanceTokenManagement.deposit(tokenID, instance.address, 721, true)
 	    Erc1155tokenID = Erc1155tokenID.logs[1]['args']['cryptoravesTokenId'].toString()
-		balance = await instanceCryptoravesToken.balanceOf(userPortfolios[account0TwitterId]['cryptoravesAddress'] , Erc1155tokenID)
+		  balance = await instanceCryptoravesToken.balanceOf(userPortfolios[account0TwitterId]['cryptoravesAddress'] , Erc1155tokenID)
 	    output = 'Account: '+accounts[0]+' Token: '+token+' Token Address: '+instance.address+' Balance: '+balance.toString()+' CryptoravesTokenID: '+Erc1155tokenID+"\n"
 	    await fs.appendFile(outputPath, output, function (err) {
 	  		console.log(output)
 			if (err) throw err
 		})
-	    
-	  	
+
 
 	  	if(token != 'NFTC10'){ //reserve NFTC10 for lambda_handler testing
 		  	res = await validatorInstance.validateCommand(
@@ -220,8 +222,6 @@ module.exports = function (deployer, network, accounts) {
 
 		if ( tokenID == 0){
 	    	tokenID=1
-	    }else{
-	    	tokenID=0
 	    }
 	    appr = await instance.approve(instanceTokenManagement.address, tokenID)
 	    Erc1155tokenID = await instanceTokenManagement.deposit(tokenID, instance.address, 721, true)
@@ -240,13 +240,13 @@ module.exports = function (deployer, network, accounts) {
 	  		'tokenAddress':instance.address,
 	  		'balance':balance.toString()
 		}
-	  	
+    tokenID=0
 		//set emoji
 		//await instanceTokenManagement.setEmoji(Erc1155tokenID, '💫')
 		//console.log(res.receipt.rawLogs)
 		//console.log(userPortfolios[twitterIds[counter]])
-		
-	
+
+
 
 		counter++
   	}
@@ -270,13 +270,13 @@ module.exports = function (deployer, network, accounts) {
   		userPortfolios[twitterIds[counter]]['twitterUsername'] = userName
   		userPortfolios[twitterIds[counter]]['layer1account'] = accounts[counter+1]
   		userPortfolios[twitterIds[counter]]['imageUrl'] = url
-  		
 
-  		//withdrawals 
+
+  		//withdrawals
   		for (tokenProfile in userPortfolios[twitterIds[counter]]['balances']){
 			if (userPortfolios[twitterIds[counter]]['balances'][tokenProfile]['ticker'].startsWith('NFT')){
 				//withdraw ERC721
-				
+
 				let _tokenID = userPortfolios[twitterIds[counter]]['balances'][tokenProfile]['tokenId']
 				let _addr = userPortfolios[twitterIds[counter]]['balances'][tokenProfile]['tokenAddress']
 				if ( counter < 59 && counter % 3 == 0){
@@ -291,7 +291,7 @@ module.exports = function (deployer, network, accounts) {
 				console.log('Withdraw ERC20:', _amount, _addr)
 				let res = await instanceTokenManagement.withdrawERC20(_amount, _addr, true, {from:accounts[counter+1]})
 				//console.log(res)
-				
+
 			}
 		}
 		counter++
@@ -299,17 +299,17 @@ module.exports = function (deployer, network, accounts) {
   	}
   	let data = await JSON.stringify(userPortfolios)
 	await fs.appendFile('/tmp/userPortfolios.json', data, (err) => {
-		
+
 	    if (err) {
 			console.log(err);
 	    }else {
 		    console.log('Data written to file');
 		}
 	})
-  	
+
   })
-  
-	
+
+
 }
 
 
