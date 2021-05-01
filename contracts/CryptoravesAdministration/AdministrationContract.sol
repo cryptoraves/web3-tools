@@ -19,6 +19,7 @@ interface ITransactionManager {
     function getUserL2AccountFromL1Account(address) external view returns(address);
     function getTokenManagementAddress() external view returns(address);
     function getCryptoravesTokenAddress() external view returns(address);
+    function emitTransferFromTokenManagementContract(address,address,uint256,uint256,uint256) external;
 }
 
 interface ITokenManager {
@@ -69,16 +70,16 @@ contract AdministrationContract {
     */
     mapping(address => bool) private _administrators;
     address [] internal _administratorList;
-    
+
     //event NewAdministrator(address indexed _newAdminAddr, address indexed _fromContractAddr);
     //event RemovedAdministrator(address indexed _oldAdminAddr, address indexed _fromContractAddr);
-    
+
     constructor() public {
         //default validator is set to sender
         _administrators[msg.sender] = true;
         _administratorList.push(msg.sender);
     }
-    
+
     /*
     * Require msg.sender to be administrator
     */
@@ -87,14 +88,14 @@ contract AdministrationContract {
       require(_administrators[msg.sender], 'Sender is not the parent contract nor an admin.');
       _;
     }
-    
+
     /*
     * Return admin flag of sender
     */
     function isAdministrator(address _addr) public view returns(bool) {
         return _administrators[_addr];
     }
-    
+
     /*
     * Add an admin to the list
     * @param _newAdmin The address of the new admin
@@ -104,7 +105,7 @@ contract AdministrationContract {
         _administratorList.push(_newAdmin);
         //emit NewAdministrator(_newAdmin, address(this));
     }
-    
+
     /*
     * de-authorize an admin
     * @param oldAdmin The address of the admin to remove access
@@ -113,27 +114,27 @@ contract AdministrationContract {
         _administrators[_oldAdmin] = false;
         //emit RemovedAdministrator(_oldAdmin, address(this));
     }
-    
+
     /*
     * For checking if contract is launched
     */
     function isAvailable() public pure returns(bool) {
         return true;
     }
-    
+
     /*
     * Admin Address Looper for hook functionality
-    */ 
+    */
     function getTransactionManagerAddress() public view returns(address) {
         require(_administratorList.length < 1000, 'List of administrators is too damn long!');
-        
+
         for (uint i=0; i<_administratorList.length; i++) {
-            //first, ensure _administrator is set to true 
+            //first, ensure _administrator is set to true
             if(_administrators[_administratorList[i]]){
                 //check if address is a contract
                 if(AdminToolsLibrary._isContract(_administratorList[i])){
                     //first instantiate existing contract
-                    ITransactionManager iTxnMgmt = ITransactionManager(_administratorList[i]);    
+                    ITransactionManager iTxnMgmt = ITransactionManager(_administratorList[i]);
                     //then try to run its function
                     try iTxnMgmt.testForTransactionManagementAddressUniquely() {
                         return _administratorList[i];
@@ -141,7 +142,7 @@ contract AdministrationContract {
                 }
             }
         }
-        
+
         revert('No TransactionManagementAddress found!');
     }
 }

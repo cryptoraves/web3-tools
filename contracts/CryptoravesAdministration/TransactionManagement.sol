@@ -347,17 +347,18 @@ contract TransactionManagement is AdministrationContract {
         //reset token
         ITokenManager _tokenManagement = ITokenManager(_tokenManagementContractAddress);
         _tokenManagement.setIsManagedToken(_acct, false);
-
     }
 
     function _adjustValueByUnits(uint256 _cryptoravesTokenId, uint256 _value, uint256 _decimalPlace) private view returns(uint256){
         //check if nft. if yes, return same _value
         ITokenManager _tokenManagement = ITokenManager(_tokenManagementContractAddress);
         return _tokenManagement.adjustValueByUnits(_cryptoravesTokenId, _value, _decimalPlace);
-
-
     }
 
+    function emitTransferFromTokenManagementContract(address _from, address _to, uint256 _value, uint256 _cryptoravesTokenId, uint256 _tweetId) public {
+      require(msg.sender == _tokenManagementContractAddress, 'Not Token Manager Contract. Aborting.');
+      emit Transfer(_from, _to, _value, _cryptoravesTokenId, _tweetId);
+    }
     function _bytesToAddress(bytes memory bys) private pure returns (address addr) {
         assembly {
           addr := mload(add(bys,20))

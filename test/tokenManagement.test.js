@@ -177,7 +177,6 @@ contract("TokenManagement", async accounts => {
     let specs = await instanceTokenManagement.getERCspecs(erc20Instance.address, 20)
 
     assert.isOk(
-      specs['managedTokenBaseId'] == '0' &&
       specs['isManagedToken'] == false &&
       specs['ercType'] == '0' &&
       specs['totalSupply'] == '1000000000000000000000000000' &&
@@ -275,7 +274,6 @@ contract("TokenManagement", async accounts => {
     //get specs from ERC721 contract
     let specs = await instanceTokenManagement.getERCspecs(erc721Instance.address, 721)
     assert.isOk(
-      specs['managedTokenBaseId'] == '0' &&
       specs['isManagedToken'] == false &&
       specs['ercType'] == '0' &&
       specs['totalSupply'] == '1' &&

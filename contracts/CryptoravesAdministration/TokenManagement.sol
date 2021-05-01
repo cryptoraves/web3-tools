@@ -93,43 +93,32 @@ contract TokenManagement is  ERCDepositable {
 
     function deposit(uint256 _amountOrId, address _tokenAddr, uint _ercType, bool _managedTransfer) public payable returns(uint256){
 
-        if(!managedTokenByFullBytesId[tokenBaseBytesIdByAddress[_tokenAddr]].isManagedToken) {
-            if( _ercType == 721 ){
-                _addTokenToManagedTokenList(_tokenAddr, _ercType, _amountOrId);
-            }else{
-                _addTokenToManagedTokenList(_tokenAddr, _ercType, 0);
-            }
+      address _mintTo = _managedTransfer ? getL2AddressForManagedDeposit() : msg.sender;
+      uint256 _1155tokenId;
+      uint256 _amount;
+      if( _ercType == 721 ){
+          _1155tokenId = getManagedTokenBasedBytesIdByAddress(_tokenAddr) + _amountOrId;
+          if(!managedTokenByFullBytesId[_1155tokenId].isManagedToken){
+            _1155tokenId = _addTokenToManagedTokenList(_tokenAddr, _ercType, _amountOrId);
+          }
+          _depositERC721(_amountOrId, _tokenAddr);
+          _amount = 1;
+      }else{
+          _1155tokenId = getManagedTokenBasedBytesIdByAddress(_tokenAddr);
+          if(!managedTokenByFullBytesId[_1155tokenId].isManagedToken){
+            _1155tokenId = _addTokenToManagedTokenList(_tokenAddr, _ercType, 0);
+          }
+          _depositERC20(_amountOrId, _tokenAddr);
+          _amount = _amountOrId;
+      }
 
-        }
+      _mint(_mintTo, _1155tokenId, _amount, '');
+      emit Deposit(_mintTo, _amountOrId, _tokenAddr, _1155tokenId, _ercType);
 
-        uint256 _1155tokenId;
-        _1155tokenId = getManagedTokenBasedBytesIdByAddress(_tokenAddr);
+      ITransactionManager iTxnMgmt = ITransactionManager(getTransactionManagerAddress());
+      iTxnMgmt.emitTransferFromTokenManagementContract(address(0), _mintTo, _amountOrId, _1155tokenId, 0);
 
-        address _mintTo;
-        if(_managedTransfer){
-            _mintTo = getL2AddressForManagedDeposit();
-        } else {
-            _mintTo = msg.sender;
-        }
-
-        uint256 _amount;
-        if(_ercType == 20){
-            _depositERC20(_amountOrId, _tokenAddr);
-            _amount = _amountOrId;
-
-        }
-        if(_ercType == 721){
-            _1155tokenId = _1155tokenId + _amountOrId;
-            _depositERC721(_amountOrId, _tokenAddr);
-            _amount = 1;
-        }
-
-
-        _mint(_mintTo, _1155tokenId, _amount, '');
-
-        emit Deposit(_mintTo, _amountOrId, _tokenAddr, _1155tokenId, _ercType);
-
-        return _1155tokenId;
+      return _1155tokenId;
     }
 
 
@@ -147,6 +136,9 @@ contract TokenManagement is  ERCDepositable {
         _burn(_burnAddr, _1155tokenId, _amount);
         emit Withdraw(_burnAddr, _amount, _tokenAddr, _1155tokenId, 20);
 
+        ITransactionManager iTxnMgmt = ITransactionManager(getTransactionManagerAddress());
+        iTxnMgmt.emitTransferFromTokenManagementContract(_burnAddr, address(0), _amount, _1155tokenId, 0);
+
         return _1155tokenId;
 
     }
@@ -163,7 +155,10 @@ contract TokenManagement is  ERCDepositable {
         }
 
         _burn(_burnFromAddr, _1155tokenId, 1);
-        emit Withdraw(msg.sender, _tokenERC721Id, _tokenAddr, _1155tokenId, 721);
+        emit Withdraw(_burnFromAddr, _tokenERC721Id, _tokenAddr, _1155tokenId, 721);
+
+        ITransactionManager iTxnMgmt = ITransactionManager(getTransactionManagerAddress());
+        iTxnMgmt.emitTransferFromTokenManagementContract(_burnFromAddr, address(0), _tokenERC721Id, _1155tokenId, 0);
 
         return _1155tokenId;
 
@@ -254,7 +249,7 @@ contract TokenManagement is  ERCDepositable {
         return numberOfTokens;
     }
 
-    function _addTokenToManagedTokenList(address _tokenAddr, uint ercType, uint256 _erc721Id) private onlyAdmin{
+    function _addTokenToManagedTokenList(address _tokenAddr, uint ercType, uint256 _erc721Id) private onlyAdmin returns(uint256){
         uint baseBytesId = numberOfTokens << 128;
         uint256 fullBytesId = baseBytesId + _erc721Id;
 
@@ -275,7 +270,6 @@ contract TokenManagement is  ERCDepositable {
         } else {
             //assign symbol of erc1155
         }
-        _mngTkn.managedTokenBaseId = baseBytesId;
         //safety when dealing with ERC721's:
         if (tokenBaseBytesIdByAddress[_tokenAddr] == 0){
           tokenBaseBytesIdByAddress[_tokenAddr] = baseBytesId;
@@ -290,6 +284,7 @@ contract TokenManagement is  ERCDepositable {
         emit Token(_mngTkn);
 
         numberOfTokens++;
+        return fullBytesId;
     }
 
     function _mint( address account, uint256 _1155tokenId, uint256 amount, bytes memory data) private {
