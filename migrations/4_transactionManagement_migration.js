@@ -8,7 +8,7 @@ const fs = require('fs');
 const outputPath = '/tmp/contractAddresses.json'
 
 module.exports = function (deployer) {
-  
+
   deployer.then(async () => {
   	await deployer.deploy(AdminToolsLibrary)
   	await deployer.link(AdminToolsLibrary, TransactionManagement)
@@ -16,12 +16,16 @@ module.exports = function (deployer) {
   	const tknMgmtInstance = await TokenManagement.deployed()
   	const usrMgmtInstance = await UserManagement.deployed()
 
-    await deployer.deploy(TransactionManagement, tknMgmtInstance.address, usrMgmtInstance.address)
+    let res = await deployer.deploy(TransactionManagement, tknMgmtInstance.address, usrMgmtInstance.address)
     const instance = await TransactionManagement.deployed()
 
     await tknMgmtInstance.setAdministrator(instance.address)
     await usrMgmtInstance.setAdministrator(instance.address)
-        
+
+    //create dummy account for zero address for thegraph & website rendering
+    let res2 = await usrMgmtInstance.launchL2Account(0, '0x0', '0x0');
+    console.log(res2['receipt']['logs'][0]['args'])
+
     console.log('\n*************************************************************************\n')
     console.log('TransactionManagement Contract Address: '+instance.address)
     console.log('\n*************************************************************************\n')

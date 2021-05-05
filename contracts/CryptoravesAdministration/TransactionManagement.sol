@@ -32,6 +32,8 @@ contract TransactionManagement is AdministrationContract {
 
         setTokenManagementAddress(_tokenManagementAddr);
         setUserManagementAddress(_userManagementAddr);
+
+        
     }
     //unique function for identifying this contract
     function testForTransactionManagementAddressUniquely() public pure returns(bool){

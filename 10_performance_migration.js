@@ -101,6 +101,7 @@ module.exports = function (deployer, network, accounts) {
   		//transfer
   		twitterUsername = 'rando'+counter
   		//amount = getRandomInt(1000) * getRandomInt(1000)
+      
       res = await validatorInstance.validateCommand(
   			[account0TwitterId,randomTwitterId,0,(amount/100),getRandomInt(3), counter+1000000],
   			['Mr.Garrison', twitterUsername, token,'twitter','transfer','',''],
