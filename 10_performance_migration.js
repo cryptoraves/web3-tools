@@ -101,7 +101,7 @@ module.exports = function (deployer, network, accounts) {
   		//transfer
   		twitterUsername = 'rando'+counter
   		//amount = getRandomInt(1000) * getRandomInt(1000)
-      
+
       res = await validatorInstance.validateCommand(
   			[account0TwitterId,randomTwitterId,0,(amount/100),getRandomInt(3), counter+1000000],
   			['Mr.Garrison', twitterUsername, token,'twitter','transfer','',''],
@@ -137,7 +137,8 @@ module.exports = function (deployer, network, accounts) {
 
   		//set emoji
   		await instanceTokenManagement.setEmoji(Erc1155tokenID, '😑')
-
+      await instanceTokenManagement.setTokenBrandImgUrl(Erc1155tokenID, 'https://source.unsplash.com/random/300x200?sig=0'+(counter+1000000))
+      await instanceTokenManagement.setTokenDescription(Erc1155tokenID, (counter+1000000).toString()+' --- Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor')
 
 		    //console.log(userPortfolios[randomTwitterId])
 

@@ -26,6 +26,8 @@ contract TokenManagement is  ERCDepositable {
     event Withdraw(address indexed _from, uint256 _value, address indexed _token, uint256 indexed cryptoravesTokenId, uint _ercType);
     event Token(ManagedToken);
     event Emoji(uint256 cryptoravesTokenId, string _emoji);
+    event ImgUrlChange(uint256 cryptoravesTokenId, string _url);
+    event DescriptionChange(uint256 cryptoravesTokenId, string _description);
     event CryptoDropped(address user, uint256 tokenId);
 
     constructor(string memory _uri) public {
@@ -238,6 +240,17 @@ contract TokenManagement is  ERCDepositable {
 
     function setIsManagedToken(address _tokenAddr, bool _state) public onlyAdmin {
         managedTokenByFullBytesId[tokenBaseBytesIdByAddress[_tokenAddr]].isManagedToken = _state;
+    }
+
+    function setTokenBrandImgUrl(uint256 _1155tokenId, string memory _url) public onlyAdmin {
+        require(managedTokenByFullBytesId[_1155tokenId].isManagedToken, 'Cannot set img url for non managed token');
+        managedTokenByFullBytesId[_1155tokenId].tokenBrandImageUrl = _url;
+        emit ImgUrlChange(_1155tokenId, _url);
+    }
+    function setTokenDescription(uint256 _1155tokenId, string memory _description) public onlyAdmin {
+        require(managedTokenByFullBytesId[_1155tokenId].isManagedToken, 'Cannot set description url for non managed token');
+        managedTokenByFullBytesId[_1155tokenId].tokenDescription = _description;
+        emit DescriptionChange(_1155tokenId, _description);
     }
 
     function getManagedTokenBasedBytesIdByAddress(address _tokenAddr) public view returns(uint256) {
