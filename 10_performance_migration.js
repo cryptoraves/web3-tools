@@ -67,9 +67,7 @@ module.exports = function (deployer, network, accounts) {
 
 		  res = await validatorInstance.validateCommand(
 	        [account0TwitterId,0,0,0,0, 1234567890],
-	        ['Mr.Garrison', '', '','twitter','mapaccount','https://sample-imgs.s3.amazonaws.com/mr.garrison.png',accounts[0]],
-	        [],
-	        ethers.utils.formatBytes32String('')
+	        ['Mr.Garrison', '', '','twitter','mapaccount','https://sample-imgs.s3.amazonaws.com/mr.garrison.png',accounts[0]]
 	      )
 
 
@@ -104,9 +102,7 @@ module.exports = function (deployer, network, accounts) {
 
       res = await validatorInstance.validateCommand(
   			[account0TwitterId,randomTwitterId,0,(amount/100),getRandomInt(3), counter+1000000],
-  			['Mr.Garrison', twitterUsername, token,'twitter','transfer','',''],
-  			[ethers.utils.formatBytes32String('')],
-  			ethers.utils.formatBytes32String('')
+  			['Mr.Garrison', twitterUsername, token,'twitter','transfer','','']
   		)
   		balance = await instanceCryptoravesToken.balanceOf(userPortfolios[account0TwitterId]['cryptoravesAddress'] , Erc1155tokenID)
   	    output = 'Account: '+accounts[0]+' Token: '+token+' Token Address: '+instance.address+' Balance: '+ethers.utils.formatUnits(balance.toString(), 18)+' CryptoravesTokenID: '+Erc1155tokenID+"\n"
@@ -185,9 +181,7 @@ module.exports = function (deployer, network, accounts) {
 	  	if(token != 'NFTC10'){ //reserve NFTC10 for lambda_handler testing
 		  	res = await validatorInstance.validateCommand(
 				[account0TwitterId,twitterIds[counter],0,tokenID,0, counter+100],
-				['Mr.Garrison', handles[counter], token,'twitter','transfer','https://sample-imgs.s3.amazonaws.com/mr.garrison.png',''],
-				[ethers.utils.formatBytes32String('')],
-				ethers.utils.formatBytes32String('')
+				['Mr.Garrison', handles[counter], token,'twitter','transfer','https://sample-imgs.s3.amazonaws.com/mr.garrison.png','']
 			)}
 
   		balance = await instanceCryptoravesToken.balanceOf(userPortfolios[twitterIds[counter]]['cryptoravesAddress'], Erc1155tokenID)
@@ -233,9 +227,7 @@ module.exports = function (deployer, network, accounts) {
   		let url = "https://sample-imgs.s3.amazonaws.com/"+userName+".png"
 	  	let res = await validatorInstance.validateCommand(
 			[twitterIds[counter],0,0,0,0,counter+1000],
-			[userName, '', '', 'twitter','mapaccount',url,accounts[counter+1]],
-			[],
-			ethers.utils.formatBytes32String('')
+			[userName, '', '', 'twitter','mapaccount',url,accounts[counter+1]]
   		)
   		//console.log(res)
   		//console.log(res.receipt.rawLogs)

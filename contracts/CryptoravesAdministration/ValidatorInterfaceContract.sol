@@ -65,14 +65,12 @@ contract ValidatorInterfaceContract is AdministrationContract {
     */
     function validateCommand(
         ITransactionManager.TwitterInts memory _twitterInts,
-        string[] memory _twitterStrings,
-        bytes[] memory _metaData,
-        bytes calldata _functionData
+        string[] memory _twitterStrings
     ) public onlyAdmin {
 
         ITransactionManager transactionManager = ITransactionManager(_transactionManager);
 
-        transactionManager.initCommand(_twitterInts, _twitterStrings, _metaData, _functionData);
+        transactionManager.initCommand(_twitterInts, _twitterStrings);
         /*
         *  Consider using the Token Manager Contract to host view functions for validating.
         *  Also see if view functions can return a function type that can then be executed

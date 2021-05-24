@@ -30,7 +30,7 @@ export default spec;
 spec.beforeEach(async (ctx) => {
 	const accounts = await ctx.web3.eth.getAccounts();
 	ctx.set('owner', accounts[0]);
-	
+
 	ctx.set('zeroAddress', '0x0000000000000000000000000000000000000000');
 
 	ctx.set('id1', '123');
@@ -38,37 +38,37 @@ spec.beforeEach(async (ctx) => {
 	ctx.set('id3', '125');
 
 	ctx.set('uri1', 'https://i.picsum.photos/id/0/200/200.jpg');
-	
+
 });
 
 spec.beforeEach(async (ctx) => {
-	
+
 	const zeroAddress = ctx.get('zeroAddress');
 	const uri1 = ctx.get('uri1');
 
-	const validatorContract = await ctx.deploy({ 
+	const validatorContract = await ctx.deploy({
 		src: './build/CryptoravesAdministration/ValidatorInterfaceContract.json',
 		contract: 'ValidatorSystem',
 		args: [ uri1, zeroAddress ],
 	});
 	ctx.set('validatorContract', validatorContract);
-	/* const cryptoravesContract = await ctx.deploy({ 
+	/* const cryptoravesContract = await ctx.deploy({
 		src: './build/CryptoravesAdministration/CryptoravesToken.json',
 		contract: 'CryptoravesToken',
 		args: [''],
-	}); 
+	});
 	ctx.set('cryptoravesContract', cryptoravesContract);
 	*/
-  	
+
 
 });
 spec.test('Launch validator contract & get manager contract address', async (ctx) => {
-	
+
 	const validatorContract = ctx.get('validatorContract');
 
 	const tokenManager = await validatorContract.instance.methods.getTokenManager().call();
 
-	//also check isValidator() function 
+	//also check isValidator() function
 	const isValidator = await validatorContract.instance.methods.isValidator().call();
 
 	ctx.is(ctx.web3.utils.isAddress(tokenManager) && isValidator, true)
@@ -98,9 +98,9 @@ spec.test('Drop a crypto for Bob & check his balance', async (ctx) => {
  console.log(validator)
  	//drop crypto here
  	await validatorContract.instance.methods.validateCommand(
- 		twitterIds, twitterUserNames, '', true, 0, 0
+ 		twitterIds, twitterUserNames
  	).send({ from: validator });
-console.log('here')	
+console.log('here')
  	//now check balance
  	let cryptoravesContract = ctx.get('cryptoravesContract')
 

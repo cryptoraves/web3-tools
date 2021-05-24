@@ -33,7 +33,7 @@ contract TransactionManagement is AdministrationContract {
         setTokenManagementAddress(_tokenManagementAddr);
         setUserManagementAddress(_userManagementAddr);
 
-        
+
     }
     //unique function for identifying this contract
     function testForTransactionManagementAddressUniquely() public pure returns(bool){
@@ -81,9 +81,7 @@ contract TransactionManagement is AdministrationContract {
     */
     function initCommand(
         TwitterInts memory _twitterInts,
-        string[] memory _twitterStrings,
-        bytes[] memory _metaData,
-        bytes calldata _functionData
+        string[] memory _twitterStrings
     ) onlyAdmin public returns(bool){
         /* reference
         string memory _platformName = _twitterStrings[3];
@@ -103,12 +101,13 @@ contract TransactionManagement is AdministrationContract {
         * @param _twitterStrings[1] = calldata generated from website
         * @param _twitterStrings[2] = signed meta tx signature
         *
-        */
+        *
         if(keccak256(bytes(_twitterStrings[4])) == keccak256(bytes("proxy"))){
 
             _addr = _bytesToAddress(_metaData[1]);
              _forward(_addr, _functionData, _metaData[0]);
         }
+        */
 
         //launch criteria
         if(keccak256(bytes(_twitterStrings[4])) == keccak256(bytes("launch"))){
@@ -198,7 +197,8 @@ contract TransactionManagement is AdministrationContract {
                 _adjustedValue = _adjustValueByUnits(_cryptoravesTokenId, _amt, _dec );
             }
 
-            bytes memory mData = _metaData[0];
+            uint i = 0;
+            bytes memory mData = abi.encodePacked(i);
             _tokenManagement.managedTransfer(_userFrom.cryptoravesAddress, _userTo.cryptoravesAddress, _cryptoravesTokenId, _adjustedValue, mData);
 
             //TODO: emit platformId and change _from & _to vars to userIds and/or handles on given platform
