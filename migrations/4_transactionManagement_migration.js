@@ -24,7 +24,6 @@ module.exports = function (deployer) {
 
     //create dummy account for zero address for thegraph & website rendering
     let res2 = await usrMgmtInstance.launchL2Account(0, '0x0', '0x0');
-    console.log(res2['receipt']['logs'][0]['args'])
 
     console.log('\n*************************************************************************\n')
     console.log('TransactionManagement Contract Address: '+instance.address)
