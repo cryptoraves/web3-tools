@@ -7,7 +7,7 @@ const TokenManagement = artifacts.require("TokenManagement")
 const CryptoravesToken = artifacts.require("CryptoravesToken")
 let userAccount
 let fakeTwitterId = 1230456987
-let fakeTwitterHandle = '@fakeHandleC'
+let fakeTwitterHandle = 'fakeHandleC'
 let fakeUrl = 'http://test.uri/101'
 
 contract("UserManagement", async accounts => {
@@ -18,8 +18,8 @@ contract("UserManagement", async accounts => {
 	    )
 
 	    let res = await instance.launchL2Account(
-	    	fakeTwitterId, 
-	    	fakeTwitterHandle, 
+	    	fakeTwitterId,
+	    	fakeTwitterHandle,
 	    	fakeUrl
 	    )
 	    userAccount = await instance.getUserAccount(fakeTwitterId)
@@ -83,7 +83,7 @@ contract("UserManagement", async accounts => {
 	    assert.equal(res.twitterHandle, fakeTwitterHandle, 'User platform handle lookup doesn\'t match')
 	    assert.equal(res.imageUrl, fakeUrl, 'User image URL lookup doesn\'t match')
 	})
-	
+
   //keep at bottom
   it("verify sender is admin", async () => {
   	let txnMgmt = await TransactionManagement.deployed()
@@ -118,7 +118,7 @@ contract("UserManagement", async accounts => {
 
     let wallet = ethers.Wallet.createRandom()
 
-    let res = await instance.setAdministrator(wallet.address) 
+    let res = await instance.setAdministrator(wallet.address)
     let isValidator = await instance.isAdministrator(wallet.address)
     assert.isOk(
       isValidator,
@@ -132,11 +132,11 @@ contract("UserManagement", async accounts => {
 	)
 
     let wallet = ethers.Wallet.createRandom()
-    
-    let res = await instance.setAdministrator(wallet.address) 
+
+    let res = await instance.setAdministrator(wallet.address)
     assert.isOk(res)
-    res = await instance.unsetAdministrator(wallet.address) 
-    
+    res = await instance.unsetAdministrator(wallet.address)
+
     try{
       isValidator = await instance.isAdministrator(wallet.address)
       assert.isOk(!isValidator, "unsetValidator failing. Should revert")

@@ -2,23 +2,27 @@
 
 while [ "$1" != "" ]; do
     case $1 in
-        -n | --network )     
+        -n | --network )
 			shift
             NETWORK=$1
             ;;
-       
+
     esac
     case $1 in
-        -b | --bypassMigration )     
+        -b | --bypassMigration )
 			shift
             BYPASS=1
             ;;
-       
+
     esac
     shift
 done
 
-DATAJSONPATH=/tmp/contractAddresses.json
+if [[ -z ${NETWORK} ]]; then
+  NETWORK="development"
+fi
+
+DATAJSONPATH="/tmp/${NETWORK}-contractAddresses.json"
 YAMLPATH=~/cryptoraves-subgraph/subgraph.yaml
 LAMBDACREDPATH=~/token-game/lambda-functions/skaleOracle/credentials.py
 
@@ -43,7 +47,7 @@ RES=$(grep "CryptoravesTokenContractAddress1" ${YAMLPATH})
 if [[ ! -z $RES ]]; then
 	replaceAddressStringYAML
 fi
-RES=$(grep "CryptoravesTokenContractAddress1localhost" ${LAMBDACREDPATH})
+RES=$(grep "CryptoravesTokenContractAddress1${NETWORK}" ${LAMBDACREDPATH})
 if [[ ! -z $RES ]]; then
 	replaceAddressStringLAMBDA
 fi
@@ -52,7 +56,7 @@ RES=$(grep "TokenManagementContractAddress1" ${YAMLPATH})
 if [[ ! -z $RES ]]; then
 	replaceAddressStringYAML
 fi
-RES=$(grep "TokenManagementContractAddress1localhost" ${LAMBDACREDPATH})
+RES=$(grep "TokenManagementContractAddress1${NETWORK}" ${LAMBDACREDPATH})
 if [[ ! -z $RES ]]; then
 	replaceAddressStringLAMBDA
 fi
@@ -61,7 +65,7 @@ RES=$(grep "UserManagementContractAddress1" ${YAMLPATH})
 if [[ ! -z $RES ]]; then
 	replaceAddressStringYAML
 fi
-RES=$(grep "UserManagementContractAddress1localhost" ${LAMBDACREDPATH})
+RES=$(grep "UserManagementContractAddress1${NETWORK}" ${LAMBDACREDPATH})
 if [[ ! -z $RES ]]; then
 	replaceAddressStringLAMBDA
 fi
@@ -70,17 +74,17 @@ RES=$(grep "TransactionManagementContractAddress1" ${YAMLPATH})
 if [[ ! -z $RES ]]; then
 	replaceAddressStringYAML
 fi
-RES=$(grep "TransactionManagementContractAddress1localhost" ${LAMBDACREDPATH})
+RES=$(grep "TransactionManagementContractAddress1${NETWORK}" ${LAMBDACREDPATH})
 if [[ ! -z $RES ]]; then
 	replaceAddressStringLAMBDA
 fi
 CONTRACTADDR=$(cat ${DATAJSONPATH} | python3 -c "import sys, json; print(json.load(sys.stdin)['ValidatorInterfaceContract'])")
-RES=$(grep "ValidatorInterfaceContractAddress1localhost" ${LAMBDACREDPATH})
+RES=$(grep "ValidatorInterfaceContractAddress1${NETWORK}" ${LAMBDACREDPATH})
 if [[ ! -z $RES ]]; then
 	replaceAddressStringLAMBDA
 fi
 CONTRACTADDR=$(cat ${DATAJSONPATH} | python3 -c "import sys, json; print(json.load(sys.stdin)['pubkey'])")
-RES=$(grep "pubkey1localhost" ${LAMBDACREDPATH})
+RES=$(grep "pubkey1${NETWORK}" ${LAMBDACREDPATH})
 if [[ ! -z $RES ]]; then
 	replaceAddressStringLAMBDA
 fi

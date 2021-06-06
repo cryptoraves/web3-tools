@@ -5,11 +5,12 @@ const TokenManagement = artifacts.require('TokenManagement')
 const UserManagement = artifacts.require('UserManagement')
 
 const fs = require('fs');
-const outputPath = '/tmp/contractAddresses.json'
 
 module.exports = function (deployer) {
-
+  const outputPath = '/tmp/'+deployer.network+'-contractAddresses.json'
+  
   deployer.then(async () => {
+
   	await deployer.deploy(AdminToolsLibrary)
   	await deployer.link(AdminToolsLibrary, TransactionManagement)
 

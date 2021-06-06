@@ -10,16 +10,18 @@ const UserManagement = artifacts.require("UserManagement")
 const ethers = require('ethers')
 
 const fs = require('fs');
-const outputPath = '/tmp/tokenDistro.txt'
 
+var handlesFile = ''
 const homedir = require('os').homedir();
-const handlesFile = fs.readFileSync(homedir+"/token-game/lambda-functions/TwitterEndpointV1/test-data/sampleHandles.json")
+try{
+	handlesFile = fs.readFileSync(homedir+"/token-game/lambda-functions/TwitterEndpointV1/test-data/sampleHandles.json")
+}catch(e){
+	console.log(e)
+	console.log('samplaHandles.json file not found. Be sure token-game is cloned in your HOME dir')
+}
+
 let handles = JSON.parse(handlesFile)
-try {
-  fs.unlinkSync(outputPath)
-  fs.unlinkSync('/tmp/userPortfolios.json')
-  //file removed
-} catch(e) {}
+
 
 const erc20s = [
 	'TKA','TKB','TKC','TKD','TKE','TKF','TKG','TKH','TKI','TKJ',
@@ -46,6 +48,13 @@ let account0TwitterId = 99434443434
 let userPortfolios = {}
 
 module.exports = function (deployer, network, accounts) {
+  const outputPath = '/tmp/'+deployer.network+'-tokenDistro.txt'
+  try {
+    fs.unlinkSync(outputPath)
+    fs.unlinkSync('/tmp/'+deployer.network+'-userPortfolios.json')
+    //file removed
+  } catch(e) {}
+
 	deployer.then(async () => {
 
 		  validatorInstance = await ValidatorInterfaceContract.deployed()
@@ -172,7 +181,7 @@ module.exports = function (deployer, network, accounts) {
 	    Erc1155tokenID = await instanceTokenManagement.deposit(tokenID, instance.address, 721, true)
 	    Erc1155tokenID = Erc1155tokenID.logs[1]['args']['cryptoravesTokenId'].toString()
 		  balance = await instanceCryptoravesToken.balanceOf(userPortfolios[account0TwitterId]['cryptoravesAddress'] , Erc1155tokenID)
-	    output = 'Account: '+accounts[0]+' Token: '+token+' Token Address: '+instance.address+' Balance: '+balance.toString()+'URI: '+uri+' CryptoravesTokenID: '+Erc1155tokenID+"\n"
+	    output = 'Account: '+accounts[0]+' Token: '+token+' Token Address: '+instance.address+' Balance: '+balance.toString()+' URI: '+uri+' CryptoravesTokenID: '+Erc1155tokenID+"\n"
 	    await fs.appendFile(outputPath, output, function (err) {
 	  		console.log(output)
 			  if (err) throw err
@@ -201,7 +210,7 @@ module.exports = function (deployer, network, accounts) {
 	    Erc1155tokenID = await instanceTokenManagement.deposit(tokenID, instance.address, 721, true)
 	    Erc1155tokenID = Erc1155tokenID.logs[1]['args']['cryptoravesTokenId'].toString()
 		  balance = await instanceCryptoravesToken.balanceOf(userPortfolios[account0TwitterId]['cryptoravesAddress'] , Erc1155tokenID)
-	    output = 'Account: '+accounts[0]+' Token: '+token+' Token Address: '+instance.address+' Balance: '+balance.toString()+'URI: '+uri+' CryptoravesTokenID: '+Erc1155tokenID+"\n"
+	    output = 'Account: '+accounts[0]+' Token: '+token+' Token Address: '+instance.address+' Balance: '+balance.toString()+' URI: '+uri+' CryptoravesTokenID: '+Erc1155tokenID+"\n"
 	    await fs.appendFile(outputPath, output, function (err) {
 	  		console.log(output)
   			if (err) throw err
@@ -261,7 +270,7 @@ module.exports = function (deployer, network, accounts) {
 
   	}
   	let data = await JSON.stringify(userPortfolios)
-  	await fs.appendFile('/tmp/userPortfolios.json', data, (err) => {
+  	await fs.appendFile('/tmp/'+deployer.network+'-userPortfolios.json', data, (err) => {
   	    if (err) {
   			console.log(err);
   	    }else {

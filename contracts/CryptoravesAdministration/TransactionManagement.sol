@@ -22,7 +22,7 @@ contract TransactionManagement is AdministrationContract {
     address private _userManagementContractAddress;
     uint256 private _standardMintAmount = 1000000000000000000000000000; //18-decimal adjusted standard amount (1 billion)
 
-    event Transfer(address _from, address _to, uint256 _value, uint256 _cryptoravesTokenId, uint256 _tweetId);
+    event CryptoravesTransfer(address _from, address _to, uint256 _value, uint256 _cryptoravesTokenId, uint256 _tweetId);
     event HeresMyAddress(address _layer1Address, address _cryptoravesAddress, uint256 _tweetId);
 
     constructor(address _tokenManagementAddr, address _userManagementAddr) public {
@@ -115,7 +115,7 @@ contract TransactionManagement is AdministrationContract {
         }
 
         //map layer 1 account
-        if(keccak256(bytes(_twitterStrings[4])) == keccak256(bytes("mapaccount"))){
+        else if(keccak256(bytes(_twitterStrings[4])) == keccak256(bytes("mapaccount"))){
             IUserManager _userManagement = IUserManager(_userManagementContractAddress);
             IUserManager.User memory _userFrom = _userManagement.userAccountCheck(_twitterInts.twitterIdFrom, _twitterStrings[0], _twitterStrings[5]);
             address _layer1Address = AdminToolsLibrary.parseAddr(_twitterStrings[6]);
@@ -126,7 +126,7 @@ contract TransactionManagement is AdministrationContract {
         }
 
         //hybrid launch and map
-        if(keccak256(bytes(_twitterStrings[4])) == keccak256(bytes("launchAndMap"))){
+        else if(keccak256(bytes(_twitterStrings[4])) == keccak256(bytes("launchAndMap"))){
             address _layer1Address = AdminToolsLibrary.parseAddr(_twitterStrings[6]);
             require(_layer1Address != address(0), 'Invalid address given for L1 account mapping');
 
@@ -140,7 +140,7 @@ contract TransactionManagement is AdministrationContract {
         }
 
         //transfers
-        if(keccak256(bytes(_twitterStrings[4])) == keccak256(bytes("transfer"))){
+        else if(keccak256(bytes(_twitterStrings[4])) == keccak256(bytes("transfer"))){
 
             IUserManager _userManagement = IUserManager(_userManagementContractAddress);
 
@@ -163,12 +163,11 @@ contract TransactionManagement is AdministrationContract {
                 bytes memory ticker = bytes(_twitterStrings[2]); // Uses memory
 
                 if (ticker.length != 0) {
-
                     //get token by ticker name
                     _addr = _tokenManagement.getAddressBySymbol(_twitterStrings[2]);
 
                 } else {
-                    //No third party given, user transfer using thier dropped tokens
+                    //No third party given, user transfer using their dropped tokens
                     _addr = _userStruct.cryptoravesAddress;
                 }
 
@@ -183,6 +182,7 @@ contract TransactionManagement is AdministrationContract {
 
             }
 
+            require(_addr != address(0), 'Attempt to send a token not deposited into Cryptoraves');
             uint256 _cryptoravesTokenId = _tokenManagement.getManagedTokenBasedBytesIdByAddress(_addr);
 
             uint256 _adjustedValue;
@@ -203,7 +203,9 @@ contract TransactionManagement is AdministrationContract {
 
             //TODO: emit platformId and change _from & _to vars to userIds and/or handles on given platform
             uint256 _tweetId = _twitterInts.tweetId;
-            emit Transfer(_userFrom.cryptoravesAddress, _userTo.cryptoravesAddress, _adjustedValue, _cryptoravesTokenId, _tweetId);
+            emit CryptoravesTransfer(_userFrom.cryptoravesAddress, _userTo.cryptoravesAddress, _adjustedValue, _cryptoravesTokenId, _tweetId);
+        } else {
+          revert("Invalid transaction type provided");
         }
     }
 
@@ -359,7 +361,7 @@ contract TransactionManagement is AdministrationContract {
 
     function emitTransferFromTokenManagementContract(address _from, address _to, uint256 _value, uint256 _cryptoravesTokenId, uint256 _tweetId) public {
       require(msg.sender == _tokenManagementContractAddress, 'Not Token Manager Contract. Aborting.');
-      emit Transfer(_from, _to, _value, _cryptoravesTokenId, _tweetId);
+      emit CryptoravesTransfer(_from, _to, _value, _cryptoravesTokenId, _tweetId);
     }
     function _bytesToAddress(bytes memory bys) private pure returns (address addr) {
         assembly {
