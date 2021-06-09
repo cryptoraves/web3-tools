@@ -1,37 +1,37 @@
 <template>
-  <div 
+  <div
     class="container"
   >
     <div v-if="ready">
       <div v-if='loadNetworkData()'></div>
       <div class="highlight">
         <h2
-          v-if="networkType == 'SKALE Testnet'" 
+          v-if="networkType == 'SKALE Testnet'"
           class="subtitle"
           style="background-color:#7CFC00"
         >
-          Network: {{ this.networkType }} 
+          Network: {{ this.networkType }}
         </h2>
         <h2
-          v-else-if="networkType == 'rinkeby'" 
+          v-else-if="networkType == 'rinkeby'"
           class="subtitle"
           style="background-color:#F0E68C"
         >
-          Network: {{ this.networkType }} 
+          Network: {{ this.networkType }}
         </h2>
         <h2
-          v-else-if="networkType == 'main'" 
+          v-else-if="networkType == 'main'"
           class="subtitle"
           style="background-color:#DC143C"
         >
-          Network: {{ this.networkType }} 
+          Network: {{ this.networkType }}
         </h2>
         <h2
-          v-else 
+          v-else
           class="subtitle"
           style="background-color:#80ccff"
         >
-          Network: {{ this.networkType }} 
+          Network: {{ this.networkType }}
         </h2>
       </div>
       <br><br><br>
@@ -46,12 +46,12 @@
       <div class="links">
         <br>
         <a
-          target="_blank" 
+          target="_blank"
           @click="goEtherscan(ethereumAddress)">
           Your Wallet Address:<br> {{ this.ethereumAddress }}
         </a>
         <div
-          v-if="!UserManagementContractAddress && !showLoading" 
+          v-if="!UserManagementContractAddress && !showLoading"
           class="links">
           <a
             @click="launchUserManagementContract()"
@@ -77,7 +77,7 @@
             </a>
         </div>
         <div
-          v-if="UserManagementContractAddress && !TokenManagementContractAddress && !showLoading" 
+          v-if="UserManagementContractAddress && !TokenManagementContractAddress && !showLoading"
           class="links">
           <a
             @click="launchTokenManagementContract(uri)"
@@ -102,7 +102,7 @@
             </a>
         </div>
         <div
-            v-if="CryptoravesTokenContractAddress && !showLoading" 
+            v-if="CryptoravesTokenContractAddress && !showLoading"
             class="links">
           <a
             target="_blank"
@@ -117,7 +117,7 @@
           </a>
         </div>
         <div
-          v-if="CryptoravesTokenContractAddress && !TransactionManagementContractAddress && !showLoading" 
+          v-if="CryptoravesTokenContractAddress && !TransactionManagementContractAddress && !showLoading"
           class="links">
           <a
             @click="launchTransactionManagementContract(TokenManagementContractAddress, UserManagementContractAddress)"
@@ -148,7 +148,7 @@
             </a>
         </div>
         <div
-          v-if="TransactionManagementContractAddress && !ValidatorInterfaceContractAddress && !showLoading" 
+          v-if="TransactionManagementContractAddress && !ValidatorInterfaceContractAddress && !showLoading"
           class="links">
           <a
             @click="launchValidatorContract()"
@@ -181,7 +181,7 @@
           >
             Test Admin Functions
           </a>
-        </div> 
+        </div>
         <div
           class="links">
           <a
@@ -191,7 +191,7 @@
           >
             Launch An ERC20
           </a>
-        </div> 
+        </div>
         <div
           v-if="ERC20FullAddress"
           class="links">
@@ -202,7 +202,7 @@
           </a>
           <br>
           <a
-            
+
             @click="depositERC20()"
             class="button--green"
           >
@@ -210,28 +210,28 @@
           </a>
           <br>
           <a
-            
+
             @click="setEmoji()"
             class="button--green"
           >
             Set Emoji For ERC20 🔥
           </a>
           <br><br>
-        </div> 
+        </div>
         <div
           v-if="ERC20FullAddress"
           class="links">
           <input v-model="depositAndSendERC20address">
           <br><br>
           <a
-            
+
             @click="depositAndSendERC20()"
             class="button--green"
           >
             Send 1000 ERC20's To Above Address
           </a>
-        </div> 
-        <div 
+        </div>
+        <div
             v-if="UserManagementContractAddress"
             class="links">
             <br>
@@ -244,7 +244,7 @@
             </a>
           </div>
 
-          <div 
+          <div
             v-if="UserManagementContractAddress && TokenManagementContractAddress && CryptoravesTokenContractAddress && TransactionManagementContractAddress && ValidatorInterfaceContractAddress"
             class="links">
             <br>
@@ -256,7 +256,7 @@
               Save Network Settings
             </a>
           </div>
-          <div 
+          <div
             class="links">
             <br>
             <br>
@@ -273,8 +273,8 @@
     <div
       v-if="showLoading"
       >
-        <img 
-          src="../assets/gif/loading.gif" 
+        <img
+          src="../assets/gif/loading.gif"
           alt >
     </div>
   </div>
@@ -292,9 +292,10 @@ export default {
       contractNames: ["CryptoravesToken", "ERC20Full", "TokenManagement", "TransactionManagement", "UserManagement", "ValidatorInterfaceContract"],
       ethereumAddress: null,
       networkType: null,
+      networkId: null,
       errorMsg: null,
       ready: true,
-      uri: 'http://a.b.com',
+      uri: 'https://i.picsum.photos/id/99/200/200.jpg',
       UserManagementContractAddress: null,
       UserManagementContractAddress: null,
       TokenManagementContractAddress: null,
@@ -324,7 +325,7 @@ export default {
     checkAbis(){
       this.contractNames.forEach(function(element) {
         if(typeof abis[element] === 'undefined') {
-          throw new Error('No ABI found for '+element)    
+          throw new Error('No ABI found for '+element)
         }
       })
       return true
@@ -343,14 +344,14 @@ export default {
       let contract = await factory.deploy(uri);
       this.showLoading = true
       let tx = await contract.deployed()
-      
+
       this.TokenManagementContractAddress = localStorage.TokenManagementContractAddress = contract.address
       this.CryptoravesTokenContractAddress = localStorage.CryptoravesTokenContractAddress = await contract.getCryptoravesTokenAddress()
 
       //set admin for cryptoraves token (to allow minting rights)
       let cryptoravesTokenContract = new this.ethers.Contract(
-        this.CryptoravesTokenContractAddress, 
-        abis['CryptoravesToken'].abi, 
+        this.CryptoravesTokenContractAddress,
+        abis['CryptoravesToken'].abi,
         this.signer
       )
       await cryptoravesTokenContract.setAdministrator(this.TokenManagementContractAddress)
@@ -365,23 +366,23 @@ export default {
 
       let factory = new this.ethers.ContractFactory(abis["AdminToolsLibrary"].abi, abis["AdminToolsLibrary"].bytecode, this.signer);
       let contract = await factory.deploy()
-      
+
       this.AdminToolsLibraryAddress = localStorage.AdminToolsLibraryAddress = contract.address
 
       console.log('AdminToolsContract Address:', contract.address)
       let bytecode = this.linkLibrary(abis["TransactionManagement"].bytecode, 'AdminToolsLibrary', contract.address)
-      
+
       factory = new this.ethers.ContractFactory(abis["TransactionManagement"].abi, bytecode, this.signer);
       contract = await factory.deploy(_tokenManagementAddr, _userManagementAddr);
       this.showLoading = true
       let tx = await contract.deployed()
-      
+
       this.TransactionManagementContractAddress = localStorage.TransactionManagementContractAddress = contract.address
 
       //set as admin for all downstream contracts
       contract = new this.ethers.Contract(
-        this.TokenManagementContractAddress, 
-        abis["TokenManagement"].abi, 
+        this.TokenManagementContractAddress,
+        abis["TokenManagement"].abi,
         this.signer
       )
       await contract.setAdministrator(this.TransactionManagementContractAddress)
@@ -390,10 +391,10 @@ export default {
       ){
         console.log("Set Admin For Token Manager")
       }
-      
+
       contract = new this.ethers.Contract(
-        this.UserManagementContractAddress, 
-        abis["UserManagement"].abi, 
+        this.UserManagementContractAddress,
+        abis["UserManagement"].abi,
         this.signer
       )
       await contract.setAdministrator(this.TransactionManagementContractAddress)
@@ -413,13 +414,13 @@ export default {
       );
       this.showLoading = true
       let tx = await contract.deployed()
-      
+
       this.ValidatorInterfaceContractAddress = localStorage.ValidatorInterfaceContractAddress = contract.address
 
       //set as admin of transaction Manager
       let transactionManagement = new this.ethers.Contract(
-        this.TransactionManagementContractAddress, 
-        abis["TransactionManagement"].abi, 
+        this.TransactionManagementContractAddress,
+        abis["TransactionManagement"].abi,
         this.signer
       )
       try{
@@ -452,19 +453,19 @@ export default {
         bytecode = abis[contractName].bytecode
       }
 
-      
+
       factory = new this.ethers.ContractFactory(abis[contractName].abi, bytecode, this.signer);
-      
+
       let oldContractAddress = this[contractAddressVariableName]
       let oldAdminAddress, contract, tx
       let transactionManagement = new this.ethers.Contract(
-        this.TransactionManagementContractAddress, 
-        abis["TransactionManagement"].abi, 
+        this.TransactionManagementContractAddress,
+        abis["TransactionManagement"].abi,
         this.signer
       )
       let tokenManagement = new this.ethers.Contract(
-        this.TokenManagementContractAddress, 
-        abis["TokenManagement"].abi, 
+        this.TokenManagementContractAddress,
+        abis["TokenManagement"].abi,
         this.signer
       )
 
@@ -475,13 +476,13 @@ export default {
           tx = await contract.deployed()
           //set new address
           this[contractAddressVariableName] = localStorage[contractAddressVariableName] = contract.address
-          
+
           console.log('setting new upstream contract TransactionManagement as admin..')
           tx = await contract.setAdministrator(this.TransactionManagementContractAddress)
           await tx.wait()
-          
+
           console.log('setting new downstram address for admin contract "setUserManagementAddress"')
-          tx = await transactionManagement.setUserManagementAddress(this[contractAddressVariableName])  
+          tx = await transactionManagement.setUserManagementAddress(this[contractAddressVariableName])
           await tx.wait()
         break;
         case 'TokenManagement':
@@ -497,10 +498,10 @@ export default {
           console.log('setting legacy downstream Cryptoraves contract addr..') //1c
           tx = await contract.setCryptoravesTokenAddress(this.CryptoravesTokenContractAddress)
           await tx.wait()
-          
+
           let cryptoravesTokenContract = new this.ethers.Contract(
-            this.CryptoravesTokenContractAddress, 
-            abis['CryptoravesToken'].abi, 
+            this.CryptoravesTokenContractAddress,
+            abis['CryptoravesToken'].abi,
             this.signer
           )
           console.log('setting new downstream admin') //2
@@ -508,7 +509,7 @@ export default {
           await tx.wait()
 
           console.log('setting new downstream address for admin contract') //3
-          tx = await transactionManagement.setTokenManagementAddress(this[contractAddressVariableName])  
+          tx = await transactionManagement.setTokenManagementAddress(this[contractAddressVariableName])
           await tx.wait()
 
           console.log('unsetting old downstream admin') //4
@@ -523,13 +524,13 @@ export default {
           tx = await contract.deployed()
           //set new address
           this[contractAddressVariableName] = localStorage[contractAddressVariableName] = contract.address
-          
+
           console.log('setting new upstream contract TokenManagement as admin..')
           tx = await contract.setAdministrator(this.TokenManagementContractAddress)
           await tx.wait()
-          
+
           console.log('setting new downstram address for admin contract "setCryptoravesTokenAddress"')
-          tx = await tokenManagement.setCryptoravesTokenAddress(this[contractAddressVariableName])  
+          tx = await tokenManagement.setCryptoravesTokenAddress(this[contractAddressVariableName])
           await tx.wait()
         break;
         case 'TransactionManagement':
@@ -543,8 +544,8 @@ export default {
           await tx.wait()
 
           let userManagement = new this.ethers.Contract(
-            this.UserManagementContractAddress, 
-            abis['UserManagement'].abi, 
+            this.UserManagementContractAddress,
+            abis['UserManagement'].abi,
             this.signer
           )
           console.log('setting new downstream admins') //2
@@ -554,12 +555,12 @@ export default {
           await tx.wait()
 
           let validatorContract = new this.ethers.Contract(
-            this.ValidatorInterfaceContractAddress, 
-            abis['ValidatorInterfaceContract'].abi, 
+            this.ValidatorInterfaceContractAddress,
+            abis['ValidatorInterfaceContract'].abi,
             this.signer
           )
           console.log('setting new downstream address for admin contract') //3
-          tx = await validatorContract.setTransactionManagementAddress(this[contractAddressVariableName])  
+          tx = await validatorContract.setTransactionManagementAddress(this[contractAddressVariableName])
           await tx.wait()
 
           console.log('unsetting old downstream admins') //4
@@ -574,9 +575,9 @@ export default {
           tx = await contract.deployed()
           //set new address
           this[contractAddressVariableName] = localStorage[contractAddressVariableName] = contract.address
-          
+
           console.log('setting new downstream admin')
-          tx = await transactionManagement.setAdministrator(this[contractAddressVariableName])  
+          tx = await transactionManagement.setAdministrator(this[contractAddressVariableName])
           await tx.wait()
         break;
       }
@@ -587,16 +588,16 @@ export default {
       this.showLoading = false
     },
     async testVariables(){
-      
+
       this.exportContractStructureForThisNetwork(false)
 
       let res, cumulativeBool
       let contract = new this.ethers.Contract(
-        this.ValidatorInterfaceContractAddress, 
-        abis['ValidatorInterfaceContract'].abi, 
+        this.ValidatorInterfaceContractAddress,
+        abis['ValidatorInterfaceContract'].abi,
         this.signer
       )
-      
+
       cumulativeBool = res = await contract.isAdministrator(this.ethereumAddress)
       console.log('Am I ValidatorInterfaceContract Administrator:', res)
       let txnManagerAddress = await contract.getTransactionManagementAddress()
@@ -605,8 +606,8 @@ export default {
       console.log('TransactionManager Address Matches:', res)
 
       let transactionManagerContract = new this.ethers.Contract(
-        txnManagerAddress, 
-        abis['TransactionManagement'].abi, 
+        txnManagerAddress,
+        abis['TransactionManagement'].abi,
         this.signer
       )
       res = await transactionManagerContract.isAdministrator(this.ethereumAddress)
@@ -621,8 +622,8 @@ export default {
       cumulativeBool = cumulativeBool && res
       console.log('TokenManager Address Matches: ', res)
       let tokenManagerContract = new this.ethers.Contract(
-        this.TokenManagementContractAddress, 
-        abis['TokenManagement'].abi, 
+        this.TokenManagementContractAddress,
+        abis['TokenManagement'].abi,
         this.signer
       )
 
@@ -652,8 +653,8 @@ export default {
       cumulativeBool = cumulativeBool && res
       console.log('CryptoravesToken Address Matches: ', res)
       let cryptoravesTokenContract = new this.ethers.Contract(
-        cryptoravesTokenAddress, 
-        abis['CryptoravesToken'].abi, 
+        cryptoravesTokenAddress,
+        abis['CryptoravesToken'].abi,
         this.signer
       )
       res = await cryptoravesTokenContract.isAdministrator(this.ethereumAddress)
@@ -671,8 +672,8 @@ export default {
       cumulativeBool = cumulativeBool && res
       console.log('UserManager Address Matches: ', res)
       let userManagerContract = new this.ethers.Contract(
-        userContractAddress, 
-        abis['UserManagement'].abi, 
+        userContractAddress,
+        abis['UserManagement'].abi,
         this.signer
       )
       res = await userManagerContract.isAdministrator(this.ethereumAddress)
@@ -714,7 +715,7 @@ export default {
       this.showLoading = true
       let factory = new this.ethers.ContractFactory(abis['ERC20Full'].abi, abis["ERC20Full"].bytecode, this.signer);
       let contract = await factory.deploy(
-        this.ethereumAddress, 
+        this.ethereumAddress,
         'TestXToken', 'TSTX', '18',
         '1000000000000000000000000000' //1 billion
       )
@@ -729,22 +730,20 @@ export default {
     async depositERC20(){
       let token = new this.ethers.Contract(this.ERC20FullAddress, abis['ERC20Full'].abi, this.signer)
       let amount1 = await token.balanceOf(this.ethereumAddress)
-      
-      this.showLoading = true
 
+      this.showLoading = true
       let cryptoravesToken = new this.ethers.Contract(
-        this.CryptoravesTokenContractAddress, 
-        abis['CryptoravesToken'].abi, 
+        this.CryptoravesTokenContractAddress,
+        abis['CryptoravesToken'].abi,
         this.signer
       )
-
-      let initialBalance 
+      let initialBalance
       initialBalance = await cryptoravesToken.balanceOf(this.ethereumAddress, this.ERC1155tokenId)
       console.log('ERC20 Amount before deposit: '+this.ethers.utils.formatUnits(amount1, 18))
 
       let tokenManagerContract = new this.ethers.Contract(
-        this.TokenManagementContractAddress, 
-        abis['TokenManagement'].abi, 
+        this.TokenManagementContractAddress,
+        abis['TokenManagement'].abi,
         this.signer
       )
 
@@ -766,17 +765,17 @@ export default {
 
       this.ERC1155tokenId = localStorage.ERC1155tokenId = await tokenManagerContract.getManagedTokenBasedBytesIdByAddress(this.ERC20FullAddress)
       console.log('ERC1155 Token ID: '+this.ERC1155tokenId)
-      
+
       let finalBalance = await cryptoravesToken.balanceOf(this.ethereumAddress, this.ERC1155tokenId)
       console.log('ERC1155 Wrapped amount received: '+this.ethers.utils.formatUnits(finalBalance, 18))
       console.log(Math.round(this.ethers.utils.formatUnits(initialBalance, 18) * 100) / 100)
       console.log(randAmount)
       console.log(Math.round(this.ethers.utils.formatUnits(finalBalance, 18) * 100 ) / 100)
       console.log(Math.round((this.ethers.utils.formatUnits(initialBalance, 18) * 1 + randAmount) * 100) / 100)
-      
+
       console.log(
-        "Deposit of Random Amount Successful: ", 
-        (Math.round((this.ethers.utils.formatUnits(initialBalance, 18) * 1 + randAmount) * 100) / 100).toString() == 
+        "Deposit of Random Amount Successful: ",
+        (Math.round((this.ethers.utils.formatUnits(initialBalance, 18) * 1 + randAmount) * 100) / 100).toString() ==
         (Math.round(this.ethers.utils.formatUnits(finalBalance, 18) * 100 ) / 100).toString()
       )
 
@@ -784,8 +783,8 @@ export default {
     },
     async setEmoji(){
       let tokenManagerContract = new this.ethers.Contract(
-        this.TokenManagementContractAddress, 
-        abis['TokenManagement'].abi, 
+        this.TokenManagementContractAddress,
+        abis['TokenManagement'].abi,
         this.signer
       )
       let addr = await tokenManagerContract.getManagedTokenBasedBytesIdByAddress(this.ERC20FullAddress)
@@ -795,21 +794,21 @@ export default {
     },
     async depositAndSendERC20(){
       let token = new this.ethers.Contract(this.ERC20FullAddress, abis['ERC20Full'].abi, this.signer)
-      
+
       this.showLoading = true
 
       let cryptoravesToken = new this.ethers.Contract(
-        this.CryptoravesTokenContractAddress, 
-        abis['CryptoravesToken'].abi, 
+        this.CryptoravesTokenContractAddress,
+        abis['CryptoravesToken'].abi,
         this.signer
       )
-      
+
       let tokenManagerContract = new this.ethers.Contract(
-        this.TokenManagementContractAddress, 
-        abis['TokenManagement'].abi, 
+        this.TokenManagementContractAddress,
+        abis['TokenManagement'].abi,
         this.signer
       )
-     
+
       this.ERC1155tokenId = localStorage.ERC1155tokenId = await tokenManagerContract.getManagedTokenBasedBytesIdByAddress(this.ERC20FullAddress)
       let initialBalance = await cryptoravesToken.balanceOf(this.depositAndSendERC20address, this.ERC1155tokenId)
       let amount = 1000
@@ -827,10 +826,10 @@ export default {
       //transfer
       let cryptoravesTokenContract = new this.ethers.Contract(
         this.CryptoravesTokenContractAddress,
-        abis['CryptoravesToken'].abi, 
+        abis['CryptoravesToken'].abi,
         this.signer
       )
-      
+
       tx = await cryptoravesTokenContract.safeTransferFrom(
         this.ethereumAddress,
         this.depositAndSendERC20address,
@@ -841,16 +840,17 @@ export default {
       val = await tx.wait()
 
       let finalBalance = await cryptoravesToken.balanceOf(this.depositAndSendERC20address, this.ERC1155tokenId)
-      
-      
+
+
       console.log(
-        "Deposit and send of 1000 tokens Successful: ", 
-        (Math.round((this.ethers.utils.formatUnits(initialBalance, 18) * 1 + amount) * 100) / 100).toString(), 
+        "Deposit and send of 1000 tokens Successful: ",
+        (Math.round((this.ethers.utils.formatUnits(initialBalance, 18) * 1 + amount) * 100) / 100).toString(),
         (Math.round(this.ethers.utils.formatUnits(finalBalance, 18) * 100 ) / 100).toString()
       )
 
       this.showLoading = false
     },
+
     importContractStructureForThisNetwork(alertsBool){
 
       let savedNetwork = {}
@@ -859,17 +859,25 @@ export default {
         if(networkInfo[this.networkType]){
           savedNetwork[this.networkType] = networkInfo[this.networkType]
         }else{
-          /*if(alertsBool){
-            alert('No Saved Network Info for '+this.networkType)
+          savedNetwork = {}
+          if(alertsBool){
+            savedNetwork[this.networkType] = {}
+            savedNetwork[this.networkType]["networkType"] = this.networkType
+            savedNetwork[this.networkType]["UserManagementContractAddress"] = abis['UserManagement'].networks[this.networkId].address
+            savedNetwork[this.networkType]["TokenManagementContractAddress"] = abis['TokenManagement'].networks[this.networkId].address
+            savedNetwork[this.networkType]["CryptoravesTokenContractAddress"] = abis['CryptoravesToken'].networks[this.networkId].addres
+            savedNetwork[this.networkType]["TransactionManagementContractAddress"] = abis['TransactionManagement'].networks[this.networkId].address
+            savedNetwork[this.networkType]["ValidatorInterfaceContractAddress"] = abis['ValidatorInterfaceContract'].networks[this.networkId].address
+            savedNetwork[this.networkType]["AdminToolsLibraryAddress"] = abis['AdminToolsLibrary'].networks[this.networkId].address
+            savedNetwork[this.networkType]["ERC20FullAddress"] = abis['ERC20Full'].networks[this.networkId].address
+            savedNetwork[this.networkType]["ERC721FullAddress"] = abis['ERC721Full'].networks[this.networkId].address
+            alertsBool=false
           }
-          return 0*/
-
-          savedNetwork = {}//JSON.parse('{}')
         }
       }
       try{
         if(this.networkType == savedNetwork[this.networkType]["networkType"]){
-          
+
           this.UserManagementContractAddress = localStorage.UserManagementContractAddress = savedNetwork[this.networkType]["UserManagementContractAddress"]
           this.TokenManagementContractAddress = localStorage.TokenManagementContractAddress = savedNetwork[this.networkType]["TokenManagementContractAddress"]
           this.CryptoravesTokenContractAddress = localStorage.CryptoravesTokenContractAddress = savedNetwork[this.networkType]["CryptoravesTokenContractAddress"]
@@ -890,7 +898,7 @@ export default {
     },
     exportContractStructureForThisNetwork(alertsBool){
       if(this.networkType){
-        
+
         //if localsotrage.networkName is set then prompt for overwrite confirmation
         let savedNetwork = {}
         savedNetwork["networkType"] = this.networkType
@@ -904,11 +912,11 @@ export default {
         }
         savedNetwork["ERC1155tokenId"] = this.ERC1155tokenId
         savedNetwork["AdminToolsLibraryAddress"]  = this.AdminToolsLibraryAddress
-        
+
         let networkInfo = {}
         if(localStorage.networkInfo){
           networkInfo = JSON.parse(localStorage.networkInfo)
-        } 
+        }
         networkInfo[this.networkType] = savedNetwork
         localStorage.networkInfo = JSON.stringify(networkInfo)
 

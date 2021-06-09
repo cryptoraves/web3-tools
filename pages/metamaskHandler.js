@@ -7,6 +7,7 @@ export default {
     return {
       ethereumAddress: null,
       networkType: null,
+      networkId: null,
       blockExplorerUrl: null,
       ethBlockExplorerUrl: null,
       ethereumProvider: null,
@@ -30,21 +31,20 @@ export default {
         this.showEnableMetaMask = true
         return false
       }
-      let networkId
       try {
-        networkId = await web3js.eth.net.getId()
+        this.networkId = await web3js.eth.net.getId()
       } catch(e) {
         console.log(e)
       }
-      if (networkId==344435){
+      if (this.networkId==344435){
         this.networkType = 'SKALE Bob Testnet'
         this.blockExplorerUrl = 'https://explorer.skale.network/'
         this.ethBlockExplorerUrl = 'https://rinkeby.etherscan.io/'
-      } else if (networkId==344435){
+      } else if (this.networkId==344435){
         this.networkType = 'SKALE Testnet'
         this.blockExplorerUrl = 'https://explorer.skale.network/'
         this.ethBlockExplorerUrl = 'https://rinkeby.etherscan.io/'
-      } else if (networkId==80001){
+      } else if (this.networkId==80001){
         this.networkType = 'Matic Testnet'
         this.blockExplorerUrl = 'https://explorer.testnet2.matic.network/'
         this.ethBlockExplorerUrl = 'https://ropsten.etherscan.io/'
@@ -56,7 +56,7 @@ export default {
         if(this.networkType == 'rinkeby'){
           this.blockExplorerUrl = 'https://rinkeby.etherscan.io/'
         }
-      } 
+      }
 
       if (web3js) {
         this.web3js = web3js

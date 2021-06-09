@@ -1,38 +1,38 @@
-<template>  
-  <div 
+<template>
+  <div
     class="container"
   >
     <div v-if='loadNetworkData()'></div>
     <div v-if="ready">
-      
+
       <div class="highlight">
         <h2
-          v-if="networkType == 'SKALE Testnet'" 
+          v-if="networkType == 'SKALE Testnet'"
           class="subtitle"
           style="background-color:#7CFC00"
         >
-          Network: {{ this.networkType }} 
+          Network: {{ this.networkType }}
         </h2>
         <h2
-          v-else-if="networkType == 'rinkeby'" 
+          v-else-if="networkType == 'rinkeby'"
           class="subtitle"
           style="background-color:#F0E68C"
         >
-          Network: {{ this.networkType }} 
+          Network: {{ this.networkType }}
         </h2>
         <h2
-          v-else-if="networkType == 'main'" 
+          v-else-if="networkType == 'main'"
           class="subtitle"
           style="background-color:#DC143C"
         >
-          Network: {{ this.networkType }} 
+          Network: {{ this.networkType }}
         </h2>
         <h2
-          v-else 
+          v-else
           class="subtitle"
           style="background-color:#80ccff"
         >
-          Network: {{ this.networkType }} 
+          Network: {{ this.networkType }}
         </h2>
       </div>
       <br><br><br>
@@ -44,13 +44,13 @@
       </h2>
     </div>
     <div v-if="ready && !showLoading">
-        
+
         <div v-if="ValidatorInterfaceContractAddress"
           class="links">
           <a
-            target="_blank" 
+            target="_blank"
             @click="goEtherscan(ethereumAddress)">
-            
+
             Your Wallet Address:<br> {{ this.ethereumAddress }}
           </a>
           <br>
@@ -61,7 +61,7 @@
           >
             Get Balances
           </a>
-        </div> 
+        </div>
         <div v-else>
           Please Launch ValidatorInterface Contract in Administrators View
         </div>
@@ -74,7 +74,7 @@
           >
             Launch An ERC20
           </a>
-        </div> 
+        </div>
         <div
           v-if="ERC20FullAddress"
           class="links">
@@ -86,12 +86,12 @@
           <a  v-if="ERC20WrappedId > 0"
               target="_blank">
               Your ERC20 Wrapped ID: {{ this.ERC20WrappedId }}<br>
-              
+
           </a>
           <a  v-if="ERC20balance"
               target="_blank">
               Your ERC20 Balance: {{ this.ERC20balance }}<br>
-              
+
           </a>
           <a  v-if="ERC20balance && ERC20WrappedId > 0"
               target="_blank">
@@ -103,7 +103,7 @@
               ERC20 Emoji: {{ this.ERC20Emoji }}<br>
           </a>
           <a
-            
+
             @click="depositERC20()"
             class="button--green"
           >
@@ -118,14 +118,14 @@
             Launch A New ERC20
           </a>
           <br>
-        </div> 
+        </div>
         <div
           v-if="ERC20FullAddress && ERC20WrappedId"
           class="links">
           <input v-model="depositAndSendERC20address">
           <br><br>
           <a
-            
+
             @click="sendWrappedERC20()"
             class="button--green"
           >
@@ -136,13 +136,13 @@
           v-if="ERC20FullAddress"
           class="links">
           <a
-            
+
             @click="offlineSignERC20()"
             class="button--green"
           >
             Sign Meta Transaction ERC20
           </a>
-        </div> 
+        </div>
         <div
           class="links">
           <a
@@ -152,7 +152,7 @@
           >
             Launch An ERC721
           </a>
-        </div> 
+        </div>
         <div
           v-if="ERC721FullAddress"
           class="links">
@@ -164,7 +164,7 @@
           <a  v-if="ERC721WrappedBaseId > 0"
               target="_blank">
               Your ERC721 Wrapped Base ID: {{ this.ERC721WrappedBaseId }}<br>
-              
+
           </a>
           <a  v-if="ERC721balance"
               target="_blank"
@@ -180,8 +180,8 @@
               ERC721 Emoji: {{ this.ERC721Emoji }}
           </a>
           <br>
-          <a 
-              
+          <a
+
               @click="mintERC721()"
               class="button--green"
           >
@@ -189,7 +189,7 @@
           </a>
           <br>
           <a
-            
+
             @click="depositERC721()"
             class="button--green"
           >
@@ -202,22 +202,22 @@
           >
             Launch A New ERC721
           </a><br><br>
-        </div> 
+        </div>
         <div
           v-if="ERC721FullAddress && ERC721WrappedBaseId"
           class="links">
           <input v-model="depositAndSendERC721address">
           <br><br>
           <a
-            
+
             @click="sendWrappedERC721()"
             class="button--green"
           >
             Send A Wrapped ERC721 To Above Address
           </a>
-        </div> 
-        
-        <div 
+        </div>
+
+        <div
             v-if="UserManagementContractAddress"
             class="links">
             <br>
@@ -230,7 +230,7 @@
             </a>
           </div>
 
-          <div 
+          <div
             v-if="UserManagementContractAddress && TokenManagementContractAddress && CryptoravesTokenContractAddress && TransactionManagementContractAddress && ValidatorInterfaceContractAddress"
             class="links">
             <br>
@@ -242,7 +242,7 @@
               Export Network Settings
             </a>
           </div>
-          <div 
+          <div
             class="links">
             <br>
             <br>
@@ -253,7 +253,7 @@
               Import Network Settings
             </a>
           </div>
-          <div 
+          <div
             class="links">
             <br>
             <br>
@@ -268,8 +268,8 @@
     <div
       v-if="showLoading"
       >
-        <img 
-          src="../assets/gif/loading.gif" 
+        <img
+          src="../assets/gif/loading.gif"
           alt >
     </div>
   </div>
@@ -320,7 +320,7 @@ export default {
     await this.initWeb3()
     await this.getBalances()
 
-    
+
   },
   methods: {
     async offlineSignERC20(){
@@ -371,7 +371,7 @@ export default {
       }
 
       if(this.networkType == savedNetwork[this.networkType]["networkType"]){
-     
+
         this.UserManagementContractAddress = localStorage.UserManagementContractAddress = savedNetwork[this.networkType]["UserManagementContractAddress"]
         this.TokenManagementContractAddress = localStorage.TokenManagementContractAddress = savedNetwork[this.networkType]["TokenManagementContractAddress"]
         this.CryptoravesTokenContractAddress = localStorage.CryptoravesTokenContractAddress = savedNetwork[this.networkType]["CryptoravesTokenContractAddress"]
@@ -379,7 +379,7 @@ export default {
         this.ValidatorInterfaceContractAddress = localStorage.ValidatorInterfaceContractAddress = savedNetwork[this.networkType]["ValidatorInterfaceContractAddress"]
         this.ERC20FullAddress = localStorage.ERC20FullAddress = savedNetwork[this.networkType]["ERC20FullAddress"]
         this.ERC721FullAddress = localStorage.ERC721FullAddress = savedNetwork[this.networkType]["ERC721FullAddress"]
-        
+
         this.AdminToolsLibraryAddress = localStorage.AdminToolsLibraryAddress = savedNetwork[this.networkType]["AdminToolsLibraryAddress"]
 
       }else{
@@ -404,12 +404,12 @@ export default {
         if (this.ERC721FullAddress){
           networkInfo[this.networkType]["ERC721FullAddress"] = this.ERC721FullAddress
         }
-        
+
         localStorage.networkInfo = JSON.stringify(networkInfo)
 
         this.copyToClipboard(localStorage.networkInfo)
         console.log('Network Info Saved for '+this.networkType+ ' and copied to clipboard')
-        
+
 
       }else{
         alert('No Network Name. Cannot Export Info.')
@@ -442,7 +442,7 @@ export default {
     checkAbis(){
       this.contractNames.forEach(function(element) {
         if(typeof abis[element] === 'undefined') {
-          throw new Error('No ABI found for '+element)    
+          throw new Error('No ABI found for '+element)
         }
       })
       return true
@@ -459,7 +459,7 @@ export default {
       }catch(e){
         console.log(e,'Error with init getERC721Balance')
       }
-      
+
       //pause for matic's RPC limit
       if (this.networkType == 'Matic Testnet'){
         await this.sleep(1000)
@@ -485,7 +485,7 @@ export default {
       this.showLoading = true
       let factory = new this.ethers.ContractFactory(abis['ERC20Full'].abi, abis["ERC20Full"].bytecode, this.signer);
       let contract = await factory.deploy(
-        this.ethereumAddress, 
+        this.ethereumAddress,
         'TestXToken', 'TSTX', '18',
         '1000000000000000000000000000' //1 billion
       )
@@ -495,7 +495,7 @@ export default {
 
       this.ERC20FullAddress = localStorage.ERC20FullAddress = contract.address
 
-      
+
 
       //get new contract id
       let tokenManagerContract = this.loadTokenManagementContract()
@@ -533,7 +533,7 @@ export default {
         await this.sleep(500)
       }
       held1155s.forEach( async function(element) {
-        
+
         console.log(element)
         if(element.lt(upperLimit) && element.gte(ERC1155tokenIdForERC721)){
           new Promise(resolve => setTimeout(resolve, 250))
@@ -556,11 +556,11 @@ export default {
       let token = new this.ethers.Contract(this.ERC20FullAddress, abis['ERC20Full'].abi, this.signer)
       this.ERC20balance = this.ethers.utils.formatUnits(await token.balanceOf(this.ethereumAddress), 18)
     },
-    async depositERC20(){     
+    async depositERC20(){
 
       let token = new this.ethers.Contract(this.ERC20FullAddress, abis['ERC20Full'].abi, this.signer)
       let amount1 = await token.balanceOf(this.ethereumAddress)
- 
+
       this.showLoading = true
 
       let cryptoravesToken = this.loadCryptoravesTokenContract()
@@ -580,7 +580,7 @@ export default {
         20,
         false
       )
-      
+
       let val = await tx.wait()
       this.ERC20balance = await token.balanceOf(this.ethereumAddress)
 
@@ -592,13 +592,13 @@ export default {
       this.ERC1155tokenIdForERC20 = localStorage.ERC1155tokenIdForERC20 = await tokenManagerContract.getManagedTokenBasedBytesIdByAddress(this.ERC20FullAddress)
       console.log(this.ERC1155tokenIdForERC20)
       console.log('ERC1155 Token ID: '+this.ERC1155tokenIdForERC20)
-      
+
       let finalBalance = await cryptoravesToken.balanceOf(this.ethereumAddress, this.ERC1155tokenIdForERC20)
-      
+
 
 
       console.log(
-        "Deposit of Random Amount Successful: ", 
+        "Deposit of Random Amount Successful: ",
         (Math.round((this.ethers.utils.formatUnits(initialBalance, 18) * 1 + randAmount) * 100) / 100).toString(),
         (Math.round(this.ethers.utils.formatUnits(finalBalance, 18) * 100 ) / 100).toString()
       )
@@ -636,11 +636,11 @@ export default {
       )
       let val = await tx.wait()
 
-      let finalBalance = await cryptoravesTokenContract.balanceOf(this.depositAndSendERC20address, this.ERC1155tokenIdForERC20)      
+      let finalBalance = await cryptoravesTokenContract.balanceOf(this.depositAndSendERC20address, this.ERC1155tokenIdForERC20)
       console.log('Send Amount: ', (this.ERC20WrappedBalance * 0.1).toString())
       console.log(
-        "Deposit and send of wrapped erc20 tokens Successful: ", 
-        (Math.round(this.ethers.utils.formatUnits(initialBalance, 18) * 100) / 100).toString(), 
+        "Deposit and send of wrapped erc20 tokens Successful: ",
+        (Math.round(this.ethers.utils.formatUnits(initialBalance, 18) * 100) / 100).toString(),
         (Math.round(this.ethers.utils.formatUnits(finalBalance, 18) * 100 ) / 100).toString()
       )
 
@@ -652,16 +652,17 @@ export default {
       this.showLoading = true
       let factory = new this.ethers.ContractFactory(abis['ERC721Full'].abi, abis["ERC721Full"].bytecode, this.signer);
       let contract = await factory.deploy(
-        this.ethereumAddress, 
-        'TestYToken', 'TSTY'
+        this.ethereumAddress,
+        'TestYToken', 'TSTY',
+        'https://i.picsum.photos/id/0/200/200.jpg'
       )
 
       console.log("Mint Token 0")
-      await contract.mint(this.ethereumAddress, 'https://i.picsum.photos/id/0/200/200.jpg')
+      await contract.mint(this.ethereumAddress)
       console.log("Mint Token 1")
-      await contract.mint(this.ethereumAddress, 'https://i.picsum.photos/id/1/200/200.jpg')
+      await contract.mint(this.ethereumAddress)
       console.log("Mint Token 2")
-      await contract.mint(this.ethereumAddress, 'https://i.picsum.photos/id/2/200/200.jpg')
+      await contract.mint(this.ethereumAddress)
 
       this.ERC721balance = await contract.balanceOf(this.ethereumAddress)
       console.log('ERC721 Token Launched With Balance: ', this.ERC721balance)
@@ -670,7 +671,7 @@ export default {
       this.getBalances()
       this.exportContractStructureForThisNetwork(false)
       this.showLoading = false
-    }, 
+    },
     async getERC721Balance(){
       let contract = new this.ethers.Contract(this.ERC721FullAddress, abis['ERC721Full'].abi, this.signer)
       this.ERC721balance = await contract.balanceOf(this.ethereumAddress)
@@ -678,17 +679,17 @@ export default {
     async mintERC721(){
       let contract = new this.ethers.Contract(this.ERC721FullAddress, abis['ERC721Full'].abi, this.signer)
       let amount1 = await contract.totalSupply()
-      await contract.mint(this.ethereumAddress, 'https://i.picsum.photos/id/'+(amount1+1)+'/200/200.jpg')
+      await contract.mint(this.ethereumAddress)//, 'https://i.picsum.photos/id/'+(amount1+1)+'/200/200.jpg')
       this.getERC721Balance()
     },
     async depositERC721(){
       this.showLoading = true
-      let token = new this.ethers.Contract(this.ERC721FullAddress, abis['ERC721Full'].abi, this.signer)      
+      let token = new this.ethers.Contract(this.ERC721FullAddress, abis['ERC721Full'].abi, this.signer)
 
       let cryptoravesToken = this.loadCryptoravesTokenContract()
       let tokenManagerContract = this.loadTokenManagementContract()
       this.ERC721WrappedBaseId = localStorage.ERC721WrappedBaseId = await tokenManagerContract.getManagedTokenBasedBytesIdByAddress(this.ERC721FullAddress)
-      
+
       let bigNumberBaseId = this.ERC721WrappedBaseId
 
       let initialBalance = this.ERC721WrappedBalance
@@ -698,21 +699,21 @@ export default {
 
       console.log('Depositing first held token (key 0): ', heldTokens[0])
       let appr = await token.approve(this.TokenManagementContractAddress, heldTokens[0]);
-      
+
       console.log(await tokenManagerContract.getManagedTokenBasedBytesIdByAddress('0x9BFa01e0417a9Aec632C8CF59B690c823172759C'))
-      
+
       let tx = await tokenManagerContract.deposit(
         heldTokens[0],
         this.ERC721FullAddress,
         721,
         false
       )
-      
+
       let val = await tx.wait()
-      
+
       this.getWrappedBalances()
       let finalBalance = this.ERC721WrappedBalance
-      
+
       console.log('ERC1155 Wrapped Balance After Deposit: '+finalBalance)
       console.log(
         "Deposit of 1 NFT Successful: Ticker: TSTY OrgId: ",heldTokens[0]
@@ -755,10 +756,10 @@ export default {
         ERC721WrappedId,
         1,
         this.ethers.utils.formatBytes32String('')
-      )   
+      )
       let val = await tx.wait()
       this.getBalances()
-      let finalBalance = this.ERC721WrappedBalance     
+      let finalBalance = this.ERC721WrappedBalance
       console.log(
         "Transfer of wrapped TSTY tokens Successful. OrgID: ",ERC721WrappedId.sub(BaseTokenId).toString()
       )
@@ -768,11 +769,11 @@ export default {
     },
     async depositAndSendERC721(tokenId){
       let token = new this.ethers.Contract(this.ERC721FullAddress, abis['ERC721Full'].abi, this.signer)
-      
+
       this.showLoading = true
 
       let cryptoravesToken = this.loadCryptoravesTokenContract()
-      
+
       let tokenManagerContract = this.loadTokenManagementContract()
 
       this.ERC1155tokenIdForERC721 = localStorage.ERC1155tokenIdForERC721 = await tokenManagerContract.getManagedTokenBasedBytesIdByAddress(this.ERC721FullAddress)
@@ -792,7 +793,7 @@ export default {
 
       //transfer
       let cryptoravesTokenContract = this.loadCryptoravesTokenContract()
-      
+
       tx = await cryptoravesTokenContract.safeTransferFrom(
         this.ethereumAddress,
         this.depositAndSendERC721address,
@@ -803,13 +804,13 @@ export default {
       val = await tx.wait()
 
       let finalBalance = await cryptoravesToken.balanceOf(this.depositAndSendERC721address, this.ERC1155tokenIdForERC721)
-      
-      
+
+
       console.log(
-        "Deposit and send of 1 token Successful: ", 
-        (Math.round((this.ethers.utils.formatUnits(initialBalance, 18) * 1 + 1) * 100) / 100).toString(), 
+        "Deposit and send of 1 token Successful: ",
+        (Math.round((this.ethers.utils.formatUnits(initialBalance, 18) * 1 + 1) * 100) / 100).toString(),
         (Math.round(this.ethers.utils.formatUnits(finalBalance, 18) * 100 ) / 100).toString(),
-        'Token ID: TODO: deep check this', tokenId, 
+        'Token ID: TODO: deep check this', tokenId,
       )
 
       this.showLoading = false
@@ -818,12 +819,12 @@ export default {
 
       let erc721Contract = new this.ethers.Contract(
         this.ERC721FullAddress,
-        ['function tokenOfOwnerByIndex(address owner, uint256 index) external view returns (uint256 tokenId)'], 
+        ['function tokenOfOwnerByIndex(address owner, uint256 index) external view returns (uint256 tokenId)'],
         this.signer
       )
       let results = []
       let res
-      for(let i=0; i<this.ERC721balance; i++){        
+      for(let i=0; i<this.ERC721balance; i++){
         res = await erc721Contract.tokenOfOwnerByIndex(this.ethereumAddress, i)
         results[i] = res.toString()
       }
@@ -836,14 +837,14 @@ export default {
     loadTokenManagementContract(){
       return new this.ethers.Contract(
         this.TokenManagementContractAddress,
-        abis['TokenManagement'].abi, 
+        abis['TokenManagement'].abi,
         this.signer
       )
     },
     loadCryptoravesTokenContract(){
       return new this.ethers.Contract(
         this.CryptoravesTokenContractAddress,
-        abis['CryptoravesToken'].abi, 
+        abis['CryptoravesToken'].abi,
         this.signer
       )
     },

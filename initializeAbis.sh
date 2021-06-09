@@ -17,16 +17,21 @@ do
 		fi
 		BYTECODE="$(cat ${f} | python3 -c "import sys, json; print(json.dumps(json.load(sys.stdin)['bytecode']))")"
 		if [[ "$BYTECODE" != *"KeyError:"* ]]; then
-			echo "\"bytecode\":$BYTECODE" >> ./pages/abis.js
+			echo "\"bytecode\":$BYTECODE," >> ./pages/abis.js
 			#echo $BYTECODE
+		fi
+		NETWORKS="$(cat ${f} | python3 -c "import sys, json; print(json.dumps(json.load(sys.stdin)['networks']))")"
+		if [[ "$NETWORKS" != *"KeyError:"* ]]; then
+			echo "\"networks\":$NETWORKS" >> ./pages/abis.js
+			#echo $NETWORKS
 		fi
 		if [[ "ValidatorInterfaceContract" == "${FILENAME}" ]]; then
 			echo '}' >> ./pages/abis.js
 		else
 			echo '},' >> ./pages/abis.js
 		fi
-		
+
 	fi
 done
-echo '} 
+echo '}
 export default abis' >> ./pages/abis.js
