@@ -213,12 +213,12 @@ export default {
       let managerContract = new this.ethers.Contract(
         this.managerContractAddress, 
         [
-          'function getCryptoravesTokenAddress() public view returns(address)',
+          'function cryptoravesTokenAddr() public view returns(address)',
           'function getUserManagementAddress() public view returns(address)'
         ],
         this.signer
       )
-      this.cryptoravesTokenContractAddress = localStorage.cryptoravesTokenContractAddress = await managerContract.getCryptoravesTokenAddress()
+      this.cryptoravesTokenContractAddress = localStorage.cryptoravesTokenContractAddress = await managerContract.cryptoravesTokenAddr()
 
       let token1155 = new this.ethers.Contract(
         this.cryptoravesTokenContractAddress, 

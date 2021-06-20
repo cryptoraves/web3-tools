@@ -41,8 +41,6 @@ contract TokenManagement is  ERCDepositable {
         numberOfTokens++;
     }
 
-    
-
     function setCryptoravesTokenAddress(address newAddr) public onlyAdmin {
         cryptoravesTokenAddr = newAddr;
     }
@@ -176,7 +174,6 @@ contract TokenManagement is  ERCDepositable {
         }
     }
     function getAddressBySymbol(string memory _symbol) public view returns (address) {
-
         uint256 _1155tokenBaseBytesId = symbolAndEmojiLookupTable[_symbol];
         return tokenAddressByFullBytesId[_1155tokenBaseBytesId];
     }

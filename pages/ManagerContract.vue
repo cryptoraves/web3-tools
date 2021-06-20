@@ -177,7 +177,7 @@ export default {
       this.showLoading = false
       
       this.managerContractAddress = localStorage.managerContractAddress = contract.address
-      this.cryptoravesTokenContractAddress = localStorage.cryptoravesTokenContractAddress = await contract.getCryptoravesTokenAddress()
+      this.cryptoravesTokenContractAddress = localStorage.cryptoravesTokenContractAddress = await contract.cryptoravesTokenAddr()
       //console.log(contract.deployTransaction.hash);
     },
     async dropMyCrypto(){
@@ -198,7 +198,7 @@ export default {
       this.launchedWalletAddress = localStorage.launchedWalletAddress = '0x'+val.events[0].topics[1].substr(val.events[0].topics[1].length - 40);
       this.showLoading = true
       
-      this.cryptoravesTokenContractAddress = localStorage.cryptoravesTokenContractAddress = await tokenManager.getCryptoravesTokenAddress()
+      this.cryptoravesTokenContractAddress = localStorage.cryptoravesTokenContractAddress = await tokenManager.cryptoravesTokenAddr()
       let token1155 = new this.ethers.Contract(
         this.cryptoravesTokenContractAddress, 
         ['function tokenBaseBytesIdByAddress(address _tokenOriginAddr) public view returns(uint256)'],
@@ -561,7 +561,7 @@ export default {
   },
   {
     "inputs": [],
-    "name": "getCryptoravesTokenAddress",
+    "name": "cryptoravesTokenAddr",
     "outputs": [
       {
         "internalType": "address",

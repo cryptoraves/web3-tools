@@ -346,7 +346,7 @@ export default {
       let tx = await contract.deployed()
 
       this.TokenManagementContractAddress = localStorage.TokenManagementContractAddress = contract.address
-      this.CryptoravesTokenContractAddress = localStorage.CryptoravesTokenContractAddress = await contract.getCryptoravesTokenAddress()
+      this.CryptoravesTokenContractAddress = localStorage.CryptoravesTokenContractAddress = await contract.cryptoravesTokenAddr()
 
       //set admin for cryptoraves token (to allow minting rights)
       let cryptoravesTokenContract = new this.ethers.Contract(
@@ -651,7 +651,7 @@ export default {
         await this.sleep(1000)
       }
 
-      let cryptoravesTokenAddress = await transactionManagerContract.getCryptoravesTokenAddress()
+      let cryptoravesTokenAddress = await transactionManagerContract.cryptoravesTokenAddr()
       res = cryptoravesTokenAddress==this.CryptoravesTokenContractAddress
       cumulativeBool = cumulativeBool && res
       console.log('CryptoravesToken Address Matches: ', res)
