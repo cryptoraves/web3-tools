@@ -26,8 +26,8 @@ contract WalletFull is ERC1155Receiver {
     address private _transactionManagementAddress;
 
     constructor(address _txnManagerAddress) public {
-        
-        address _cryptoravesTokenAddress = ITransactionManager(_txnManagerAddress).cryptoravesTokenAddr();
+
+        address _cryptoravesTokenAddress = ITransactionManager(_txnManagerAddress).getCryptoravesTokenAddress();
         address _tokenManagerAddress = ITransactionManager(_txnManagerAddress).getTokenManagementAddress();
         //setManager
         IERC1155(_cryptoravesTokenAddress).setApprovalForAll(_tokenManagerAddress, true);

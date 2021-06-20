@@ -651,7 +651,7 @@ export default {
         await this.sleep(1000)
       }
 
-      let cryptoravesTokenAddress = await transactionManagerContract.cryptoravesTokenAddr()
+      let cryptoravesTokenAddress = await transactionManagerContract.getCryptoravesTokenAddress()
       res = cryptoravesTokenAddress==this.CryptoravesTokenContractAddress
       cumulativeBool = cumulativeBool && res
       console.log('CryptoravesToken Address Matches: ', res)

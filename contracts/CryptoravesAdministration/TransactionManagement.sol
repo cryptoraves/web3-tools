@@ -18,7 +18,7 @@ contract TransactionManagement is AdministrationContract {
         uint256 decimalPlaceLocation;   //where the decimal place lies: 1.31 = 2, 12321.989293 = 6, 1000 = 0 etc
         uint256 tweetId;                //tweet ID from twitter
     }
-    address private _tokenManagementContractAddress;
+    address public tokenManagementContractAddress;
     address private _userManagementContractAddress;
     uint256 private _standardMintAmount = 1000000000000000000000000000; //18-decimal adjusted standard amount (1 billion)
 
@@ -41,11 +41,11 @@ contract TransactionManagement is AdministrationContract {
     }
 
     function getTokenManagementAddress() public view returns(address) {
-        return _tokenManagementContractAddress;
+        return tokenManagementContractAddress;
     }
 
     function setTokenManagementAddress(address _newAddr) public onlyAdmin {
-        _tokenManagementContractAddress = _newAddr;
+        tokenManagementContractAddress = _newAddr;
     }
 
     function getUserManagementAddress() public view returns(address){
@@ -56,8 +56,8 @@ contract TransactionManagement is AdministrationContract {
         _userManagementContractAddress = _newAddr;
     }
 
-    function cryptoravesTokenAddr() public view returns(address){
-        ITokenManager _tokenManagement = ITokenManager(_tokenManagementContractAddress);
+    function getCryptoravesTokenAddress() public view returns(address){
+        ITokenManager _tokenManagement = ITokenManager(tokenManagementContractAddress);
         return _tokenManagement.cryptoravesTokenAddr();
     }
 
@@ -152,7 +152,7 @@ contract TransactionManagement is AdministrationContract {
 
             IUserManager.User memory _userStruct;
 
-            ITokenManager _tokenManagement = ITokenManager(_tokenManagementContractAddress);
+            ITokenManager _tokenManagement = ITokenManager(tokenManagementContractAddress);
 
             //transfer type check
             if(_twitterInts.twitterIdThirdParty == 0){
@@ -297,7 +297,7 @@ contract TransactionManagement is AdministrationContract {
         //init account
         IUserManager.User memory _user = _userManagement.userAccountCheck(_platformUserId,_twitterHandleFrom,_imageUrl);
 
-        ITokenManager _tokenManagement = ITokenManager(_tokenManagementContractAddress);
+        ITokenManager _tokenManagement = ITokenManager(tokenManagementContractAddress);
 
         _tokenManagement.dropCrypto(_twitterHandleFrom, _user.cryptoravesAddress, _standardMintAmount, '');
 
@@ -310,7 +310,7 @@ contract TransactionManagement is AdministrationContract {
     function getTokenIdFromPlatformId(uint256 _platformId) public view returns(uint256) {
 
         IUserManager _userManagement = IUserManager(_userManagementContractAddress);
-        ITokenManager _tokenManagement = ITokenManager(_tokenManagementContractAddress);
+        ITokenManager _tokenManagement = ITokenManager(tokenManagementContractAddress);
 
         address _userAccount = _userManagement.getUserAccount(_platformId);
 
@@ -332,7 +332,7 @@ contract TransactionManagement is AdministrationContract {
 
 
     function testDownstreamAdminConfiguration() public view onlyAdmin returns(bool){
-        IDownStream _downstream1 = IDownStream(getTokenManagementAddress());
+        IDownStream _downstream1 = IDownStream(tokenManagementContractAddress);
         bool test1 = _downstream1.testDownstreamAdminConfiguration();
         IDownStream _downstream2 = IDownStream(getUserManagementAddress());
         bool test2 = _downstream2.testDownstreamAdminConfiguration();
@@ -349,18 +349,18 @@ contract TransactionManagement is AdministrationContract {
         address _acct = _userManagement.getUserAccount(_platformUserId);
 
         //reset token
-        ITokenManager _tokenManagement = ITokenManager(_tokenManagementContractAddress);
+        ITokenManager _tokenManagement = ITokenManager(tokenManagementContractAddress);
         _tokenManagement.setIsManagedToken(_acct, false);
     }
 
     function _adjustValueByUnits(uint256 _cryptoravesTokenId, uint256 _value, uint256 _decimalPlace) private view returns(uint256){
         //check if nft. if yes, return same _value
-        ITokenManager _tokenManagement = ITokenManager(_tokenManagementContractAddress);
+        ITokenManager _tokenManagement = ITokenManager(tokenManagementContractAddress);
         return _tokenManagement.adjustValueByUnits(_cryptoravesTokenId, _value, _decimalPlace);
     }
 
     function emitTransferFromTokenManagementContract(address _from, address _to, uint256 _value, uint256 _cryptoravesTokenId, uint256 _tweetId) public {
-      require(msg.sender == _tokenManagementContractAddress, 'Not Token Manager Contract. Aborting.');
+      require(msg.sender == tokenManagementContractAddress, 'Not Token Manager Contract. Aborting.');
       emit CryptoravesTransfer(_from, _to, _value, _cryptoravesTokenId, _tweetId);
     }
     function _bytesToAddress(bytes memory bys) private pure returns (address addr) {

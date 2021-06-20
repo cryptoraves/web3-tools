@@ -101,7 +101,7 @@ contract("TransactionManagement", async accounts => {
     })
     it("verify cryptoraves token address is valid", async () => {
       let instance = await TransactionManagement.deployed()
-      let tokenContractAddr = await instance.cryptoravesTokenAddr.call()
+      let tokenContractAddr = await instance.getCryptoravesTokenAddress.call()
 
       assert.notEqual('0x0000000000000000000000000000000000000000', tokenContractAddr, "Token Manager Address is zero address")
       assert.lengthOf(

@@ -94,7 +94,7 @@ contract UserManagement is AdministrationContract {
         l2Wallet.setAdministrator(_l1Addr);
 
         //set L1 account as 1155 operator for this wallet
-        address _cryptoravesTokenAddress = ITransactionManager(getTransactionManagerAddress()).cryptoravesTokenAddr();
+        address _cryptoravesTokenAddress = ITransactionManager(getTransactionManagerAddress()).getCryptoravesTokenAddress();
         IERC1155(_cryptoravesTokenAddress).setApprovalForAll(_l1Addr, true);
 
         //set l1 address
