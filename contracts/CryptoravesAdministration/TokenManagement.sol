@@ -10,7 +10,7 @@ contract TokenManagement is  ERCDepositable {
     using SafeMath for uint256;
     using Address for address;
 
-    address private _cryptoravesTokenAddr;
+    address public cryptoravesTokenAddr;
 
     //Bytes-based token ID scheme
     uint256 numberOfTokens = 0;
@@ -34,19 +34,17 @@ contract TokenManagement is  ERCDepositable {
 
         setAdministrator(msg.sender);
         CryptoravesToken newCryptoravesToken = new CryptoravesToken(_uri);
-        _cryptoravesTokenAddr = address(newCryptoravesToken);
+        cryptoravesTokenAddr = address(newCryptoravesToken);
 
         //must add fake token to zero spot
         tokenAddressByFullBytesId[numberOfTokens] = address(this);
         numberOfTokens++;
     }
 
-    function getCryptoravesTokenAddress() public view returns(address) {
-        return _cryptoravesTokenAddr;
-    }
+    
 
     function setCryptoravesTokenAddress(address newAddr) public onlyAdmin {
-        _cryptoravesTokenAddr = newAddr;
+        cryptoravesTokenAddr = newAddr;
     }
 
     /*
@@ -63,7 +61,7 @@ contract TokenManagement is  ERCDepositable {
             _addTokenToManagedTokenList(account, 1155, 0);
         }
 
-        uint256 _1155tokenId = getManagedTokenBasedBytesIdByAddress(account);
+        uint256 _1155tokenId = tokenBaseBytesIdByAddress[account];
 
         //add username as symbol
         _checkSymbolAddress(_twitterHandleFrom, _1155tokenId);
@@ -99,14 +97,14 @@ contract TokenManagement is  ERCDepositable {
       uint256 _1155tokenId;
       uint256 _amount;
       if( _ercType == 721 ){
-          _1155tokenId = getManagedTokenBasedBytesIdByAddress(_tokenAddr) + _amountOrId;
+          _1155tokenId = tokenBaseBytesIdByAddress[_tokenAddr] + _amountOrId;
           if(!managedTokenByFullBytesId[_1155tokenId].isManagedToken){
             _1155tokenId = _addTokenToManagedTokenList(_tokenAddr, _ercType, _amountOrId);
           }
           _depositERC721(_amountOrId, _tokenAddr);
           _amount = 1;
       }else{
-          _1155tokenId = getManagedTokenBasedBytesIdByAddress(_tokenAddr);
+          _1155tokenId = tokenBaseBytesIdByAddress[_tokenAddr];
           if(!managedTokenByFullBytesId[_1155tokenId].isManagedToken){
             _1155tokenId = _addTokenToManagedTokenList(_tokenAddr, _ercType, 0);
           }
@@ -127,7 +125,7 @@ contract TokenManagement is  ERCDepositable {
     function withdrawERC20(uint256 _amount, address _tokenAddr, bool _isManagedWithdraw) public payable returns(uint256){
         _withdrawERC20(_amount, _tokenAddr);
 
-        uint256 _1155tokenId = getManagedTokenBasedBytesIdByAddress(_tokenAddr);
+        uint256 _1155tokenId = tokenBaseBytesIdByAddress[_tokenAddr];
         address _burnAddr;
         if (_isManagedWithdraw) {
             _burnAddr = getL2AddressForManagedDeposit();
@@ -148,7 +146,7 @@ contract TokenManagement is  ERCDepositable {
     function withdrawERC721(uint256 _tokenERC721Id, address _tokenAddr, bool _isManagedWithdraw) public payable returns(uint256){
         _withdrawERC721(_tokenERC721Id, _tokenAddr);
 
-        uint256 _1155tokenId = getManagedTokenBasedBytesIdByAddress(_tokenAddr) + _tokenERC721Id;
+        uint256 _1155tokenId = tokenBaseBytesIdByAddress[_tokenAddr] + _tokenERC721Id;
         address _burnFromAddr;
         if (_isManagedWithdraw) {
             _burnFromAddr = getL2AddressForManagedDeposit();
@@ -253,11 +251,6 @@ contract TokenManagement is  ERCDepositable {
         emit DescriptionChange(_1155tokenId, _description);
     }
 
-    function getManagedTokenBasedBytesIdByAddress(address _tokenAddr) public view returns(uint256) {
-        //split byte format
-        return tokenBaseBytesIdByAddress[_tokenAddr];
-    }
-
     function getTokenListCount() public view returns(uint count) {
         return numberOfTokens;
     }
@@ -301,12 +294,12 @@ contract TokenManagement is  ERCDepositable {
     }
 
     function _mint( address account, uint256 _1155tokenId, uint256 amount, bytes memory data) private {
-        CryptoravesToken instanceCryptoravesToken = CryptoravesToken(_cryptoravesTokenAddr);
+        CryptoravesToken instanceCryptoravesToken = CryptoravesToken(cryptoravesTokenAddr);
         instanceCryptoravesToken.mint(account, _1155tokenId, amount, data);
     }
 
     function _burn( address account, uint256 _1155tokenId, uint256 amount) private {
-        CryptoravesToken instanceCryptoravesToken = CryptoravesToken(_cryptoravesTokenAddr);
+        CryptoravesToken instanceCryptoravesToken = CryptoravesToken(cryptoravesTokenAddr);
         instanceCryptoravesToken.burn(account, _1155tokenId, amount);
     }
 
@@ -317,13 +310,13 @@ contract TokenManagement is  ERCDepositable {
      */
 
     function managedTransfer(address _from, address _to, uint256 _1155tokenId,  uint256 _val, bytes memory _data)  public onlyAdmin {
-        CryptoravesToken instanceCryptoravesToken = CryptoravesToken(_cryptoravesTokenAddr);
+        CryptoravesToken instanceCryptoravesToken = CryptoravesToken(cryptoravesTokenAddr);
         instanceCryptoravesToken.safeTransferFrom(_from, _to, _1155tokenId, _val, _data);
     }
 
 
     function testDownstreamAdminConfiguration() public view onlyAdmin returns(bool){
-        IDownStream _downstream = IDownStream(getCryptoravesTokenAddress());
+        IDownStream _downstream = IDownStream(cryptoravesTokenAddr);
         return _downstream.testDownstreamAdminConfiguration();
     }
 }

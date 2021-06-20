@@ -37,7 +37,7 @@ contract("TokenManagement", async accounts => {
   it("Drop 1 billion to admin", async () => {
     let instanceTokenManagement = await TokenManagement.deployed()
     let instanceCryptoravesToken = await CryptoravesToken.at(
-      await instanceTokenManagement.getCryptoravesTokenAddress()
+      await instanceTokenManagement.cryptoravesTokenAddr()
     )
 
     let amount = ethers.utils.parseUnits('1000000000',18).toString()
@@ -49,7 +49,7 @@ contract("TokenManagement", async accounts => {
       ethers.utils.formatBytes32String('test')
     )
 
-    primary_tokenId1155 = await instanceTokenManagement.getManagedTokenBasedBytesIdByAddress(accounts[0])
+    primary_tokenId1155 = await instanceTokenManagement.tokenBaseBytesIdByAddress(accounts[0])
     let balance = await instanceCryptoravesToken.balanceOf(accounts[0], primary_tokenId1155)
 
     assert.equal(
@@ -82,9 +82,9 @@ contract("TokenManagement", async accounts => {
     )
 
     let gasUsed = res.receipt.cumulativeGasUsed
-    let tokenId1155 = await instanceTokenManagement.getManagedTokenBasedBytesIdByAddress(zeroAddr)
+    let tokenId1155 = await instanceTokenManagement.tokenBaseBytesIdByAddress(zeroAddr)
     let instanceCryptoravesToken = await CryptoravesToken.at(
-      await instanceTokenManagement.getCryptoravesTokenAddress()
+      await instanceTokenManagement.cryptoravesTokenAddr()
     )
     let balance = await instanceCryptoravesToken.balanceOf(accounts[0], tokenId1155)
     let finalEthBalance = await web3.eth.getBalance(accounts[0]);
@@ -126,9 +126,9 @@ contract("TokenManagement", async accounts => {
     const txInfo = await web3.eth.getTransaction(res.tx);
   	const gasCost = txInfo.gasPrice * res.receipt.gasUsed
 
-    let tokenId1155 = await instanceTokenManagement.getManagedTokenBasedBytesIdByAddress(zeroAddr)
+    let tokenId1155 = await instanceTokenManagement.tokenBaseBytesIdByAddress(zeroAddr)
     let instanceCryptoravesToken = await CryptoravesToken.at(
-      await instanceTokenManagement.getCryptoravesTokenAddress()
+      await instanceTokenManagement.cryptoravesTokenAddr()
     )
     let balance = await instanceCryptoravesToken.balanceOf(accounts[0], tokenId1155)
 
@@ -155,9 +155,9 @@ contract("TokenManagement", async accounts => {
       20, //indicates ERC20
       false
     )
-    let tokenId1155 = await instanceTokenManagement.getManagedTokenBasedBytesIdByAddress(erc20Instance.address)
+    let tokenId1155 = await instanceTokenManagement.tokenBaseBytesIdByAddress(erc20Instance.address)
     let instanceCryptoravesToken = await CryptoravesToken.at(
-      await instanceTokenManagement.getCryptoravesTokenAddress()
+      await instanceTokenManagement.cryptoravesTokenAddr()
     )
     let balance = await instanceCryptoravesToken.balanceOf(accounts[0], tokenId1155)
     assert.equal(
@@ -194,7 +194,7 @@ contract("TokenManagement", async accounts => {
       let erc20Instance = await ERC20Full.deployed()
 
       let addressB1 = await instanceTokenManagement.getAddressBySymbol('TKX')
-      let tokenId1155_B = await instanceTokenManagement.getManagedTokenBasedBytesIdByAddress(
+      let tokenId1155_B = await instanceTokenManagement.tokenBaseBytesIdByAddress(
         addressB1
       )
 
@@ -227,9 +227,9 @@ contract("TokenManagement", async accounts => {
     	erc20Instance.address,
       false
     )
-    let tokenId1155 = await instanceTokenManagement.getManagedTokenBasedBytesIdByAddress(erc20Instance.address)
+    let tokenId1155 = await instanceTokenManagement.tokenBaseBytesIdByAddress(erc20Instance.address)
     let instanceCryptoravesToken = await CryptoravesToken.at(
-      await instanceTokenManagement.getCryptoravesTokenAddress()
+      await instanceTokenManagement.cryptoravesTokenAddr()
     )
     let balance = await instanceCryptoravesToken.balanceOf(accounts[0], tokenId1155)
     assert.equal(
@@ -257,10 +257,10 @@ contract("TokenManagement", async accounts => {
       721, //indicates ERC721
       false
     )
-    let tokenId1155 = await instanceTokenManagement.getManagedTokenBasedBytesIdByAddress(erc721Instance.address)
+    let tokenId1155 = await instanceTokenManagement.tokenBaseBytesIdByAddress(erc721Instance.address)
 
     let instanceCryptoravesToken = await CryptoravesToken.at(
-      await instanceTokenManagement.getCryptoravesTokenAddress()
+      await instanceTokenManagement.cryptoravesTokenAddr()
     )
 
     let balance = await instanceCryptoravesToken.balanceOf(accounts[0], tokenId1155)
@@ -288,9 +288,9 @@ contract("TokenManagement", async accounts => {
   it("withdraws ERC721", async () => {
   	let instanceTokenManagement = await TokenManagement.deployed()
     let erc721Instance = await ERC721Full.deployed()
-    let tokenId1155 = await instanceTokenManagement.getManagedTokenBasedBytesIdByAddress(erc721Instance.address)
+    let tokenId1155 = await instanceTokenManagement.tokenBaseBytesIdByAddress(erc721Instance.address)
     let instanceCryptoravesToken = await CryptoravesToken.at(
-      await instanceTokenManagement.getCryptoravesTokenAddress()
+      await instanceTokenManagement.cryptoravesTokenAddr()
     )
     let balance1 = await instanceCryptoravesToken.balanceOf(accounts[0], tokenId1155)
 
@@ -314,7 +314,7 @@ contract("TokenManagement", async accounts => {
     let erc20Instance = await ERC20Full.deployed()
 
     let symbol = await tokenManagementInstance.getSymbol(
-      await tokenManagementInstance.getManagedTokenBasedBytesIdByAddress(erc20Instance.address)
+      await tokenManagementInstance.tokenBaseBytesIdByAddress(erc20Instance.address)
     )
     assert.equal(
       symbol,
@@ -322,7 +322,7 @@ contract("TokenManagement", async accounts => {
       'ERC20 symbol does not match'
     )
     symbol = await tokenManagementInstance.getSymbol(
-      await tokenManagementInstance.getManagedTokenBasedBytesIdByAddress(erc721Instance.address)
+      await tokenManagementInstance.tokenBaseBytesIdByAddress(erc721Instance.address)
     )
     assert.equal(
       symbol,
@@ -335,7 +335,7 @@ contract("TokenManagement", async accounts => {
     let erc721Instance = await ERC721Full.deployed()
     let erc20Instance = await ERC20Full.deployed()
 
-    let tokenId = await tokenManagementInstance.getManagedTokenBasedBytesIdByAddress(erc20Instance.address)
+    let tokenId = await tokenManagementInstance.tokenBaseBytesIdByAddress(erc20Instance.address)
     await tokenManagementInstance.setEmoji(
       tokenId,
       emoji
@@ -352,7 +352,7 @@ contract("TokenManagement", async accounts => {
   it("set new uri", async () => {
     let tokenManagementInstance = await TokenManagement.deployed()
     let instanceCryptoravesToken = await CryptoravesToken.at(
-      await tokenManagementInstance.getCryptoravesTokenAddress()
+      await tokenManagementInstance.cryptoravesTokenAddr()
     )
 
     let newUri = 'data:application/json;charset=utf-8;base64,ew0KCSJuYW1lIjogIkFzc2V0IE5hbWUiLA0KCSJkZXNjcmlwdGlvbiI6ICJMb3JlbSBpcHN1bS4uLiIsDQoJImltYWdlIjogImh0dHBzOi8vczMuYW1hem9uYXdzLmNvbS95b3VyLWJ1Y2tldC9pbWFnZXMve2lkfS5wbmciLA0KCSJwcm9wZXJ0aWVzIjogew0KCQkic2ltcGxlX3Byb3BlcnR5IjogImV4YW1wbGUgdmFsdWUiLA0KCQkicmljaF9wcm9wZXJ0eSI6IHsNCgkJCSJuYW1lIjogIk5hbWUiLA0KCQkJInZhbHVlIjogIjEyMyIsDQoJCQkiZGlzcGxheV92YWx1ZSI6ICIxMjMgRXhhbXBsZSBWYWx1ZSIsDQoJCQkiY2xhc3MiOiAiZW1waGFzaXMiLA0KCQkJImNzcyI6IHsNCgkJCQkiY29sb3IiOiAiI2ZmZmZmZiIsDQoJCQkJImZvbnQtd2VpZ2h0IjogImJvbGQiLA0KCQkJCSJ0ZXh0LWRlY29yYXRpb24iOiAidW5kZXJsaW5lIg0KCQkJfQ0KCQl9LA0KCQkiYXJyYXlfcHJvcGVydHkiOiB7DQoJCQkibmFtZSI6ICJOYW1lIiwNCgkJCSJ2YWx1ZSI6IFsxLDIsMyw0XSwNCgkJCSJjbGFzcyI6ICJlbXBoYXNpcyINCgkJfQ0KCX0NCn0='
@@ -377,7 +377,7 @@ contract("TokenManagement", async accounts => {
       let erc20Instance = await ERC20Full.deployed()
       let erc721Instance = await ERC721Full.deployed()
 
-      let tokenId1155 = await instanceTokenManagement.getManagedTokenBasedBytesIdByAddress(erc20Instance.address)
+      let tokenId1155 = await instanceTokenManagement.tokenBaseBytesIdByAddress(erc20Instance.address)
       let erc1155TotSupply = await instanceTokenManagement.getTotalSupply(tokenId1155)
       let erc20TotSupply = await erc20Instance.totalSupply()
       assert.equal(
@@ -385,7 +385,7 @@ contract("TokenManagement", async accounts => {
         erc20TotSupply.toString(),
         "ERC20 Total supply doesn't match"
       )
-      tokenId1155 = await instanceTokenManagement.getManagedTokenBasedBytesIdByAddress(erc721Instance.address)
+      tokenId1155 = await instanceTokenManagement.tokenBaseBytesIdByAddress(erc721Instance.address)
       erc1155TotSupply = await instanceTokenManagement.getTotalSupply(tokenId1155)
       let erc721TotSupply = await erc721Instance.totalSupply()
       assert.equal(
@@ -400,8 +400,8 @@ contract("TokenManagement", async accounts => {
   	let erc721Instance = await ERC721Full.deployed()
   	let erc20Instance = await ERC20Full.deployed()
 
-  	let id20 = await instanceTokenManagement.getManagedTokenBasedBytesIdByAddress(erc20Instance.address)
-  	let id721 = await instanceTokenManagement.getManagedTokenBasedBytesIdByAddress(erc721Instance.address)
+  	let id20 = await instanceTokenManagement.tokenBaseBytesIdByAddress(erc20Instance.address)
+  	let id721 = await instanceTokenManagement.tokenBaseBytesIdByAddress(erc721Instance.address)
 
   	assert.equal(
   		id20.toString(),
@@ -417,7 +417,7 @@ contract("TokenManagement", async accounts => {
   it("add managed token to list", async () => {
   	let instanceTokenManagement = await TokenManagement.deployed()
     //let wallet = ethers.Wallet.createRandom()
-  	let id7 = await instanceTokenManagement.getManagedTokenBasedBytesIdByAddress(accounts[0])
+  	let id7 = await instanceTokenManagement.tokenBaseBytesIdByAddress(accounts[0])
   	assert.equal(
   		id7.toString(),
   		primary_tokenId1155.toString(),

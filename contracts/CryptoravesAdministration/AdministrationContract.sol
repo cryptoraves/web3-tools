@@ -19,15 +19,15 @@ interface ITransactionManager {
     function getUserL2AccountFromL1Account(address) external view returns(address);
     function getTokenManagementAddress() external view returns(address);
     function getUserManagementAddress() external view returns(address);
-    function getCryptoravesTokenAddress() external view returns(address);
+    function cryptoravesTokenAddr() external view returns(address);
     function emitTransferFromTokenManagementContract(address,address,uint256,uint256,uint256) external;
 }
 
 interface ITokenManager {
-    function getCryptoravesTokenAddress() external view returns(address);
+    function cryptoravesTokenAddr() external view returns(address);
     function getUserManagementAddress() external view returns(address);
     function getAddressBySymbol(string memory) external view returns(address);
-    function getManagedTokenBasedBytesIdByAddress(address) external view returns(uint256);
+    function tokenBaseBytesIdByAddress(address) external view returns(uint256);
     function dropCrypto(string memory, address, uint256, bytes memory) external;
     function managedTransfer(address, address, uint256, uint256, bytes memory) external;
     function setIsManagedToken(address, bool) external;

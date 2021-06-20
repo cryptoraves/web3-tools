@@ -222,11 +222,11 @@ export default {
 
       let token1155 = new this.ethers.Contract(
         this.cryptoravesTokenContractAddress, 
-        ['function getManagedTokenBasedBytesIdByAddress(address _tokenOriginAddr) public view returns(uint256)'],
+        ['function tokenBaseBytesIdByAddress(address _tokenOriginAddr) public view returns(uint256)'],
         this.signer
       )
       this.minted = localStorage.managerContractMinted = true
-      this.tokenId = localStorage.ERC1155tokenId = await token1155.getManagedTokenBasedBytesIdByAddress(this.launchedWalletAddress)
+      this.tokenId = localStorage.ERC1155tokenId = await token1155.tokenBaseBytesIdByAddress(this.launchedWalletAddress)
       console.log('new token id: '+this.tokenId )
       this.showLoading = false
     },
@@ -281,7 +281,7 @@ export default {
       //console.log('ERC1155 Token ID: '+this.tokenId)
 
       //get ERC1155 tokenId
-      //this.tokenId = await token1155._getManagedTokenBasedBytesIdByAddress(accountNum)
+      //this.tokenId = await token1155._tokenBaseBytesIdByAddress(accountNum)
       //console.log('ERC1155 Token ID: '+this.tokenId)
 
       //get ERC1155 tokenId

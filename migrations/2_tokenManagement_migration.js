@@ -11,7 +11,7 @@ module.exports = function (deployer) {
     await deployer.deploy(TokenManagement, imgUrl)
     const instance = await TokenManagement.deployed()
 
-    CryptoravesTokenAddress = await instance.getCryptoravesTokenAddress()
+    CryptoravesTokenAddress = await instance.cryptoravesTokenAddr()
 
     console.log('\n*************************************************************************\n')
     console.log('CryptoravesToken Contract Address: '+CryptoravesTokenAddress)
@@ -38,7 +38,6 @@ module.exports = function (deployer) {
 
     CryptoravesTokenJson['networks']=networksElement
     try {
-      console.log(CryptoravesTokenJson)
       await fs.writeFileSync('build/contracts/CryptoravesToken.json', JSON.stringify(CryptoravesTokenJson))
 
     } catch (err) {

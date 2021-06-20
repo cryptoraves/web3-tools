@@ -45,7 +45,7 @@ contract("TransactionManagement", async accounts => {
       let userId = await userManagementInstance.getUserIdByPlatformHandle('fakeHandleA')
       let account = await userManagementInstance.getUserAccount(userId)
       let symbol = await tokenManagementInstance.getSymbol(
-        await tokenManagementInstance.getManagedTokenBasedBytesIdByAddress(account)
+        await tokenManagementInstance.tokenBaseBytesIdByAddress(account)
       )
       assert.equal(
         symbol,
@@ -101,7 +101,7 @@ contract("TransactionManagement", async accounts => {
     })
     it("verify cryptoraves token address is valid", async () => {
       let instance = await TransactionManagement.deployed()
-      let tokenContractAddr = await instance.getCryptoravesTokenAddress.call()
+      let tokenContractAddr = await instance.cryptoravesTokenAddr.call()
 
       assert.notEqual('0x0000000000000000000000000000000000000000', tokenContractAddr, "Token Manager Address is zero address")
       assert.lengthOf(
@@ -186,7 +186,7 @@ contract("TransactionManagement", async accounts => {
         await TransactionManagementInstance.getUserManagementAddress()
       )
       let user = await userManagementInstance.getUser(fakeUserId)
-      let tokenId1155_A = await instanceTokenManagement.getManagedTokenBasedBytesIdByAddress(
+      let tokenId1155_A = await instanceTokenManagement.tokenBaseBytesIdByAddress(
         user.cryptoravesAddress
       )
 
@@ -206,10 +206,10 @@ contract("TransactionManagement", async accounts => {
       )
       //6. check new balance.
       let instanceCryptoravesToken = await CryptoravesToken.at(
-        await instanceTokenManagement.getCryptoravesTokenAddress()
+        await instanceTokenManagement.cryptoravesTokenAddr()
       )
 
-      let tokenId1155_B = await instanceTokenManagement.getManagedTokenBasedBytesIdByAddress(
+      let tokenId1155_B = await instanceTokenManagement.tokenBaseBytesIdByAddress(
         user.cryptoravesAddress
       )
       user = await userManagementInstance.getUser(fakeUserId2)
