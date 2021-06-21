@@ -23,29 +23,47 @@ try{
 let handles = JSON.parse(handlesFile)
 
 
-const erc20s = [
+/*const erc20s = [
 	'TKA','TKB','TKC','TKD','TKE','TKF','TKG','TKH','TKI','TKJ',
 	'TKK','TKL','TKM','TKN','TKO','TKP','TKQ','TKR','TKS','TKT',
 	'TKU','TKV','TKW','TKX','TKY','TKZ','TKA1','TKA2','TKA3','TKA4',
 	'TKA5','TKA6','TKA7','TKA8','TKA9','TKB1','TKB2','TKB3','TKB4','TKB5',
 	'TKB6','TKB7','TKB8','TKB9','TKB10','TKB11','TKB12','TKB13','TKB14','TKB15',
 	'TKC1','TKC2','TKC3','TKC4','TKC5','TKC6','TKC7','TKC8','TKC9','TKC10'
-]
+]*/
 
-const erc721s = [
+/*const erc721s = [
 	'NFTA','NFTB','NFTC','NFTD','NFTE','NFTF','NFTG','NFTH','NFTI','NFTJ',
 	'NFTK','NFTL','NFTM','NFTN','NFTO','NFTP','NFTQ','NFTR','NFTS','NFTT',
 	'NFTU','NFTV','NFTW','NFTX','NFTY','NFTZ','NFTA1','NFTA2','NFTA3','NFTA4',
 	'NFTA5','NFTA6','NFTA7','NFTA8','NFTA9','NFTB1','NFTB2','NFTB3','NFTB4','NFTB5',
 	'NFTB6','NFTB7','NFTB8','NFTB9','NFTB10','NFTB11','NFTB12','NFTB13','NFTB14','NFTB15',
 	'NFTC1','NFTC2','NFTC3','NFTC4','NFTC5','NFTC6','NFTC7','NFTC8','NFTC9','NFTC10'
-]
+]*/
 
 let account = output = instance = instanceTokenManagement = appr = validatorInstance = ''
 let balance = Erc1155tokenID = 0
 let twitterIds = []
 let account0TwitterId = 99434443434
 let userPortfolios = {}
+let defaultNumberOfERCs = 500
+if (Number.isInteger(process.argv[1])){
+	defaultNumberOfERCs = process.argv[1]
+}
+
+function generateXErcs(numTokensToGenerate, ercType){
+	if(ercType == 20){
+		prefix = 'TK'
+	}else{
+		prefix = 'NFT'
+	}
+
+	let list = []
+	for (let i = 0; i < numTokensToGenerate; i++) {
+		list[i] = prefix + i.toString()
+	}
+	return list
+}
 
 module.exports = function (deployer, network, accounts) {
   const outputPath = '/tmp/'+deployer.network+'-tokenDistro.txt'
@@ -92,7 +110,14 @@ module.exports = function (deployer, network, accounts) {
   //ERC20's
   deployer.then(async () => {
   	let counter = 0
+		let userCounter = 0
+		let erc20s = generateXErcs(defaultNumberOfERCs, 20)
   	for await (token of erc20s){
+
+			if(userCounter > 59){
+				userCounter = 0
+			}
+
       randomTwitterId = (getRandomInt(100000) * getRandomInt(100000) + 99000000000).toString()
   		twitterIds.push(randomTwitterId.toString())
 
@@ -110,11 +135,11 @@ module.exports = function (deployer, network, accounts) {
   		//amount = getRandomInt(1000) * getRandomInt(1000)
 
       res = await validatorInstance.validateCommand(
-  			[account0TwitterId,randomTwitterId,0,(amount/100),getRandomInt(3), counter+1000000],
-  			['Mr.Garrison', twitterUsername, token,'twitter','transfer','','']
+  			[account0TwitterId,twitterIds[userCounter],0,(amount/100),getRandomInt(3), counter+1000000],
+  			['Mr.Garrison', handles[userCounter], token,'twitter','transfer','','']
   		)
   		balance = await instanceCryptoravesToken.balanceOf(userPortfolios[account0TwitterId]['cryptoravesAddress'] , Erc1155tokenID)
-  	    output = 'Account: '+accounts[0]+' Token: '+token+' Token Address: '+instance.address+' Balance: '+ethers.utils.formatUnits(balance.toString(), 18)+' CryptoravesTokenID: '+Erc1155tokenID+"\n"
+  	    output = 'Account: '+accounts[0]+' Token: '+token+' Token Address: '+instance.address+' Balance: '+ethers.utils.formatUnits(balance.toString(), 18)+' CryptoravesTokenID: 0x'+BigInt(Erc1155tokenID).toString(16)+"\n"
   	  	await fs.appendFile(outputPath, output, function (err) {
   	  		console.log(output)
   			if (err) throw err
@@ -159,6 +184,7 @@ module.exports = function (deployer, network, accounts) {
     	console.log('Balance: ', balance.toString())
     	*/
       counter++
+			userCounter++
     }
   })
 
@@ -168,8 +194,13 @@ module.exports = function (deployer, network, accounts) {
   deployer.then(async () => {
   	let tokenID = 0
   	let counter = 0
+		let userCounter = 0
+		let erc721s = generateXErcs(defaultNumberOfERCs, 721)
   	for await (token of erc721s){
 
+			if(userCounter > 59){
+				userCounter = 0
+			}
   		//mint
   		account = ethers.Wallet.createRandom().address
   		await deployer.deploy(ERC721Full, accounts[0], 'Token'+token, token, 'https://source.unsplash.com/random/300x200?sig='+(counter+1))
@@ -181,7 +212,7 @@ module.exports = function (deployer, network, accounts) {
 	    Erc1155tokenID = await instanceTokenManagement.deposit(tokenID, instance.address, 721, true)
 	    Erc1155tokenID = Erc1155tokenID.logs[1]['args']['cryptoravesTokenId'].toString()
 		  balance = await instanceCryptoravesToken.balanceOf(userPortfolios[account0TwitterId]['cryptoravesAddress'] , Erc1155tokenID)
-	    output = 'Account: '+accounts[0]+' Token: '+token+' Token Address: '+instance.address+' Balance: '+balance.toString()+' URI: '+uri+' CryptoravesTokenID: '+Erc1155tokenID+"\n"
+	    output = 'Account: '+accounts[0]+' Token: '+token+' Token Address: '+instance.address+' Balance: '+balance.toString()+' URI: '+uri+' CryptoravesTokenID: 0x'+BigInt(Erc1155tokenID).toString(16)+"\n"
 	    await fs.appendFile(outputPath, output, function (err) {
 	  		console.log(output)
 			  if (err) throw err
@@ -189,12 +220,12 @@ module.exports = function (deployer, network, accounts) {
 
 	  	if(token != 'NFTC10'){ //reserve NFTC10 for lambda_handler testing
 		  	res = await validatorInstance.validateCommand(
-				[account0TwitterId,twitterIds[counter],0,tokenID,0, counter+100],
-				['Mr.Garrison', handles[counter], token,'twitter','transfer','https://sample-imgs.s3.amazonaws.com/mr.garrison.png','']
+				[account0TwitterId,twitterIds[userCounter],0,tokenID,0, counter+100],
+				['Mr.Garrison', handles[userCounter], token,'twitter','transfer','https://sample-imgs.s3.amazonaws.com/mr.garrison.png','']
 			)}
 
-  		balance = await instanceCryptoravesToken.balanceOf(userPortfolios[twitterIds[counter]]['cryptoravesAddress'], Erc1155tokenID)
-  		userPortfolios[twitterIds[counter]]['balances'][Erc1155tokenID.toString()] = {
+  		balance = await instanceCryptoravesToken.balanceOf(userPortfolios[twitterIds[userCounter]]['cryptoravesAddress'], Erc1155tokenID)
+  		userPortfolios[twitterIds[userCounter]]['balances'][Erc1155tokenID.toString()] = {
   			'ticker':token,
   			'tokenId':tokenID,
   	  		'tokenAddress':instance.address,
@@ -210,7 +241,7 @@ module.exports = function (deployer, network, accounts) {
 	    Erc1155tokenID = await instanceTokenManagement.deposit(tokenID, instance.address, 721, true)
 	    Erc1155tokenID = Erc1155tokenID.logs[1]['args']['cryptoravesTokenId'].toString()
 		  balance = await instanceCryptoravesToken.balanceOf(userPortfolios[account0TwitterId]['cryptoravesAddress'] , Erc1155tokenID)
-	    output = 'Account: '+accounts[0]+' Token: '+token+' Token Address: '+instance.address+' Balance: '+balance.toString()+' URI: '+uri+' CryptoravesTokenID: '+Erc1155tokenID+"\n"
+	    output = 'Account: '+accounts[0]+' Token: '+token+' Token Address: '+instance.address+' Balance: '+balance.toString()+' URI: '+uri+' CryptoravesTokenID: 0x'+BigInt(Erc1155tokenID).toString(16)+"\n"
 	    await fs.appendFile(outputPath, output, function (err) {
 	  		console.log(output)
   			if (err) throw err
@@ -225,6 +256,7 @@ module.exports = function (deployer, network, accounts) {
   		}
       tokenID=0
       counter++
+			userCounter++
   	}
   })
 
@@ -251,7 +283,7 @@ module.exports = function (deployer, network, accounts) {
 
   				let _tokenID = userPortfolios[twitterIds[counter]]['balances'][tokenProfile]['tokenId']
   				let _addr = userPortfolios[twitterIds[counter]]['balances'][tokenProfile]['tokenAddress']
-  				if ( counter < 59 && counter % 3 == 0){
+  				if ( counter < defaultNumberOfERCs - 1 && counter % 3 == 0){
   					console.log('Withdraw NFT:', _tokenID, _addr)
   					let res = await instanceTokenManagement.withdrawERC721(_tokenID, _addr, true, {from:accounts[counter+1]})
   				}

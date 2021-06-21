@@ -405,12 +405,12 @@ contract("TokenManagement", async accounts => {
 
   	assert.equal(
   		id20.toString(),
-  		'1701411834604692317316873037158841057280', //3 << 128
+  		'1020847100762815390390123822295304634368', //3 << 128
   		"ERC20 token id lookup failed"
   	)
   	assert.equal(
   		id721.toString(),
-  		'2381976568446569244243622252022377480192', //4 << 128
+  		'1361129467683753853853498429727072845824', //4 << 128
   		"ERC721 token id lookup failed"
   	)
   })
@@ -443,12 +443,13 @@ contract("TokenManagement", async accounts => {
     let res = await instanceTokenManagement.symbolAndEmojiLookupTable('TKX')
     assert.equal(
       res.toString(),
-      '1701411834604692317316873037158841057280', //3 << 128
+      '1020847100762815390390123822295304634368', //3 << 128
       'ERC20 symbol reverse lookup failed'
     )
+
     assert.equal(
       await instanceTokenManagement.symbolAndEmojiLookupTable('TKY'),
-      '2381976568446569244243622252022377480192', //4 << 128
+      '1361129467683753853853498429727072845824', //4 << 128
       'ERC721 symbol reverse lookup failed'
     )
     assert.equal(
@@ -459,7 +460,7 @@ contract("TokenManagement", async accounts => {
     res = await instanceTokenManagement.symbolAndEmojiLookupTable(emoji)
     assert.equal(
       res.toString(),
-      '1701411834604692317316873037158841057280', //2 << 128
+      '1020847100762815390390123822295304634368', //2 << 128
       'ERC20 Emoji reverse lookup failed'
     )
   })

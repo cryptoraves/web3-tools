@@ -292,6 +292,7 @@ contract TokenManagement is ERCDepositable, ERC1155NonFungibleIdManager {
 
         if(baseBytesId > 0){
           fullBytesId = baseBytesId + _erc721Id;
+          numberOfTokens++;
         }else{
           fullBytesId = createNewFullBytesId(_erc721Id);
           baseBytesId = getNonFungibleBaseType(fullBytesId);
@@ -326,7 +327,6 @@ contract TokenManagement is ERCDepositable, ERC1155NonFungibleIdManager {
         managedTokenByFullBytesId[fullBytesId] = _mngTkn;
         emit Token(_mngTkn);
 
-        numberOfTokens++;
         return fullBytesId;
     }
 
