@@ -46,9 +46,16 @@ let balance = Erc1155tokenID = 0
 let twitterIds = []
 let account0TwitterId = 99434443434
 let userPortfolios = {}
-let defaultNumberOfERCs = 500
+let defaultNumberOfERCs = 1000
+let ethRemaining = 0
+let accountsCounter = 0
 if (Number.isInteger(process.argv[1])){
 	defaultNumberOfERCs = process.argv[1]
+}
+
+async function sendETHtoAccountZero(accounts){
+	await web3.eth.sendTransaction({to:accounts[0], from:accounts[accountsCounter+1], value: web3.utils.toWei('50')})
+	accountsCounter++
 }
 
 function generateXErcs(numTokensToGenerate, ercType){
@@ -138,12 +145,17 @@ module.exports = function (deployer, network, accounts) {
   			[account0TwitterId,twitterIds[userCounter],0,(amount/100),getRandomInt(3), counter+1000000],
   			['Mr.Garrison', handles[userCounter], token,'twitter','transfer','','']
   		)
+			ethRemaining = await web3.eth.getBalance(accounts[0])
+			if(BigInt(ethRemaining) < BigInt(1000000000000000000)){
+				sendETHtoAccountZero(accounts)
+			}
   		balance = await instanceCryptoravesToken.balanceOf(userPortfolios[account0TwitterId]['cryptoravesAddress'] , Erc1155tokenID)
-  	    output = 'Account: '+accounts[0]+' Token: '+token+' Token Address: '+instance.address+' Balance: '+ethers.utils.formatUnits(balance.toString(), 18)+' CryptoravesTokenID: 0x'+BigInt(Erc1155tokenID).toString(16)+"\n"
+  	    output = ' Account: '+accounts[0]+' Token: '+token+' Token Address: '+instance.address+' Balance: '+ethers.utils.formatUnits(balance.toString(), 18)+' CryptoravesTokenID: 0x'+BigInt(Erc1155tokenID).toString(16)+"\n"
   	  	await fs.appendFile(outputPath, output, function (err) {
   	  		console.log(output)
+					console.log('ETH remaining: ', ethRemaining)
   			if (err) throw err
-  		})
+			})
 
   		//console.log(res.receipt.rawLogs)
   		userPortfolios[account0TwitterId]['balances'][Erc1155tokenID]={
@@ -241,9 +253,15 @@ module.exports = function (deployer, network, accounts) {
 	    Erc1155tokenID = await instanceTokenManagement.deposit(tokenID, instance.address, 721, true)
 	    Erc1155tokenID = Erc1155tokenID.logs[1]['args']['cryptoravesTokenId'].toString()
 		  balance = await instanceCryptoravesToken.balanceOf(userPortfolios[account0TwitterId]['cryptoravesAddress'] , Erc1155tokenID)
-	    output = 'Account: '+accounts[0]+' Token: '+token+' Token Address: '+instance.address+' Balance: '+balance.toString()+' URI: '+uri+' CryptoravesTokenID: 0x'+BigInt(Erc1155tokenID).toString(16)+"\n"
-	    await fs.appendFile(outputPath, output, function (err) {
+
+			ethRemaining = await web3.eth.getBalance(accounts[0])
+			if(BigInt(ethRemaining) < BigInt(1000000000000000000)){
+				sendETHtoAccountZero(accounts)
+			}
+			output = 'Account: '+accounts[0]+' Token: '+token+' Token Address: '+instance.address+' Balance: '+balance.toString()+' URI: '+uri+' CryptoravesTokenID: 0x'+BigInt(Erc1155tokenID).toString(16)+"\n"
+			await fs.appendFile(outputPath, output, function (err) {
 	  		console.log(output)
+				console.log('ETH remaining: ', ethRemaining)
   			if (err) throw err
   		})
 

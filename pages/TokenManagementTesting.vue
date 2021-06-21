@@ -331,7 +331,7 @@ export default {
 
     await this.initWeb3()
     await this.getBalances()
-
+    console.log(await web3.utils.toWei('1'))
 
   },
   methods: {
