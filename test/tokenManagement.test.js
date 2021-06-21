@@ -49,7 +49,7 @@ contract("TokenManagement", async accounts => {
       ethers.utils.formatBytes32String('test')
     )
 
-    primary_tokenId1155 = await instanceTokenManagement.tokenBaseBytesIdByAddress(accounts[0])
+    primary_tokenId1155 = await instanceTokenManagement.cryptoravesIdByAddress(accounts[0])
     let balance = await instanceCryptoravesToken.balanceOf(accounts[0], primary_tokenId1155)
 
     assert.equal(
@@ -82,7 +82,7 @@ contract("TokenManagement", async accounts => {
     )
 
     let gasUsed = res.receipt.cumulativeGasUsed
-    let tokenId1155 = await instanceTokenManagement.tokenBaseBytesIdByAddress(zeroAddr)
+    let tokenId1155 = await instanceTokenManagement.cryptoravesIdByAddress(zeroAddr)
     let instanceCryptoravesToken = await CryptoravesToken.at(
       await instanceTokenManagement.cryptoravesTokenAddr()
     )
@@ -126,7 +126,7 @@ contract("TokenManagement", async accounts => {
     const txInfo = await web3.eth.getTransaction(res.tx);
   	const gasCost = txInfo.gasPrice * res.receipt.gasUsed
 
-    let tokenId1155 = await instanceTokenManagement.tokenBaseBytesIdByAddress(zeroAddr)
+    let tokenId1155 = await instanceTokenManagement.cryptoravesIdByAddress(zeroAddr)
     let instanceCryptoravesToken = await CryptoravesToken.at(
       await instanceTokenManagement.cryptoravesTokenAddr()
     )
@@ -155,7 +155,7 @@ contract("TokenManagement", async accounts => {
       20, //indicates ERC20
       false
     )
-    let tokenId1155 = await instanceTokenManagement.tokenBaseBytesIdByAddress(erc20Instance.address)
+    let tokenId1155 = await instanceTokenManagement.cryptoravesIdByAddress(erc20Instance.address)
     let instanceCryptoravesToken = await CryptoravesToken.at(
       await instanceTokenManagement.cryptoravesTokenAddr()
     )
@@ -194,7 +194,7 @@ contract("TokenManagement", async accounts => {
       let erc20Instance = await ERC20Full.deployed()
 
       let addressB1 = await instanceTokenManagement.getAddressBySymbol('TKX')
-      let tokenId1155_B = await instanceTokenManagement.tokenBaseBytesIdByAddress(
+      let tokenId1155_B = await instanceTokenManagement.cryptoravesIdByAddress(
         addressB1
       )
 
@@ -227,7 +227,7 @@ contract("TokenManagement", async accounts => {
     	erc20Instance.address,
       false
     )
-    let tokenId1155 = await instanceTokenManagement.tokenBaseBytesIdByAddress(erc20Instance.address)
+    let tokenId1155 = await instanceTokenManagement.cryptoravesIdByAddress(erc20Instance.address)
     let instanceCryptoravesToken = await CryptoravesToken.at(
       await instanceTokenManagement.cryptoravesTokenAddr()
     )
@@ -257,7 +257,7 @@ contract("TokenManagement", async accounts => {
       721, //indicates ERC721
       false
     )
-    let tokenId1155 = await instanceTokenManagement.tokenBaseBytesIdByAddress(erc721Instance.address)
+    let tokenId1155 = await instanceTokenManagement.cryptoravesIdByAddress(erc721Instance.address)
 
     let instanceCryptoravesToken = await CryptoravesToken.at(
       await instanceTokenManagement.cryptoravesTokenAddr()
@@ -288,7 +288,7 @@ contract("TokenManagement", async accounts => {
   it("withdraws ERC721", async () => {
   	let instanceTokenManagement = await TokenManagement.deployed()
     let erc721Instance = await ERC721Full.deployed()
-    let tokenId1155 = await instanceTokenManagement.tokenBaseBytesIdByAddress(erc721Instance.address)
+    let tokenId1155 = await instanceTokenManagement.cryptoravesIdByAddress(erc721Instance.address)
     let instanceCryptoravesToken = await CryptoravesToken.at(
       await instanceTokenManagement.cryptoravesTokenAddr()
     )
@@ -314,7 +314,7 @@ contract("TokenManagement", async accounts => {
     let erc20Instance = await ERC20Full.deployed()
 
     let symbol = await tokenManagementInstance.getSymbol(
-      await tokenManagementInstance.tokenBaseBytesIdByAddress(erc20Instance.address)
+      await tokenManagementInstance.cryptoravesIdByAddress(erc20Instance.address)
     )
     assert.equal(
       symbol,
@@ -322,7 +322,7 @@ contract("TokenManagement", async accounts => {
       'ERC20 symbol does not match'
     )
     symbol = await tokenManagementInstance.getSymbol(
-      await tokenManagementInstance.tokenBaseBytesIdByAddress(erc721Instance.address)
+      await tokenManagementInstance.cryptoravesIdByAddress(erc721Instance.address)
     )
     assert.equal(
       symbol,
@@ -335,7 +335,7 @@ contract("TokenManagement", async accounts => {
     let erc721Instance = await ERC721Full.deployed()
     let erc20Instance = await ERC20Full.deployed()
 
-    let tokenId = await tokenManagementInstance.tokenBaseBytesIdByAddress(erc20Instance.address)
+    let tokenId = await tokenManagementInstance.cryptoravesIdByAddress(erc20Instance.address)
     await tokenManagementInstance.setEmoji(
       tokenId,
       emoji
@@ -377,7 +377,7 @@ contract("TokenManagement", async accounts => {
       let erc20Instance = await ERC20Full.deployed()
       let erc721Instance = await ERC721Full.deployed()
 
-      let tokenId1155 = await instanceTokenManagement.tokenBaseBytesIdByAddress(erc20Instance.address)
+      let tokenId1155 = await instanceTokenManagement.cryptoravesIdByAddress(erc20Instance.address)
       let erc1155TotSupply = await instanceTokenManagement.getTotalSupply(tokenId1155)
       let erc20TotSupply = await erc20Instance.totalSupply()
       assert.equal(
@@ -385,7 +385,7 @@ contract("TokenManagement", async accounts => {
         erc20TotSupply.toString(),
         "ERC20 Total supply doesn't match"
       )
-      tokenId1155 = await instanceTokenManagement.tokenBaseBytesIdByAddress(erc721Instance.address)
+      tokenId1155 = await instanceTokenManagement.cryptoravesIdByAddress(erc721Instance.address)
       erc1155TotSupply = await instanceTokenManagement.getTotalSupply(tokenId1155)
       let erc721TotSupply = await erc721Instance.totalSupply()
       assert.equal(
@@ -400,24 +400,24 @@ contract("TokenManagement", async accounts => {
   	let erc721Instance = await ERC721Full.deployed()
   	let erc20Instance = await ERC20Full.deployed()
 
-  	let id20 = await instanceTokenManagement.tokenBaseBytesIdByAddress(erc20Instance.address)
-  	let id721 = await instanceTokenManagement.tokenBaseBytesIdByAddress(erc721Instance.address)
+  	let id20 = await instanceTokenManagement.cryptoravesIdByAddress(erc20Instance.address)
+  	let id721 = await instanceTokenManagement.cryptoravesIdByAddress(erc721Instance.address)
 
   	assert.equal(
   		id20.toString(),
-  		'1020847100762815390390123822295304634368', //3 << 128
+  		'1701411834604692317316873037158841057280', //3 << 128
   		"ERC20 token id lookup failed"
   	)
   	assert.equal(
   		id721.toString(),
-  		'1361129467683753853853498429727072845824', //4 << 128
+  		'2381976568446569244243622252022377480192', //4 << 128
   		"ERC721 token id lookup failed"
   	)
   })
   it("add managed token to list", async () => {
   	let instanceTokenManagement = await TokenManagement.deployed()
     //let wallet = ethers.Wallet.createRandom()
-  	let id7 = await instanceTokenManagement.tokenBaseBytesIdByAddress(accounts[0])
+  	let id7 = await instanceTokenManagement.cryptoravesIdByAddress(accounts[0])
   	assert.equal(
   		id7.toString(),
   		primary_tokenId1155.toString(),
@@ -443,12 +443,12 @@ contract("TokenManagement", async accounts => {
     let res = await instanceTokenManagement.symbolAndEmojiLookupTable('TKX')
     assert.equal(
       res.toString(),
-      '1020847100762815390390123822295304634368', //3 << 128
+      '1701411834604692317316873037158841057280', //3 << 128
       'ERC20 symbol reverse lookup failed'
     )
     assert.equal(
       await instanceTokenManagement.symbolAndEmojiLookupTable('TKY'),
-      '1361129467683753853853498429727072845824', //4 << 128
+      '2381976568446569244243622252022377480192', //4 << 128
       'ERC721 symbol reverse lookup failed'
     )
     assert.equal(
@@ -459,7 +459,7 @@ contract("TokenManagement", async accounts => {
     res = await instanceTokenManagement.symbolAndEmojiLookupTable(emoji)
     assert.equal(
       res.toString(),
-      '1020847100762815390390123822295304634368', //2 << 128
+      '1701411834604692317316873037158841057280', //2 << 128
       'ERC20 Emoji reverse lookup failed'
     )
   })

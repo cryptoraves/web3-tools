@@ -183,7 +183,7 @@ contract TransactionManagement is AdministrationContract {
             }
 
             require(_addr != address(0), 'Attempt to send a token not deposited into Cryptoraves');
-            uint256 _cryptoravesTokenId = _tokenManagement.tokenBaseBytesIdByAddress(_addr);
+            uint256 _cryptoravesTokenId = _tokenManagement.cryptoravesIdByAddress(_addr);
 
             uint256 _adjustedValue;
 
@@ -316,7 +316,7 @@ contract TransactionManagement is AdministrationContract {
 
         require(_userAccount != address(0), 'User account does not exist');
 
-        return _tokenManagement.tokenBaseBytesIdByAddress(_userAccount);
+        return _tokenManagement.cryptoravesIdByAddress(_userAccount);
     }
 
     function getUserL1AccountFromL2Account(address _l2) public view returns(address) {

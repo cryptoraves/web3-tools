@@ -42,6 +42,14 @@
       <h2 class="subtitle">
         For Testing And Developing Token Management System Through The Oracle
       </h2>
+      <div>
+        <input
+          v-model="searchFoprNFTTickerAndErc721Index"
+          v-on:keyup="searchNFTbyTicker"
+          placeholder="TSTY 0">
+        <p>Ticker Base ID: {{ searchForNFTIdResult }}</p>
+        <p>Ticker Full ID: {{ searchForNFTIdResultFullID }}</p>
+      </div>
     </div>
     <div v-if="ready && !showLoading">
 
@@ -196,7 +204,7 @@
             Deposit Test ERC721 Tokens
           </a>
           <br><a
-            v-if="ERC20FullAddress"
+            v-if="ERC721FullAddress"
             @click="launchERC721()"
             class="button--green"
           >
@@ -273,6 +281,7 @@
           alt >
     </div>
   </div>
+
 </template>
 
 <script>
@@ -285,6 +294,9 @@ export default {
   data() {
     return {
       contractNames: ["CryptoravesToken", "ERC20Full", "TokenManagement", "TransactionManagement", "UserManagement", "ValidatorInterfaceContract"],
+      searchFoprNFTTickerAndErc721Index: 'TSTY 0',
+      searchForNFTIdResult: null,
+      searchForNFTIdResultFullID: null,
       ethereumAddress: null,
       networkType: null,
       errorMsg: null,
@@ -323,6 +335,26 @@ export default {
 
   },
   methods: {
+    async searchNFTbyTicker(e){
+      if (e.keyCode === 13) {
+        try{
+          let tokenManagerContract = this.loadTokenManagementContract()
+          let args = this.searchFoprNFTTickerAndErc721Index.toUpperCase().split(' ')
+          console.log(await tokenManagerContract.cryptoravesIdByAddress(this.ERC721FullAddress))
+          this.searchForNFTIdResult = await tokenManagerContract.symbolAndEmojiLookupTable(args[0])
+          this.searchForNFTIdResult = this.searchForNFTIdResult.toHexString()
+          this.searchForNFTIdResultFullID = await tokenManagerContract.getCryptoravesNFTIDbyTickerAndIndex(args[0], args[1])
+          this.searchForNFTIdResultFullID = this.searchForNFTIdResultFullID.toHexString()
+
+          console.log('Base ID: ', await tokenManagerContract.getNonFungibleBaseType(this.searchForNFTIdResultFullID))
+          console.log('NFT Index: ', await tokenManagerContract.getNonFungibleIndex(this.searchForNFTIdResultFullID))
+          console.log('ERC721 IdByAddress: ', await tokenManagerContract.cryptoravesIdByAddress(this.ERC721FullAddress))
+          console.log('Full Cryptoraves Token Object',await tokenManagerContract.managedTokenByFullBytesId(this.searchForNFTIdResultFullID))
+        }catch(e){
+          console.log(e)
+        }
+      }
+    },
     async offlineSignERC20(){
       if(this.ERC20FullAddress){
         let tokenValue = this.ethers.utils.parseEther((this.ERC20WrappedBalance * 0.1).toString())
@@ -500,7 +532,7 @@ export default {
       //get new contract id
       let tokenManagerContract = this.loadTokenManagementContract()
       let cryptoravesToken = this.loadCryptoravesTokenContract()
-      let ERC1155tokenIdForERC20 = await tokenManagerContract.tokenBaseBytesIdByAddress(this.ERC20FullAddress)
+      let ERC1155tokenIdForERC20 = await tokenManagerContract.cryptoravesIdByAddress(this.ERC20FullAddress)
       this.ERC20WrappedBalance = this.ethers.utils.formatUnits(
         await cryptoravesToken.balanceOf(this.ethereumAddress, ERC1155tokenIdForERC20),
         18
@@ -515,31 +547,34 @@ export default {
 
       let tokenManagerContract = this.loadTokenManagementContract()
       let cryptoravesToken = this.loadCryptoravesTokenContract()
-      let ERC1155tokenIdForERC20 = await tokenManagerContract.tokenBaseBytesIdByAddress(this.ERC20FullAddress)
+      let ERC1155tokenIdForERC20 = await tokenManagerContract.cryptoravesIdByAddress(this.ERC20FullAddress)
       this.ERC20WrappedBalance = this.ethers.utils.formatUnits(
         await cryptoravesToken.balanceOf(this.ethereumAddress, ERC1155tokenIdForERC20),
         18
       )
       this.ERC20WrappedId = ERC1155tokenIdForERC20
 
-      let ERC1155tokenIdForERC721 = await tokenManagerContract.tokenBaseBytesIdByAddress(this.ERC721FullAddress)
+      let ERC1155tokenIdForERC721 = await tokenManagerContract.cryptoravesIdByAddress(this.ERC721FullAddress)
       let held1155s = await this.getAll1155TokensHeld()
       let upperLimit = await tokenManagerContract.getNextBaseId(ERC1155tokenIdForERC721)
-
+      let ERC721WrappedBalance = 0
       let ethAddr = this.ethereumAddress
 
       //pause for matic's RPC limit
       if (this.networkType == 'Matic Testnet'){
         await this.sleep(500)
       }
+      console.log('upper limit: ', upperLimit)
       held1155s.forEach( async function(element) {
+        console.log(element)
         if(element.lt(upperLimit) && element.gte(ERC1155tokenIdForERC721)){
+
           new Promise(resolve => setTimeout(resolve, 250))
-          this.ERC721WrappedBalance++
+          ERC721WrappedBalance++
           console.log(element.toString(), await cryptoravesToken.balanceOf(ethAddr, element))
         }
       })
-
+      this.ERC721WrappedBalance = ERC721WrappedBalance
       this.ERC721WrappedBaseId = ERC1155tokenIdForERC721
 
     },
@@ -587,7 +622,7 @@ export default {
         await this.sleep(1000)
       }
 
-      this.ERC1155tokenIdForERC20 = localStorage.ERC1155tokenIdForERC20 = await tokenManagerContract.tokenBaseBytesIdByAddress(this.ERC20FullAddress)
+      this.ERC1155tokenIdForERC20 = localStorage.ERC1155tokenIdForERC20 = await tokenManagerContract.cryptoravesIdByAddress(this.ERC20FullAddress)
       console.log(this.ERC1155tokenIdForERC20)
       console.log('ERC1155 Token ID: '+this.ERC1155tokenIdForERC20)
 
@@ -613,7 +648,7 @@ export default {
     },
     async setERC20Emoji(){
       let tokenManagerContract = this.loadTokenManagementContract()
-      let id = await tokenManagerContract.tokenBaseBytesIdByAddress(this.ERC20FullAddress)
+      let id = await tokenManagerContract.cryptoravesIdByAddress(this.ERC20FullAddress)
       let res = await tokenManagerContract.setEmoji(id,'🔥')
       console.log('Emoji set', res)
     },
@@ -622,7 +657,7 @@ export default {
       this.showLoading = true
       let cryptoravesTokenContract = this.loadCryptoravesTokenContract()
       let tokenManagerContract = this.loadTokenManagementContract()
-      this.ERC1155tokenIdForERC20 = localStorage.ERC1155tokenIdForERC20 = await tokenManagerContract.tokenBaseBytesIdByAddress(this.ERC20FullAddress)
+      this.ERC1155tokenIdForERC20 = localStorage.ERC1155tokenIdForERC20 = await tokenManagerContract.cryptoravesIdByAddress(this.ERC20FullAddress)
 
       let initialBalance = await cryptoravesTokenContract.balanceOf(this.depositAndSendERC20address, this.ERC1155tokenIdForERC20)
       let tx = await cryptoravesTokenContract.safeTransferFrom(
@@ -686,7 +721,7 @@ export default {
 
       let cryptoravesToken = this.loadCryptoravesTokenContract()
       let tokenManagerContract = this.loadTokenManagementContract()
-      this.ERC721WrappedBaseId = localStorage.ERC721WrappedBaseId = await tokenManagerContract.tokenBaseBytesIdByAddress(this.ERC721FullAddress)
+      this.ERC721WrappedBaseId = localStorage.ERC721WrappedBaseId = await tokenManagerContract.cryptoravesIdByAddress(this.ERC721FullAddress)
 
       let bigNumberBaseId = this.ERC721WrappedBaseId
 
@@ -698,7 +733,7 @@ export default {
       console.log('Depositing first held token (key 0): ', heldTokens[0])
       let appr = await token.approve(this.TokenManagementContractAddress, heldTokens[0]);
 
-      console.log(await tokenManagerContract.tokenBaseBytesIdByAddress('0x9BFa01e0417a9Aec632C8CF59B690c823172759C'))
+      console.log(await tokenManagerContract.cryptoravesIdByAddress(this.ERC721FullAddress))
 
       let tx = await tokenManagerContract.deposit(
         heldTokens[0],
@@ -728,7 +763,7 @@ export default {
     },
     async setERC721Emoji(){
       let tokenManagerContract = this.loadTokenManagementContract()
-      let id = await tokenManagerContract.tokenBaseBytesIdByAddress(this.ERC721FullAddress)
+      let id = await tokenManagerContract.cryptoravesIdByAddress(this.ERC721FullAddress)
       let res = await tokenManagerContract.setEmoji(id,'✨')
     },
     async sendWrappedERC721(){
@@ -736,7 +771,7 @@ export default {
       this.showLoading = true
       let cryptoravesTokenContract = this.loadCryptoravesTokenContract()
       let tokenManagerContract = this.loadTokenManagementContract()
-      let BaseTokenId = localStorage.BaseTokenId = await tokenManagerContract.tokenBaseBytesIdByAddress(this.ERC721FullAddress)
+      let BaseTokenId = localStorage.BaseTokenId = await tokenManagerContract.cryptoravesIdByAddress(this.ERC721FullAddress)
 
       let initialBalance = this.ERC721WrappedBalance
       let held1155s = await this.getAll1155TokensHeld()
@@ -774,7 +809,7 @@ export default {
 
       let tokenManagerContract = this.loadTokenManagementContract()
 
-      this.ERC1155tokenIdForERC721 = localStorage.ERC1155tokenIdForERC721 = await tokenManagerContract.tokenBaseBytesIdByAddress(this.ERC721FullAddress)
+      this.ERC1155tokenIdForERC721 = localStorage.ERC1155tokenIdForERC721 = await tokenManagerContract.cryptoravesIdByAddress(this.ERC721FullAddress)
       console.log(this.depositAndSendERC721address)
       console.log(this.ERC1155tokenIdForERC721.toString())
       let initialBalance = await cryptoravesToken.balanceOf(this.depositAndSendERC721address, this.ERC1155tokenIdForERC721.toString())

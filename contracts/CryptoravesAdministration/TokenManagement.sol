@@ -5,17 +5,43 @@ pragma experimental ABIEncoderV2;
 import "./ERCDepositable.sol";
 import "./CryptoravesToken.sol";
 
-contract TokenManagement is  ERCDepositable {
+contract ERC1155NonFungibleIdManager {
+  // Uses a split bit implementation.
+  // Store the type in the upper 128 bits..
+  uint256 constant TYPE_MASK = uint256(uint128(~0)) << 128;
+
+  // ..and the non-fungible index in the lower 128
+  uint256 constant NF_INDEX_MASK = uint128(~0);
+
+  //Bytes-based token ID scheme
+  uint256 numberOfTokens = 0;
+
+  mapping (uint128 => address) ERC721AddressByBaseId;
+  mapping (uint128 => address) BaseIdByERC721Address;
+
+  function getNonFungibleIndex(uint256 _id) public pure returns(uint256) {
+      return _id & NF_INDEX_MASK;
+  }
+  function getNonFungibleBaseType(uint256 _id) public pure returns(uint256) {
+      return _id & TYPE_MASK;
+  }
+
+  function createNewFullBytesId(uint128 indexNFT) internal returns(uint256) {
+      uint256 baseTokenNFT = numberOfTokens << 128;
+      numberOfTokens++;
+      return baseTokenNFT + indexNFT;
+  }
+}
+
+contract TokenManagement is ERCDepositable, ERC1155NonFungibleIdManager {
 
     using SafeMath for uint256;
     using Address for address;
 
     address public cryptoravesTokenAddr;
 
-    //Bytes-based token ID scheme
-    uint256 numberOfTokens = 0;
     mapping(uint256 =>address) public tokenAddressByFullBytesId;
-    mapping(address =>uint256) public tokenBaseBytesIdByAddress;
+    mapping(address =>uint256) public cryptoravesIdByAddress;
 
     mapping(uint256 => ManagedToken) public managedTokenByFullBytesId;
 
@@ -37,8 +63,7 @@ contract TokenManagement is  ERCDepositable {
         cryptoravesTokenAddr = address(newCryptoravesToken);
 
         //must add fake token to zero spot
-        tokenAddressByFullBytesId[numberOfTokens] = address(this);
-        numberOfTokens++;
+        tokenAddressByFullBytesId[createNewFullBytesId(0)] = address(this);
     }
 
     function setCryptoravesTokenAddress(address newAddr) public onlyAdmin {
@@ -54,19 +79,19 @@ contract TokenManagement is  ERCDepositable {
     */
     function dropCrypto(string memory _twitterHandleFrom, address account, uint256 amount, bytes memory data) public virtual onlyAdmin {
 
-        if(!managedTokenByFullBytesId[tokenBaseBytesIdByAddress[account]].isManagedToken) {
-            tokenBaseBytesIdByAddress[account] = 0;
+        if(!managedTokenByFullBytesId[cryptoravesIdByAddress[account]].isManagedToken) {
+            cryptoravesIdByAddress[account] = 0;
             _addTokenToManagedTokenList(account, 1155, 0);
         }
 
-        uint256 _1155tokenId = tokenBaseBytesIdByAddress[account];
+        uint256 _1155tokenId = cryptoravesIdByAddress[account];
 
         //add username as symbol
         _checkSymbolAddress(_twitterHandleFrom, _1155tokenId);
 
         _mint(account, _1155tokenId, amount, data);
 
-        managedTokenByFullBytesId[tokenBaseBytesIdByAddress[account]].symbol = _twitterHandleFrom;
+        managedTokenByFullBytesId[cryptoravesIdByAddress[account]].symbol = _twitterHandleFrom;
         symbolAndEmojiLookupTable[_twitterHandleFrom] = _1155tokenId;
 
         emit CryptoDropped(account, _1155tokenId);
@@ -89,20 +114,20 @@ contract TokenManagement is  ERCDepositable {
         return _l2Addr;
     }
 
-    function deposit(uint256 _amountOrId, address _tokenAddr, uint _ercType, bool _managedTransfer) public payable returns(uint256){
+    function deposit(uint128 _amountOrId, address _tokenAddr, uint _ercType, bool _managedTransfer) public payable returns(uint256){
 
       address _mintTo = _managedTransfer ? getL2AddressForManagedDeposit() : msg.sender;
       uint256 _1155tokenId;
       uint256 _amount;
       if( _ercType == 721 ){
-          _1155tokenId = tokenBaseBytesIdByAddress[_tokenAddr] + _amountOrId;
+          _1155tokenId = getNonFungibleBaseType(cryptoravesIdByAddress[_tokenAddr]) + _amountOrId;
           if(!managedTokenByFullBytesId[_1155tokenId].isManagedToken){
             _1155tokenId = _addTokenToManagedTokenList(_tokenAddr, _ercType, _amountOrId);
           }
           _depositERC721(_amountOrId, _tokenAddr);
           _amount = 1;
       }else{
-          _1155tokenId = tokenBaseBytesIdByAddress[_tokenAddr];
+          _1155tokenId = cryptoravesIdByAddress[_tokenAddr];
           if(!managedTokenByFullBytesId[_1155tokenId].isManagedToken){
             _1155tokenId = _addTokenToManagedTokenList(_tokenAddr, _ercType, 0);
           }
@@ -123,7 +148,7 @@ contract TokenManagement is  ERCDepositable {
     function withdrawERC20(uint256 _amount, address _tokenAddr, bool _isManagedWithdraw) public payable returns(uint256){
         _withdrawERC20(_amount, _tokenAddr);
 
-        uint256 _1155tokenId = tokenBaseBytesIdByAddress[_tokenAddr];
+        uint256 _1155tokenId = cryptoravesIdByAddress[_tokenAddr];
         address _burnAddr;
         if (_isManagedWithdraw) {
             _burnAddr = getL2AddressForManagedDeposit();
@@ -144,7 +169,7 @@ contract TokenManagement is  ERCDepositable {
     function withdrawERC721(uint256 _tokenERC721Id, address _tokenAddr, bool _isManagedWithdraw) public payable returns(uint256){
         _withdrawERC721(_tokenERC721Id, _tokenAddr);
 
-        uint256 _1155tokenId = tokenBaseBytesIdByAddress[_tokenAddr] + _tokenERC721Id;
+        uint256 _1155tokenId = cryptoravesIdByAddress[_tokenAddr] + _tokenERC721Id;
         address _burnFromAddr;
         if (_isManagedWithdraw) {
             _burnFromAddr = getL2AddressForManagedDeposit();
@@ -173,6 +198,11 @@ contract TokenManagement is  ERCDepositable {
             success := call(txGas, destination, value, add(data, 0x20), mload(data), 0, 0)
         }
     }
+    function getCryptoravesNFTIDbyTickerAndIndex(string memory _ticker, uint128 index) public view returns (uint256){
+      uint256 _fullId = symbolAndEmojiLookupTable[_ticker] + index;
+      require(managedTokenByFullBytesId[_fullId].isManagedToken, 'No result for given cryptoraves ID');
+      return _fullId;
+    }
     function getAddressBySymbol(string memory _symbol) public view returns (address) {
         uint256 _1155tokenBaseBytesId = symbolAndEmojiLookupTable[_symbol];
         return tokenAddressByFullBytesId[_1155tokenBaseBytesId];
@@ -186,6 +216,9 @@ contract TokenManagement is  ERCDepositable {
     }
     function setSymbol(uint256 _1155tokenId, string memory _symbol) public onlyAdmin {
         managedTokenByFullBytesId[_1155tokenId].symbol = _symbol;
+        if(managedTokenByFullBytesId[_1155tokenId].ercType == 721){
+          _1155tokenId = getNonFungibleBaseType(_1155tokenId);
+        }
         symbolAndEmojiLookupTable[_symbol] = _1155tokenId;
     }
     function getEmoji(uint256 _1155tokenId) public view  returns(string memory){
@@ -230,11 +263,11 @@ contract TokenManagement is  ERCDepositable {
     }
 
     function isManagedToken(address _tokenAddr) public view returns(bool) {
-        return managedTokenByFullBytesId[tokenBaseBytesIdByAddress[_tokenAddr]].isManagedToken;
+        return managedTokenByFullBytesId[cryptoravesIdByAddress[_tokenAddr]].isManagedToken;
     }
 
     function setIsManagedToken(address _tokenAddr, bool _state) public onlyAdmin {
-        managedTokenByFullBytesId[tokenBaseBytesIdByAddress[_tokenAddr]].isManagedToken = _state;
+        managedTokenByFullBytesId[cryptoravesIdByAddress[_tokenAddr]].isManagedToken = _state;
     }
 
     function setTokenBrandImgUrl(uint256 _1155tokenId, string memory _url) public onlyAdmin {
@@ -252,12 +285,19 @@ contract TokenManagement is  ERCDepositable {
         return numberOfTokens;
     }
 
-    function _addTokenToManagedTokenList(address _tokenAddr, uint ercType, uint256 _erc721Id) private onlyAdmin returns(uint256){
-        uint baseBytesId = numberOfTokens << 128;
-        uint256 fullBytesId = baseBytesId + _erc721Id;
+    function _addTokenToManagedTokenList(address _tokenAddr, uint ercType, uint128 _erc721Id) private onlyAdmin returns(uint256){
+
+        uint256 fullBytesId;
+        uint baseBytesId = cryptoravesIdByAddress[_tokenAddr];
+
+        if(baseBytesId > 0){
+          fullBytesId = baseBytesId + _erc721Id;
+        }else{
+          fullBytesId = createNewFullBytesId(_erc721Id);
+          baseBytesId = getNonFungibleBaseType(fullBytesId);
+        }
 
         tokenAddressByFullBytesId[fullBytesId] = _tokenAddr;
-
 
         ManagedToken memory _mngTkn;
         if(ercType == 20 || ercType == 721){
@@ -274,8 +314,8 @@ contract TokenManagement is  ERCDepositable {
             //assign symbol of erc1155
         }
         //safety when dealing with ERC721's:
-        if (tokenBaseBytesIdByAddress[_tokenAddr] == 0){
-          tokenBaseBytesIdByAddress[_tokenAddr] = baseBytesId;
+        if (cryptoravesIdByAddress[_tokenAddr] == 0){
+          cryptoravesIdByAddress[_tokenAddr] = baseBytesId;
         }
         symbolAndEmojiLookupTable[_mngTkn.symbol] = baseBytesId;
         _mngTkn.isManagedToken = true;

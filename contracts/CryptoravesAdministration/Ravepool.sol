@@ -5,7 +5,7 @@ import "/home/cartosys/openzeppelin-contracts/contracts/token/ERC1155/ERC1155Bur
 import "./AdministrationContract.sol";
 
 interface CryptoravesTokenManager {
-    function tokenBaseBytesIdByAddress(address _account) external view returns(uint256);
+    function cryptoravesIdByAddress(address _account) external view returns(uint256);
     function getHeldTokenIds(address _addr) external view returns(uint256[] memory);
     function getHeldTokenBalances(address _addr) external view returns(uint256[] memory);
     function safeTransferFrom(address from, address to, uint256 id, uint256 amount, bytes memory data) external;
@@ -67,7 +67,7 @@ contract Ravepool is AdministrationContract {
         address _cryptoravesTokenAddress = ITokenManager(_tokenManager).cryptoravesTokenAddr();
         
         //get personal token Id
-        uint256 _1155tokenId  = CryptoravesTokenManager(_cryptoravesTokenAddress).tokenBaseBytesIdByAddress(address(this));
+        uint256 _1155tokenId  = CryptoravesTokenManager(_cryptoravesTokenAddress).cryptoravesIdByAddress(address(this));
         
         //require sent token to be the designated personal token
         require(_sentTokenId == _1155tokenId, 'Token ID sent to redeemAndBurnViaRavepool doesn\'t match designated burn token ID');

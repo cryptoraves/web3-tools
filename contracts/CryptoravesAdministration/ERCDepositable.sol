@@ -88,7 +88,7 @@ contract ERCDepositable is IERC721Receiver, AdministrationContract {
 }
 
 interface IERCuni is IERC20 {
-    //adding erc721 function for minimilaization of inhereitances
+    //adding erc721 function for reducing inhereitances
     function safeTransferFrom(address from, address to, uint256 tokenId) external;
     function name() external view returns(string memory);
     function symbol() external view returns(string memory);
