@@ -46,7 +46,7 @@ let balance = Erc1155tokenID = 0
 let twitterIds = []
 let account0TwitterId = 99434443434
 let userPortfolios = {}
-let defaultNumberOfERCs = 1000
+let defaultNumberOfERCs = 60 //increase to increase performance test capacity
 let ethRemaining = 0
 let accountsCounter = 0
 if (Number.isInteger(process.argv[1])){
@@ -150,7 +150,7 @@ module.exports = function (deployer, network, accounts) {
 				sendETHtoAccountZero(accounts)
 			}
   		balance = await instanceCryptoravesToken.balanceOf(userPortfolios[account0TwitterId]['cryptoravesAddress'] , Erc1155tokenID)
-  	    output = ' Account: '+accounts[0]+' Token: '+token+' Token Address: '+instance.address+' Balance: '+ethers.utils.formatUnits(balance.toString(), 18)+' CryptoravesTokenID: 0x'+BigInt(Erc1155tokenID).toString(16)+"\n"
+  	    output = 'txHash: '+res.tx+' Account: '+accounts[0]+' Token: '+token+' Token Address: '+instance.address+' Balance: '+ethers.utils.formatUnits(balance.toString(), 18)+' CryptoravesTokenID: 0x'+BigInt(Erc1155tokenID).toString(16)+"\n"
   	  	await fs.appendFile(outputPath, output, function (err) {
   	  		console.log(output)
 					console.log('ETH remaining: ', ethRemaining)
@@ -224,17 +224,20 @@ module.exports = function (deployer, network, accounts) {
 	    Erc1155tokenID = await instanceTokenManagement.deposit(tokenID, instance.address, 721, true)
 	    Erc1155tokenID = Erc1155tokenID.logs[1]['args']['cryptoravesTokenId'].toString()
 		  balance = await instanceCryptoravesToken.balanceOf(userPortfolios[account0TwitterId]['cryptoravesAddress'] , Erc1155tokenID)
-	    output = 'Account: '+accounts[0]+' Token: '+token+' Token Address: '+instance.address+' Balance: '+balance.toString()+' URI: '+uri+' CryptoravesTokenID: 0x'+BigInt(Erc1155tokenID).toString(16)+"\n"
+
+			if(token != 'NFTC10'){ //reserve NFTC10 for lambda_handler testing
+		  	res = await validatorInstance.validateCommand(
+				[account0TwitterId,twitterIds[userCounter],0,tokenID,0, counter+100],
+				['Mr.Garrison', handles[userCounter], token,'twitter','transfer','https://sample-imgs.s3.amazonaws.com/mr.garrison.png','']
+			)}
+
+			output = 'txHash: '+res.tx+' Account: '+accounts[0]+' Token: '+token+' Token Address: '+instance.address+' Balance: '+balance.toString()+' URI: '+uri+' CryptoravesTokenID: 0x'+BigInt(Erc1155tokenID).toString(16)+"\n"
 	    await fs.appendFile(outputPath, output, function (err) {
 	  		console.log(output)
 			  if (err) throw err
 		  })
 
-	  	if(token != 'NFTC10'){ //reserve NFTC10 for lambda_handler testing
-		  	res = await validatorInstance.validateCommand(
-				[account0TwitterId,twitterIds[userCounter],0,tokenID,0, counter+100],
-				['Mr.Garrison', handles[userCounter], token,'twitter','transfer','https://sample-imgs.s3.amazonaws.com/mr.garrison.png','']
-			)}
+
 
   		balance = await instanceCryptoravesToken.balanceOf(userPortfolios[twitterIds[userCounter]]['cryptoravesAddress'], Erc1155tokenID)
   		userPortfolios[twitterIds[userCounter]]['balances'][Erc1155tokenID.toString()] = {
