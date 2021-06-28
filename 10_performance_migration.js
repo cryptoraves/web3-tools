@@ -21,8 +21,6 @@ try{
 }
 
 let handles = JSON.parse(handlesFile)
-
-
 /*const erc20s = [
 	'TKA','TKB','TKC','TKD','TKE','TKF','TKG','TKH','TKI','TKJ',
 	'TKK','TKL','TKM','TKN','TKO','TKP','TKQ','TKR','TKS','TKT',
