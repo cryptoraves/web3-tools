@@ -190,7 +190,7 @@ contract TransactionManagement is AdministrationContract {
             //nft id adjustment
             if(_tokenManagement.getERCtype(_cryptoravesTokenId) == 721){
                 _cryptoravesTokenId = _cryptoravesTokenId + _twitterInts.amountOrId;
-                _adjustedValue = 1;
+                _adjustedValue = _twitterInts.amountOrId;
             }else{
                 uint256 _dec = _twitterInts.decimalPlaceLocation;
                 uint256 _amt = _twitterInts.amountOrId;
