@@ -285,15 +285,15 @@ contract TokenManagement is ERCDepositable, ERC1155NonFungibleIdManager {
         return numberOfTokens;
     }
 
-    function _addTokenToManagedTokenList(address _tokenAddr, uint ercType, uint128 _erc721Id) private onlyAdmin returns(uint256){
+    function _addTokenToManagedTokenList(address _tokenAddr, uint ercType, uint128 _nftIndex) private onlyAdmin returns(uint256){
 
         uint256 fullBytesId;
         uint baseBytesId = cryptoravesIdByAddress[_tokenAddr];
 
         if(baseBytesId > 0){
-          fullBytesId = baseBytesId + _erc721Id;
+          fullBytesId = baseBytesId + _nftIndex;
         }else{
-          fullBytesId = createNewFullBytesId(_erc721Id);
+          fullBytesId = createNewFullBytesId(_nftIndex);
           baseBytesId = getNonFungibleBaseType(fullBytesId);
         }
 
@@ -308,7 +308,7 @@ contract TokenManagement is ERCDepositable, ERC1155NonFungibleIdManager {
             if(ercType == 721){
                 //get baseUrl
                 IERCuni _tkn = IERCuni(_tokenAddr);
-                _mngTkn.tokenBrandImageUrl = _tkn.tokenURI(_erc721Id);
+                _mngTkn.tokenBrandImageUrl = _tkn.tokenURI(_nftIndex);
             }
         } else {
             //assign symbol of erc1155
@@ -320,6 +320,7 @@ contract TokenManagement is ERCDepositable, ERC1155NonFungibleIdManager {
         symbolAndEmojiLookupTable[_mngTkn.symbol] = baseBytesId;
         _mngTkn.isManagedToken = true;
         _mngTkn.ercType = ercType;
+        _mngTkn.nftIndex = _nftIndex;
 
         _mngTkn.cryptoravesTokenId = fullBytesId;
 

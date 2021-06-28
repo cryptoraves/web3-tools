@@ -13,6 +13,7 @@ contract ERCDepositable is IERC721Receiver, AdministrationContract {
         uint256 cryptoravesTokenId;
         bool isManagedToken;
         uint ercType;
+        uint nftIndex;
         uint256 totalSupply;
         string name;
         string symbol;
