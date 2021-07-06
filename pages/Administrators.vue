@@ -560,7 +560,7 @@ export default {
             this.signer
           )
           console.log('setting new downstream address for admin contract') //3
-          tx = await validatorContract.setTransactionManagementAddress(this[contractAddressVariableName])
+          tx = await validatorContract.settransactionManagerAddress(this[contractAddressVariableName])
           await tx.wait()
 
           console.log('unsetting old downstream admins') //4
@@ -603,7 +603,7 @@ export default {
       if(!res){
         console.log('Is correct metamask account being used?')
       }
-      let txnManagerAddress = await contract.getTransactionManagementAddress()
+      let txnManagerAddress = await contract.transactionManagerAddress()
       res = txnManagerAddress==this.TransactionManagementContractAddress
       cumulativeBool = cumulativeBool && res
       console.log('TransactionManager Address Matches:', res)

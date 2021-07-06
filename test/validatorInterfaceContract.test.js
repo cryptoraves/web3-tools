@@ -68,7 +68,7 @@ contract("ValidatorInterfaceContract", async accounts => {
     });
     it("verify transaction manager address is valid", async () => {
       let instance = await ValidatorInterfaceContract.deployed()
-      let txnManagerAddr = await instance.getTransactionManagementAddress()
+      let txnManagerAddr = await instance.transactionManagerAddress()
 
       assert.notEqual('0x0000000000000000000000000000000000000000', txnManagerAddr, "Token Manager Address is zero address")
       assert.lengthOf(
@@ -79,7 +79,7 @@ contract("ValidatorInterfaceContract", async accounts => {
     });
     it("run heresMyAddress", async () => {
       let instance = await ValidatorInterfaceContract.deployed()
-      let txnManagerAddr = await instance.getTransactionManagementAddress()
+      let txnManagerAddr = await instance.transactionManagerAddress()
 
       var bytes = ethers.utils.formatBytes32String('')
 
@@ -92,7 +92,7 @@ contract("ValidatorInterfaceContract", async accounts => {
       )
 
       let instanceTransactionManagement = await TransactionManagement.at(
-        await instance.getTransactionManagementAddress()
+        await instance.transactionManagerAddress()
       )
       let instanceUserManagement = await UserManagement.at(
         await instanceTransactionManagement.getUserManagementAddress()
@@ -106,7 +106,7 @@ contract("ValidatorInterfaceContract", async accounts => {
       let additionalAccount = signerAccount.address
       let instance = await ValidatorInterfaceContract.deployed()
       let instanceTransactionManagement = await TransactionManagement.at(
-        await instance.getTransactionManagementAddress()
+        await instance.transactionManagerAddress()
       )
       // Launch an ERC20 and deposit some to instantiate onto Cryptoraves. Then send some to Twitter user L1
       let instanceTokenManagement = await TokenManagement.at(
@@ -142,7 +142,7 @@ contract("ValidatorInterfaceContract", async accounts => {
 
       let instance = await ValidatorInterfaceContract.deployed()
       let instanceTransactionManagement = await TransactionManagement.at(
-        await instance.getTransactionManagementAddress()
+        await instance.transactionManagerAddress()
       )
       let instanceTokenManagement = await TokenManagement.at(
         await instanceTransactionManagement.getTokenManagementAddress()
@@ -270,7 +270,7 @@ contract("ValidatorInterfaceContract", async accounts => {
       let instance = await ValidatorInterfaceContract.deployed()
 
       let instanceTransactionManagement = await TransactionManagement.at(
-        await instance.getTransactionManagementAddress()
+        await instance.transactionManagerAddress()
       )
       let instanceTokenManagement = await TokenManagement.at(
         await instanceTransactionManagement.getTokenManagementAddress()
@@ -343,12 +343,12 @@ contract("ValidatorInterfaceContract", async accounts => {
         secondTokenManagerAddr = ethers.Wallet.createRandom().address
       }
 
-      let res = await instance.setTransactionManagementAddress(secondTokenManagerAddr)
-      let transactionManagerAddr = await instance.getTransactionManagementAddress()
+      let res = await instance.settransactionManagerAddress(secondTokenManagerAddr)
+      let transactionManagerAddr = await instance.transactionManagerAddress()
       assert.equal(
         transactionManagerAddr,
         secondTokenManagerAddr,
-        "setTransactionManagementAddress failed with random wallet.address as input"
+        "settransactionManagerAddress failed with random wallet.address as input"
       );
     });
   }

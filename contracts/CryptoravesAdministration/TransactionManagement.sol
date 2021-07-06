@@ -36,7 +36,7 @@ contract TransactionManagement is AdministrationContract {
 
     }
     //unique function for identifying this contract
-    function testForTransactionManagementAddressUniquely() public pure returns(bool){
+    function testFortransactionManagerAddressUniquely() public pure returns(bool){
         return true;
     }
 

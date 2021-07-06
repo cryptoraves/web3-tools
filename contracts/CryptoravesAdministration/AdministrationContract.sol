@@ -14,7 +14,7 @@ interface ITransactionManager {
         uint256 tweetId;
     }
     function initCommand(TwitterInts memory, string[] memory) external returns(bool);
-    function testForTransactionManagementAddressUniquely() external pure returns(bool);
+    function testFortransactionManagerAddressUniquely() external pure returns(bool);
     function getUserL1AccountFromL2Account(address) external view returns(address);
     function getUserL2AccountFromL1Account(address) external view returns(address);
     function getTokenManagementAddress() external view returns(address);
@@ -137,13 +137,13 @@ contract AdministrationContract {
                     //first instantiate existing contract
                     ITransactionManager iTxnMgmt = ITransactionManager(_administratorList[i]);
                     //then try to run its function
-                    try iTxnMgmt.testForTransactionManagementAddressUniquely() {
+                    try iTxnMgmt.testFortransactionManagerAddressUniquely() {
                         return _administratorList[i];
                     } catch {}
                 }
             }
         }
 
-        revert('No TransactionManagementAddress found!');
+        revert('No transactionManagerAddress found!');
     }
 }

@@ -10,7 +10,7 @@ import "./AdministrationContract.sol";
 contract ValidatorInterfaceContract is AdministrationContract {
 
     //token manager contract address
-    address private _transactionManager;
+    address public transactionManagerAddress;
 
     //owner is administrator ("validator") by default. Can later revoke self by unsetValidator()
     constructor(address _txnManager) public {
@@ -19,29 +19,21 @@ contract ValidatorInterfaceContract is AdministrationContract {
         setAdministrator(msg.sender);
 
         //set default token manager address
-        setTransactionManagementAddress(_txnManager);
-    }
-
-
-    /*
-    * Get token manager address
-    */
-    function getTransactionManagementAddress() public view onlyAdmin returns(address) {
-        return _transactionManager;
+        settransactionManagerAddress(_txnManager);
     }
 
     /*
     * set token manager address
     * @param newTransactionManager is the address of new Token Manager
     */
-    function setTransactionManagementAddress(address newTransactionManager) public onlyAdmin {
+    function settransactionManagerAddress(address newTransactionManager) public onlyAdmin {
 
-        require(_transactionManager != newTransactionManager);
-        _transactionManager = newTransactionManager;
+        require(transactionManagerAddress != newTransactionManager);
+        transactionManagerAddress = newTransactionManager;
     }
 
     function testDownstreamAdminConfiguration() public view onlyAdmin returns(bool){
-        IDownStream _downstream = IDownStream(getTransactionManagementAddress());
+        IDownStream _downstream = IDownStream(transactionManagerAddress);
         return _downstream.testDownstreamAdminConfiguration();
     }
 
@@ -68,7 +60,7 @@ contract ValidatorInterfaceContract is AdministrationContract {
         string[] memory _twitterStrings
     ) public onlyAdmin {
 
-        ITransactionManager transactionManager = ITransactionManager(_transactionManager);
+        ITransactionManager transactionManager = ITransactionManager(transactionManagerAddress);
 
         transactionManager.initCommand(_twitterInts, _twitterStrings);
         /*
