@@ -14,7 +14,7 @@ const fs = require('fs');
 var handlesFile = ''
 const homedir = require('os').homedir();
 try{
-	handlesFile = fs.readFileSync(homedir+"/token-game/lambda-functions/TwitterEndpointV1/test-data/sampleHandles.json")
+	handlesFile = fs.readFileSync(homedir+"/token-game/lambda-functions/TwitterEndpointV1/test-data/realUserData.json")
 }catch(e){
 	console.log(e)
 	console.log('samplaHandles.json file not found. Be sure token-game is cloned in your HOME dir')
