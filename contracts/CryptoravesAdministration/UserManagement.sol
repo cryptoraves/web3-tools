@@ -143,10 +143,6 @@ contract UserManagement is AdministrationContract {
       return users[_userId].isUser;
     }
 
-    function getUser (uint256 _userId) public view onlyAdmin returns(User memory) {
-      return users[_userId];
-    }
-
     function getUserIdByPlatformHandle (string memory _platformHandle) public view onlyAdmin returns(uint256) {
       return userIDs[_platformHandle];
     }

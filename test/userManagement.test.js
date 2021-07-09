@@ -50,7 +50,7 @@ contract("UserManagement", async accounts => {
 	    	await txnMgmt.getUserManagementAddress()
 	    )
 		let userId = await instance.getUserIdByPlatformHandle(fakeTwitterHandle)
-		let account = await instance.getUser(userId)
+		let account = await instance.getUserStruct(userId)
 
 		assert.equal(
 			account.twitterHandle,
@@ -77,7 +77,7 @@ contract("UserManagement", async accounts => {
 	    let instance = await UserManagement.at(
 	    	await txnMgmt.getUserManagementAddress()
 	    )
-	    let res = await instance.getUser(fakeTwitterId)
+	    let res = await instance.getUserStruct(fakeTwitterId)
 
 	    assert.equal(res.cryptoravesAddress, userAccount, 'User account lookup doesn\'t match')
 	    assert.equal(res.twitterHandle, fakeTwitterHandle, 'User platform handle lookup doesn\'t match')

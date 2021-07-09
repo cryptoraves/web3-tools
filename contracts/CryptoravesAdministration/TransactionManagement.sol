@@ -19,8 +19,8 @@ contract TransactionManagement is AdministrationContract {
         uint256 tweetId;                //tweet ID from twitter
     }
     address public tokenManagementContractAddress;
-    address private _userManagementContractAddress;
-    uint256 private _standardMintAmount = 1000000000000000000000000000; //18-decimal adjusted standard amount (1 billion)
+    address public userManagementContractAddress;
+    uint256 public standardMintAmount = 1000000000000000000000000000; //18-decimal adjusted standard amount (1 billion)
 
     event CryptoravesTransfer(address _from, address _to, uint256 _value, uint256 _cryptoravesTokenId, uint256 _tweetId);
     event HeresMyAddress(address _layer1Address, address _cryptoravesAddress, uint256 _tweetId);
@@ -49,11 +49,11 @@ contract TransactionManagement is AdministrationContract {
     }
 
     function getUserManagementAddress() public view returns(address){
-        return _userManagementContractAddress;
+        return userManagementContractAddress;
     }
 
     function setUserManagementAddress(address _newAddr) public onlyAdmin {
-        _userManagementContractAddress = _newAddr;
+        userManagementContractAddress = _newAddr;
     }
 
     function getCryptoravesTokenAddress() public view returns(address){
@@ -116,7 +116,7 @@ contract TransactionManagement is AdministrationContract {
 
         //map layer 1 account
         else if(keccak256(bytes(_twitterStrings[4])) == keccak256(bytes("mapaccount"))){
-            IUserManager _userManagement = IUserManager(_userManagementContractAddress);
+            IUserManager _userManagement = IUserManager(userManagementContractAddress);
             IUserManager.User memory _userFrom = _userManagement.userAccountCheck(_twitterInts.twitterIdFrom, _twitterStrings[0], _twitterStrings[5]);
             address _layer1Address = AdminToolsLibrary.parseAddr(_twitterStrings[6]);
             require(_layer1Address != address(0), 'Invalid address given for L1 account mapping');
@@ -132,7 +132,7 @@ contract TransactionManagement is AdministrationContract {
 
             _initCryptoDrop(_twitterInts.twitterIdFrom, _twitterStrings[0], _twitterStrings[3]);
 
-             IUserManager _userManagement = IUserManager(_userManagementContractAddress);
+             IUserManager _userManagement = IUserManager(userManagementContractAddress);
             address _userFrom = _userManagement.getUserAccount(_twitterInts.twitterIdFrom);
             _userManagement.mapLayerOneAccount(_userFrom, _layer1Address);
 
@@ -142,7 +142,7 @@ contract TransactionManagement is AdministrationContract {
         //transfers
         else if(keccak256(bytes(_twitterStrings[4])) == keccak256(bytes("transfer"))){
 
-            IUserManager _userManagement = IUserManager(_userManagementContractAddress);
+            IUserManager _userManagement = IUserManager(userManagementContractAddress);
 
             require(_userManagement.isUser(_twitterInts.twitterIdFrom), 'Initiating Twitter user is not a Cryptoraves user');
 
@@ -225,7 +225,7 @@ contract TransactionManagement is AdministrationContract {
         );
 
         //ensure user's address is registered
-        IUserManager _userManagement = IUserManager(_userManagementContractAddress);
+        IUserManager _userManagement = IUserManager(userManagementContractAddress);
         require(_userManagement.getLayerTwoAccount(signerAddress) != address(0), "Offline Transaction Signer Not Registered on Cryptoraves");
 
 
@@ -289,7 +289,7 @@ contract TransactionManagement is AdministrationContract {
 
     function _initCryptoDrop(uint256 _platformUserId, string memory _twitterHandleFrom, string memory _imageUrl) internal returns(address) {
 
-        IUserManager _userManagement = IUserManager(_userManagementContractAddress);
+        IUserManager _userManagement = IUserManager(userManagementContractAddress);
 
         //check if user already dropped
         require(!_userManagement.dropState(_platformUserId), 'User already dropped their crypto.');
@@ -299,7 +299,7 @@ contract TransactionManagement is AdministrationContract {
 
         ITokenManager _tokenManagement = ITokenManager(tokenManagementContractAddress);
 
-        _tokenManagement.dropCrypto(_twitterHandleFrom, _user.cryptoravesAddress, _standardMintAmount, '');
+        _tokenManagement.dropCrypto(_twitterHandleFrom, _user.cryptoravesAddress, standardMintAmount, '');
 
         _userManagement.setDropState(_platformUserId, true);
 
@@ -309,7 +309,7 @@ contract TransactionManagement is AdministrationContract {
 
     function getTokenIdFromPlatformId(uint256 _platformId) public view returns(uint256) {
 
-        IUserManager _userManagement = IUserManager(_userManagementContractAddress);
+        IUserManager _userManagement = IUserManager(userManagementContractAddress);
         ITokenManager _tokenManagement = ITokenManager(tokenManagementContractAddress);
 
         address _userAccount = _userManagement.getUserAccount(_platformId);
@@ -320,12 +320,12 @@ contract TransactionManagement is AdministrationContract {
     }
 
     function getUserL1AccountFromL2Account(address _l2) public view returns(address) {
-        IUserManager _userManagement = IUserManager(_userManagementContractAddress);
+        IUserManager _userManagement = IUserManager(userManagementContractAddress);
         return _userManagement.getLayerOneAccount(_l2);
     }
 
     function getUserL2AccountFromL1Account(address _l1) public view returns(address) {
-        IUserManager _userManagement = IUserManager(_userManagementContractAddress);
+        IUserManager _userManagement = IUserManager(userManagementContractAddress);
         return _userManagement.getLayerTwoAccount(_l1);
     }
 
@@ -343,7 +343,7 @@ contract TransactionManagement is AdministrationContract {
     //End user support features
     function resetTokenDrop(uint256 _platformUserId) public onlyAdmin {
         //reset user's dropState
-        IUserManager _userManagement = IUserManager(_userManagementContractAddress);
+        IUserManager _userManagement = IUserManager(userManagementContractAddress);
         _userManagement.setDropState(_platformUserId, false);
 
         address _acct = _userManagement.getUserAccount(_platformUserId);

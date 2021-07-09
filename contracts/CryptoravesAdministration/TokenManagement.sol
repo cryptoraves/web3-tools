@@ -311,7 +311,16 @@ contract TokenManagement is ERCDepositable, ERC1155NonFungibleIdManager {
                 _mngTkn.tokenBrandImageUrl = _tkn.tokenURI(_nftIndex);
             }
         } else {
-            //assign symbol of erc1155
+              //assign symbol of erc1155
+              ITransactionManager iTxnMgmt = ITransactionManager(getTransactionManagerAddress());
+              _mngTkn.totalSupply = iTxnMgmt.standardMintAmount();
+
+              IUserManager iUserMgmt = IUserManager(iTxnMgmt.getUserManagementAddress());
+              IUserManager.User memory _userStruct = iUserMgmt.getUserStruct(iUserMgmt.getUserId(_tokenAddr));
+              _mngTkn.name = _userStruct.twitterHandle;
+              _mngTkn.symbol = _userStruct.twitterHandle;
+              _mngTkn.decimals = 18;
+              _mngTkn.tokenBrandImageUrl = _userStruct.imageUrl;
         }
         //safety when dealing with ERC721's:
         if (cryptoravesIdByAddress[_tokenAddr] == 0){

@@ -1,6 +1,7 @@
 #!/bin/bash
 
 MIGRATIONFILE=10_performance_migration.js
+MIGRATIONFILENUMBER=10
 
 while [ "$1" != "" ]; do
     case $1 in
@@ -21,7 +22,7 @@ while [ "$1" != "" ]; do
         -r | --redeploymentMigration )
 			shift
             MIGRATIONFILE=11_redeployCryptoravesToken_migration.js
-            print $MIGRATIONFILE
+            MIGRATIONFILENUMBER=11
             ;;
 
     esac
@@ -104,9 +105,9 @@ if [[ -z $BYPASS ]]; then
 	cp ${MIGRATIONFILE} ${HOME}/web3-tools/migrations/
 
 	if [[ -z $NETWORK ]]; then
-		truffle migrate -f 10 --to 10
+		truffle migrate -f $MIGRATIONFILENUMBER --to $MIGRATIONFILENUMBER
 	else
-		truffle migrate -f 10 --to 10 --network $NETWORK
+		truffle migrate -f $MIGRATIONFILENUMBER --to $MIGRATIONFILENUMBER --network $NETWORK
 	fi
 
 	rm ${HOME}/web3-tools/migrations/${MIGRATIONFILE}

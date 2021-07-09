@@ -13,6 +13,7 @@ interface ITransactionManager {
         uint256 decimalPlaceLocation;
         uint256 tweetId;
     }
+    function standardMintAmount() external view returns(uint);
     function initCommand(TwitterInts memory, string[] memory) external returns(bool);
     function testFortransactionManagerAddressUniquely() external pure returns(bool);
     function getUserL1AccountFromL2Account(address) external view returns(address);

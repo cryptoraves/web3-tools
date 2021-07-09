@@ -130,7 +130,7 @@ contract("TransactionManagement", async accounts => {
         await TransactionManagementInstance.getTokenManagementAddress()
       )
 
-      let res = await userManagementInstance.getUser(1029384756);
+      let res = await userManagementInstance.getUserStruct(1029384756);
       let addr = res['cryptoravesAddress']
       res = await userManagementInstance.userHasL1AddressMapped(addr)
       assert.isOk(
@@ -138,7 +138,7 @@ contract("TransactionManagement", async accounts => {
         "L1 Mapped address should exist"
       );
       //set token management contract back to original
-      res = await userManagementInstance.getUser(99434443434);
+      res = await userManagementInstance.getUserStruct(99434443434);
       addr = res['cryptoravesAddress']
       let randoAddr = ethers.Wallet.createRandom().address
       res = await userManagementInstance.userHasL1AddressMapped(addr)
@@ -150,7 +150,7 @@ contract("TransactionManagement", async accounts => {
         [99434443434,0,0,0,0, 1234567895],
         ['rando2', '', '','twitter','mapaccount','https://i.picsum.photos/id/111/200/200.jpg',randoAddr]
       )
-      res = await userManagementInstance.getUser(99434443434);
+      res = await userManagementInstance.getUserStruct(99434443434);
       res = await userManagementInstance.userHasL1AddressMapped(addr)
       assert.isOk(
         res,
@@ -185,7 +185,7 @@ contract("TransactionManagement", async accounts => {
       let userManagementInstance = await UserManagement.at(
         await TransactionManagementInstance.getUserManagementAddress()
       )
-      let user = await userManagementInstance.getUser(fakeUserId)
+      let user = await userManagementInstance.getUserStruct(fakeUserId)
       let tokenId1155_A = await instanceTokenManagement.cryptoravesIdByAddress(
         user.cryptoravesAddress
       )
@@ -212,7 +212,7 @@ contract("TransactionManagement", async accounts => {
       let tokenId1155_B = await instanceTokenManagement.cryptoravesIdByAddress(
         user.cryptoravesAddress
       )
-      user = await userManagementInstance.getUser(fakeUserId2)
+      user = await userManagementInstance.getUserStruct(fakeUserId2)
       assert.notEqual(
         tokenId1155_A,
         tokenId1155_B,
@@ -275,7 +275,7 @@ contract("TransactionManagement", async accounts => {
         'crypto drop'
       )
     //get WalletFull (Ravepool) contract
-    res = await userManagementInstance.getUser(9929387656);
+    res = await userManagementInstance.getUserStruct(9929387656);
     let walletFullAddr = res['account']
     res = await userManagementInstance.userHasL1AddressMapped(walletFullAddr)
     assert.isOk(res, "could not map address for new user")
