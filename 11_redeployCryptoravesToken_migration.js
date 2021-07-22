@@ -66,6 +66,7 @@ module.exports = function (deployer, network, accounts) {
 				let isExport = false
 				if(record['twitterIdFrom']=='LAUNCH' || record['twitterIdFrom']=='IMPORT'){
 					record['twitterIdFrom']=record['twitterIdTo']
+					record['twitterHandleFrom']=record['twitterHandleTo']
 				}
 				if(!record['tweetId']){
 					record['tweetId']=1234567
