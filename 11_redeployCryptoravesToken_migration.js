@@ -15,12 +15,23 @@ const readline = require('readline');
 var res = ''
 var dataFile = ''
 var modLine = ''
+let ethRemaining = 0
+let accountsCounter = 0
+
+//set to false to include personal token drops & transfers
+let cryptoravesTokensOnly = true
+
 const homedir = require('os').homedir();
 try{
 	dataFile = homedir+"/token-game/lambda-functions/TwitterEndpointV1/test-data/realUserData.json"
 }catch(e){
 	console.log(e)
 	console.log('realUserData.json file not found. Be sure token-game is cloned in your HOME dir')
+}
+
+async function sendETHtoAccountZero(accounts){
+	await web3.eth.sendTransaction({to:accounts[0], from:accounts[accountsCounter+1], value: web3.utils.toWei('50')})
+	accountsCounter++
 }
 
 module.exports = function (deployer, network, accounts) {
@@ -94,7 +105,16 @@ module.exports = function (deployer, network, accounts) {
 					mappedAccounts.push(record['L1Address'])
 				}
 
-
+				//cryptoraves tokens only
+				if(cryptoravesTokensOnly){
+					if(record['twitterIdFrom'] == '1054910011795824640' || record['twitterIdThirdParty'] == '1054910011795824640'){
+						//proceed
+					}else{
+						//skip txn
+						continue
+						console.log('Skipping non-$CRYPTORAVES txn')
+					}
+				}
 
 				if(!isExport){
 					try{
@@ -110,6 +130,11 @@ module.exports = function (deployer, network, accounts) {
 					}
 					console.log(res)
 					console.log(counter)
+				}
+
+				ethRemaining = await web3.eth.getBalance(accounts[0])
+				if(BigInt(ethRemaining) < BigInt(1000000000000000000)){
+					sendETHtoAccountZero(accounts)
 				}
 
 				counter++
