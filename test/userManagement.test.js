@@ -14,7 +14,7 @@ contract("UserManagement", async accounts => {
 	it("create an account", async () => {
 		let txnMgmt = await TransactionManagement.deployed()
 	    let instance = await UserManagement.at(
-	    	await txnMgmt.getUserManagementAddress()
+	    	await txnMgmt.userManagementContractAddress()
 	    )
 
 	    let res = await instance.launchL2Account(
@@ -33,7 +33,7 @@ contract("UserManagement", async accounts => {
 	it('check getUserAccount & getUserId functions', async () => {
 		let txnMgmt = await TransactionManagement.deployed()
 	    let instance = await UserManagement.at(
-	    	await txnMgmt.getUserManagementAddress()
+	    	await txnMgmt.userManagementContractAddress()
 	    )
 		let userId = await instance.getUserId(userAccount)
 		let accountCheck = await instance.getUserAccount(userId)
@@ -47,7 +47,7 @@ contract("UserManagement", async accounts => {
 	it('check getUserId from Handle', async () => {
 		let txnMgmt = await TransactionManagement.deployed()
 	    let instance = await UserManagement.at(
-	    	await txnMgmt.getUserManagementAddress()
+	    	await txnMgmt.userManagementContractAddress()
 	    )
 		let userId = await instance.getUserIdByPlatformHandle(fakeTwitterHandle)
 		let account = await instance.getUserStruct(userId)
@@ -61,7 +61,7 @@ contract("UserManagement", async accounts => {
 	it("verify transaction manager address is valid", async () => {
 		let txnMgmt = await TransactionManagement.deployed()
 	    let instance = await UserManagement.at(
-	    	await txnMgmt.getUserManagementAddress()
+	    	await txnMgmt.userManagementContractAddress()
 	    )
 		let transactionManagerAddr = await instance.getTransactionManagerAddress.call()
 
@@ -75,7 +75,7 @@ contract("UserManagement", async accounts => {
 	it('user account check w/ existing user', async () => {
 		let txnMgmt = await TransactionManagement.deployed()
 	    let instance = await UserManagement.at(
-	    	await txnMgmt.getUserManagementAddress()
+	    	await txnMgmt.userManagementContractAddress()
 	    )
 	    let res = await instance.getUserStruct(fakeTwitterId)
 
@@ -88,7 +88,7 @@ contract("UserManagement", async accounts => {
   it("verify sender is admin", async () => {
   	let txnMgmt = await TransactionManagement.deployed()
     let instance = await UserManagement.at(
-	    await txnMgmt.getUserManagementAddress()
+	    await txnMgmt.userManagementContractAddress()
 	)
     let isValidator = await instance.isAdministrator(accounts[0])
     assert.isOk(
@@ -99,7 +99,7 @@ contract("UserManagement", async accounts => {
   it("revert since different sender is not admin", async () => {
   	let txnMgmt = await TransactionManagement.deployed()
     let instance = await UserManagement.at(
-	    await txnMgmt.getUserManagementAddress()
+	    await txnMgmt.userManagementContractAddress()
 	)
     let isValidator
     try{
@@ -113,7 +113,7 @@ contract("UserManagement", async accounts => {
   it("set a new administrator and check it", async () => {
   	let txnMgmt = await TransactionManagement.deployed()
     let instance = await UserManagement.at(
-	    await txnMgmt.getUserManagementAddress()
+	    await txnMgmt.userManagementContractAddress()
 	)
 
     let wallet = ethers.Wallet.createRandom()
@@ -128,7 +128,7 @@ contract("UserManagement", async accounts => {
   it("should UNSET a new administrator and check it", async () => {
   	let txnMgmt = await TransactionManagement.deployed()
     let instance = await UserManagement.at(
-	    await txnMgmt.getUserManagementAddress()
+	    await txnMgmt.userManagementContractAddress()
 	)
 
     let wallet = ethers.Wallet.createRandom()

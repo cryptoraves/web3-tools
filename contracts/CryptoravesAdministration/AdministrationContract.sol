@@ -13,23 +13,18 @@ interface ITransactionManager {
         uint256 decimalPlaceLocation;
         uint256 tweetId;
     }
-    function standardMintAmount() external view returns(uint);
     function initCommand(TwitterInts memory, string[] memory) external returns(bool);
     function testFortransactionManagerAddressUniquely() external pure returns(bool);
-    function getUserL1AccountFromL2Account(address) external view returns(address);
-    function getUserL2AccountFromL1Account(address) external view returns(address);
-    function getTokenManagementAddress() external view returns(address);
-    function getUserManagementAddress() external view returns(address);
-    function getCryptoravesTokenAddress() external view returns(address);
-    function emitTransferFromTokenManagementContract(address,address,uint256,uint256,uint256) external;
+    function tokenManagementContractAddress() external view returns(address);
+    function userManagementContractAddress() external view returns(address);
 }
 
 interface ITokenManager {
+    function standardMintAmount() external view returns(uint);
     function cryptoravesTokenAddr() external view returns(address);
-    function getUserManagementAddress() external view returns(address);
     function getAddressBySymbol(string memory) external view returns(address);
     function cryptoravesIdByAddress(address) external view returns(uint256);
-    function dropCrypto(string memory, address, uint256, bytes memory) external;
+    function dropCrypto(string memory, address, uint256, bytes memory) external returns(uint256);
     function managedTransfer(address, address, uint256, uint256, bytes memory) external;
     function setIsManagedToken(address, bool) external;
     function adjustValueByUnits(uint256, uint256, uint256) external view returns(uint256);
@@ -54,7 +49,7 @@ interface IUserManager {
     function getUserId(address) external view returns(uint256);
     function dropState (uint256) external view returns(bool);
     function userAccountCheck(uint256, string memory, string memory) external returns(User memory);
-    function mapLayerOneAccount(address, address) external;
+    function mapLayerOneAccount(address, address, uint256) external;
     function getUserAccount(uint256) external view returns(address);
     function getUserStruct(uint256) external view returns(User memory);
     function isUser (uint256) external view  returns(bool);

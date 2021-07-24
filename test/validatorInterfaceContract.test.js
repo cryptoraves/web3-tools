@@ -95,7 +95,7 @@ contract("ValidatorInterfaceContract", async accounts => {
         await instance.transactionManagerAddress()
       )
       let instanceUserManagement = await UserManagement.at(
-        await instanceTransactionManagement.getUserManagementAddress()
+        await instanceTransactionManagement.userManagementContractAddress()
       )
 
       let l2Address = await instanceUserManagement.getLayerTwoAccount(additionalAccount)
@@ -110,7 +110,7 @@ contract("ValidatorInterfaceContract", async accounts => {
       )
       // Launch an ERC20 and deposit some to instantiate onto Cryptoraves. Then send some to Twitter user L1
       let instanceTokenManagement = await TokenManagement.at(
-        await instanceTransactionManagement.getTokenManagementAddress()
+        await instanceTransactionManagement.tokenManagementContractAddress()
       )
 
       let erc20Instance = await ERC20Full.deployed()
@@ -145,7 +145,7 @@ contract("ValidatorInterfaceContract", async accounts => {
         await instance.transactionManagerAddress()
       )
       let instanceTokenManagement = await TokenManagement.at(
-        await instanceTransactionManagement.getTokenManagementAddress()
+        await instanceTransactionManagement.tokenManagementContractAddress()
       )
       let erc20Instance = await ERC20Full.deployed()
       let res1 = await erc20Instance.balanceOf(signerAccount.address)
@@ -273,10 +273,10 @@ contract("ValidatorInterfaceContract", async accounts => {
         await instance.transactionManagerAddress()
       )
       let instanceTokenManagement = await TokenManagement.at(
-        await instanceTransactionManagement.getTokenManagementAddress()
+        await instanceTransactionManagement.tokenManagementContractAddress()
       )
       let instanceUserManagement = await UserManagement.at(
-        await instanceTransactionManagement.getUserManagementAddress()
+        await instanceTransactionManagement.userManagementContractAddress()
       )
 
       //generate dummy data

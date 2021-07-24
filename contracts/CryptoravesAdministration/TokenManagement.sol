@@ -15,6 +15,7 @@ contract ERC1155NonFungibleIdManager {
 
   //Bytes-based token ID scheme
   uint256 numberOfTokens = 0;
+  uint256 public standardMintAmount = 1000000000000000000000000000; //18-decimal adjusted standard amount (1 billion)
 
   mapping (uint128 => address) ERC721AddressByBaseId;
   mapping (uint128 => address) BaseIdByERC721Address;
@@ -55,6 +56,7 @@ contract TokenManagement is ERCDepositable, ERC1155NonFungibleIdManager {
     event ImgUrlChange(uint256 cryptoravesTokenId, string _url);
     event DescriptionChange(uint256 cryptoravesTokenId, string _description);
     event CryptoDropped(address user, uint256 tokenId);
+    event CryptoravesTransfer(address _from, address _to, uint256 _value, uint256 _cryptoravesTokenId, uint256 _tweetId);
 
     constructor(string memory _uri) public {
 
@@ -77,7 +79,7 @@ contract TokenManagement is ERCDepositable, ERC1155NonFungibleIdManager {
         This will reduce false account creation attacks, while allowing dapp-only launches
 
     */
-    function dropCrypto(string memory _twitterHandleFrom, address account, uint256 amount, bytes memory data) public virtual onlyAdmin {
+    function dropCrypto(string memory _twitterHandleFrom, address account, uint256 amount, bytes memory data) public virtual onlyAdmin returns(uint256) {
 
         if(!managedTokenByFullBytesId[cryptoravesIdByAddress[account]].isManagedToken) {
             cryptoravesIdByAddress[account] = 0;
@@ -89,12 +91,19 @@ contract TokenManagement is ERCDepositable, ERC1155NonFungibleIdManager {
         //add username as symbol
         _checkSymbolAddress(_twitterHandleFrom, _1155tokenId);
 
+        if(amount == 0){
+          amount = standardMintAmount;
+        }
+
         _mint(account, _1155tokenId, amount, data);
 
         managedTokenByFullBytesId[cryptoravesIdByAddress[account]].symbol = _twitterHandleFrom;
         symbolAndEmojiLookupTable[_twitterHandleFrom] = _1155tokenId;
 
         emit CryptoDropped(account, _1155tokenId);
+        emit CryptoravesTransfer(address(0), account, amount, _1155tokenId, AdminToolsLibrary.bytesToUint256(data));
+
+        return _1155tokenId;
 
     }
 
@@ -107,8 +116,9 @@ contract TokenManagement is ERCDepositable, ERC1155NonFungibleIdManager {
     function getL2AddressForManagedDeposit() private view returns(address){
         //check if existing user:
         ITransactionManager iTxnMgmt = ITransactionManager(getTransactionManagerAddress());
+        IUserManager iUserMgmt = IUserManager(iTxnMgmt.userManagementContractAddress());
         //1. lookup msg.sender's L2 account
-        address _l2Addr = iTxnMgmt.getUserL2AccountFromL1Account(msg.sender);
+        address _l2Addr = iUserMgmt.getLayerTwoAccount(msg.sender);
         //2. require they are mapped to an L2 account
         require(_l2Addr != address(0), 'Depositor/Withdrawer\'s L1 account not mapped to cryptoraves (L2) account');
         return _l2Addr;
@@ -138,8 +148,7 @@ contract TokenManagement is ERCDepositable, ERC1155NonFungibleIdManager {
       _mint(_mintTo, _1155tokenId, _amount, '');
       emit Deposit(_mintTo, _amountOrId, _tokenAddr, _1155tokenId, _ercType);
 
-      ITransactionManager iTxnMgmt = ITransactionManager(getTransactionManagerAddress());
-      iTxnMgmt.emitTransferFromTokenManagementContract(address(0), _mintTo, _amountOrId, _1155tokenId, 0);
+      emit CryptoravesTransfer(address(0), _mintTo, _amountOrId, _1155tokenId, 0);
 
       return _1155tokenId;
     }
@@ -159,8 +168,7 @@ contract TokenManagement is ERCDepositable, ERC1155NonFungibleIdManager {
         _burn(_burnAddr, _1155tokenId, _amount);
         emit Withdraw(_burnAddr, _amount, _tokenAddr, _1155tokenId, 20);
 
-        ITransactionManager iTxnMgmt = ITransactionManager(getTransactionManagerAddress());
-        iTxnMgmt.emitTransferFromTokenManagementContract(_burnAddr, address(0), _amount, _1155tokenId, 0);
+        emit CryptoravesTransfer(_burnAddr, address(0), _amount, _1155tokenId, 0);
 
         return _1155tokenId;
 
@@ -180,8 +188,7 @@ contract TokenManagement is ERCDepositable, ERC1155NonFungibleIdManager {
         _burn(_burnFromAddr, _1155tokenId, 1);
         emit Withdraw(_burnFromAddr, _tokenERC721Id, _tokenAddr, _1155tokenId, 721);
 
-        ITransactionManager iTxnMgmt = ITransactionManager(getTransactionManagerAddress());
-        iTxnMgmt.emitTransferFromTokenManagementContract(_burnFromAddr, address(0), _tokenERC721Id, _1155tokenId, 0);
+        emit CryptoravesTransfer(_burnFromAddr, address(0), _tokenERC721Id, _1155tokenId, 0);
 
         return _1155tokenId;
 
@@ -312,10 +319,10 @@ contract TokenManagement is ERCDepositable, ERC1155NonFungibleIdManager {
             }
         } else {
               //assign symbol of erc1155
-              ITransactionManager iTxnMgmt = ITransactionManager(getTransactionManagerAddress());
-              _mngTkn.totalSupply = iTxnMgmt.standardMintAmount();
+              _mngTkn.totalSupply = standardMintAmount;
 
-              IUserManager iUserMgmt = IUserManager(iTxnMgmt.getUserManagementAddress());
+              ITransactionManager iTxnMgmt = ITransactionManager(getTransactionManagerAddress());
+              IUserManager iUserMgmt = IUserManager(iTxnMgmt.userManagementContractAddress());
               IUserManager.User memory _userStruct = iUserMgmt.getUserStruct(iUserMgmt.getUserId(_tokenAddr));
               _mngTkn.name = _userStruct.twitterHandle;
               _mngTkn.symbol = _userStruct.twitterHandle;
@@ -358,6 +365,7 @@ contract TokenManagement is ERCDepositable, ERC1155NonFungibleIdManager {
     function managedTransfer(address _from, address _to, uint256 _1155tokenId,  uint256 _val, bytes memory _data)  public onlyAdmin {
         CryptoravesToken instanceCryptoravesToken = CryptoravesToken(cryptoravesTokenAddr);
         instanceCryptoravesToken.safeTransferFrom(_from, _to, _1155tokenId, _val, _data);
+        emit CryptoravesTransfer(_from, _to, _val, _1155tokenId, AdminToolsLibrary.bytesToUint256(_data));
     }
 
 

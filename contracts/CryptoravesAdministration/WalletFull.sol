@@ -15,7 +15,6 @@ abstract contract ERC1155Receiver is ERC165, IERC1155Receiver, AdministrationCon
 
 interface IERC1155Mintable {
     function mint() external view returns(address);
-    function getUserManagementAddress() external view returns(address);
 }
 
 contract WalletFull is ERC1155Receiver {
@@ -27,8 +26,9 @@ contract WalletFull is ERC1155Receiver {
 
     constructor(address _txnManagerAddress) public {
 
-        address _cryptoravesTokenAddress = ITransactionManager(_txnManagerAddress).getCryptoravesTokenAddress();
-        address _tokenManagerAddress = ITransactionManager(_txnManagerAddress).getTokenManagementAddress();
+
+        address _tokenManagerAddress = ITransactionManager(_txnManagerAddress).tokenManagementContractAddress();
+        address _cryptoravesTokenAddress = ITokenManager(_tokenManagerAddress).cryptoravesTokenAddr();
         //setManager
         IERC1155(_cryptoravesTokenAddress).setApprovalForAll(_tokenManagerAddress, true);
         _transactionManagerAddress = _txnManagerAddress;

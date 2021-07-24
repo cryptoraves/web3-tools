@@ -23,6 +23,7 @@ contract UserManagement is AdministrationContract {
     event UserData(User);
     event UsernameChange(address _cryptoravesAddress, string _handle);
     event ImageChange(address _cryptoravesAddress, string imageUrl);
+    event HeresMyAddress(address _layer1Address, address _cryptoravesAddress, uint256 _tweetId);
 
     //maps platform user id to User object
     mapping(uint256 => User) public users;
@@ -86,7 +87,7 @@ contract UserManagement is AdministrationContract {
         return user;
     }
 
-    function mapLayerOneAccount(address _l2Addr, address _l1Addr) public onlyAdmin {
+    function mapLayerOneAccount(address _l2Addr, address _l1Addr, uint256 _tweetId) public onlyAdmin {
 
         require(layerOneAccounts[_l2Addr] == address(0), "User already mapped an L1 account");
 
@@ -94,12 +95,15 @@ contract UserManagement is AdministrationContract {
         l2Wallet.setAdministrator(_l1Addr);
 
         //set L1 account as 1155 operator for this wallet
-        address _cryptoravesTokenAddress = ITransactionManager(getTransactionManagerAddress()).getCryptoravesTokenAddress();
+        address _TokenManagerAddress = ITransactionManager(getTransactionManagerAddress()).tokenManagementContractAddress();
+        address _cryptoravesTokenAddress = ITokenManager(_TokenManagerAddress).cryptoravesTokenAddr();
         IERC1155(_cryptoravesTokenAddress).setApprovalForAll(_l1Addr, true);
 
         //set l1 address
         layerOneAccounts[_l2Addr] = _l1Addr;
         layerTwoAccounts[_l1Addr] = _l2Addr;
+
+        emit HeresMyAddress(_l1Addr, _l2Addr, _tweetId);
     }
 
     function getLayerOneAccount(address _l2Addr) public view returns(address){

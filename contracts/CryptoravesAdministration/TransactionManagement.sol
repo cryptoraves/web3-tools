@@ -20,10 +20,6 @@ contract TransactionManagement is AdministrationContract {
     }
     address public tokenManagementContractAddress;
     address public userManagementContractAddress;
-    uint256 public standardMintAmount = 1000000000000000000000000000; //18-decimal adjusted standard amount (1 billion)
-
-    event CryptoravesTransfer(address _from, address _to, uint256 _value, uint256 _cryptoravesTokenId, uint256 _tweetId);
-    event HeresMyAddress(address _layer1Address, address _cryptoravesAddress, uint256 _tweetId);
 
     constructor(address _tokenManagementAddr, address _userManagementAddr) public {
 
@@ -33,32 +29,18 @@ contract TransactionManagement is AdministrationContract {
         setTokenManagementAddress(_tokenManagementAddr);
         setUserManagementAddress(_userManagementAddr);
 
-
     }
     //unique function for identifying this contract
     function testFortransactionManagerAddressUniquely() public pure returns(bool){
         return true;
     }
 
-    function getTokenManagementAddress() public view returns(address) {
-        return tokenManagementContractAddress;
-    }
-
     function setTokenManagementAddress(address _newAddr) public onlyAdmin {
         tokenManagementContractAddress = _newAddr;
     }
 
-    function getUserManagementAddress() public view returns(address){
-        return userManagementContractAddress;
-    }
-
     function setUserManagementAddress(address _newAddr) public onlyAdmin {
         userManagementContractAddress = _newAddr;
-    }
-
-    function getCryptoravesTokenAddress() public view returns(address){
-        ITokenManager _tokenManagement = ITokenManager(tokenManagementContractAddress);
-        return _tokenManagement.cryptoravesTokenAddr();
     }
 
     /*
@@ -111,7 +93,7 @@ contract TransactionManagement is AdministrationContract {
 
         //launch criteria
         if(keccak256(bytes(_twitterStrings[4])) == keccak256(bytes("launch"))){
-            _initCryptoDrop(_twitterInts.twitterIdFrom, _twitterStrings[0], _twitterStrings[5]);
+            _initCryptoDrop(_twitterInts.twitterIdFrom, _twitterStrings[0], _twitterStrings[5], _twitterInts.tweetId);
         }
 
         //map layer 1 account
@@ -120,9 +102,7 @@ contract TransactionManagement is AdministrationContract {
             IUserManager.User memory _userFrom = _userManagement.userAccountCheck(_twitterInts.twitterIdFrom, _twitterStrings[0], _twitterStrings[5]);
             address _layer1Address = AdminToolsLibrary.parseAddr(_twitterStrings[6]);
             require(_layer1Address != address(0), 'Invalid address given for L1 account mapping');
-            _userManagement.mapLayerOneAccount(_userFrom.cryptoravesAddress, _layer1Address);
-
-            emit HeresMyAddress(_layer1Address, _userFrom.cryptoravesAddress, _twitterInts.tweetId);
+            _userManagement.mapLayerOneAccount(_userFrom.cryptoravesAddress, _layer1Address, _twitterInts.tweetId);
         }
 
         //hybrid launch and map
@@ -130,13 +110,11 @@ contract TransactionManagement is AdministrationContract {
             address _layer1Address = AdminToolsLibrary.parseAddr(_twitterStrings[6]);
             require(_layer1Address != address(0), 'Invalid address given for L1 account mapping');
 
-            _initCryptoDrop(_twitterInts.twitterIdFrom, _twitterStrings[0], _twitterStrings[3]);
+            _initCryptoDrop(_twitterInts.twitterIdFrom, _twitterStrings[0], _twitterStrings[3], _twitterInts.tweetId);
 
              IUserManager _userManagement = IUserManager(userManagementContractAddress);
             address _userFrom = _userManagement.getUserAccount(_twitterInts.twitterIdFrom);
-            _userManagement.mapLayerOneAccount(_userFrom, _layer1Address);
-
-            emit HeresMyAddress(_layer1Address, _userFrom,_twitterInts.tweetId);
+            _userManagement.mapLayerOneAccount(_userFrom, _layer1Address, _twitterInts.tweetId);
         }
 
         //transfers
@@ -196,14 +174,9 @@ contract TransactionManagement is AdministrationContract {
                 uint256 _amt = _twitterInts.amountOrId;
                 _adjustedValue = _adjustValueByUnits(_cryptoravesTokenId, _amt, _dec );
             }
+            bytes memory bytesTweetId = abi.encodePacked(_twitterInts.tweetId);
+            _tokenManagement.managedTransfer(_userFrom.cryptoravesAddress, _userTo.cryptoravesAddress, _cryptoravesTokenId, _adjustedValue, bytesTweetId);
 
-            uint i = 0;
-            bytes memory mData = abi.encodePacked(i);
-            _tokenManagement.managedTransfer(_userFrom.cryptoravesAddress, _userTo.cryptoravesAddress, _cryptoravesTokenId, _adjustedValue, mData);
-
-            //TODO: emit platformId and change _from & _to vars to userIds and/or handles on given platform
-            uint256 _tweetId = _twitterInts.tweetId;
-            emit CryptoravesTransfer(_userFrom.cryptoravesAddress, _userTo.cryptoravesAddress, _adjustedValue, _cryptoravesTokenId, _tweetId);
         } else {
           revert("Invalid transaction type provided");
         }
@@ -287,7 +260,7 @@ contract TransactionManagement is AdministrationContract {
         return keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", hash));
     }
 
-    function _initCryptoDrop(uint256 _platformUserId, string memory _twitterHandleFrom, string memory _imageUrl) internal returns(address) {
+    function _initCryptoDrop(uint256 _platformUserId, string memory _twitterHandleFrom, string memory _imageUrl, uint256 _tweetId) internal returns(address) {
 
         IUserManager _userManagement = IUserManager(userManagementContractAddress);
 
@@ -299,7 +272,7 @@ contract TransactionManagement is AdministrationContract {
 
         ITokenManager _tokenManagement = ITokenManager(tokenManagementContractAddress);
 
-        _tokenManagement.dropCrypto(_twitterHandleFrom, _user.cryptoravesAddress, standardMintAmount, '');
+        _tokenManagement.dropCrypto(_twitterHandleFrom, _user.cryptoravesAddress, 0, abi.encodePacked(_tweetId));
 
         _userManagement.setDropState(_platformUserId, true);
 
@@ -319,22 +292,12 @@ contract TransactionManagement is AdministrationContract {
         return _tokenManagement.cryptoravesIdByAddress(_userAccount);
     }
 
-    function getUserL1AccountFromL2Account(address _l2) public view returns(address) {
-        IUserManager _userManagement = IUserManager(userManagementContractAddress);
-        return _userManagement.getLayerOneAccount(_l2);
-    }
-
-    function getUserL2AccountFromL1Account(address _l1) public view returns(address) {
-        IUserManager _userManagement = IUserManager(userManagementContractAddress);
-        return _userManagement.getLayerTwoAccount(_l1);
-    }
-
 
 
     function testDownstreamAdminConfiguration() public view onlyAdmin returns(bool){
         IDownStream _downstream1 = IDownStream(tokenManagementContractAddress);
         bool test1 = _downstream1.testDownstreamAdminConfiguration();
-        IDownStream _downstream2 = IDownStream(getUserManagementAddress());
+        IDownStream _downstream2 = IDownStream(userManagementContractAddress);
         bool test2 = _downstream2.testDownstreamAdminConfiguration();
 
         return test1 && test2;
@@ -359,10 +322,6 @@ contract TransactionManagement is AdministrationContract {
         return _tokenManagement.adjustValueByUnits(_cryptoravesTokenId, _value, _decimalPlace);
     }
 
-    function emitTransferFromTokenManagementContract(address _from, address _to, uint256 _value, uint256 _cryptoravesTokenId, uint256 _tweetId) public {
-      require(msg.sender == tokenManagementContractAddress, 'Not Token Manager Contract. Aborting.');
-      emit CryptoravesTransfer(_from, _to, _value, _cryptoravesTokenId, _tweetId);
-    }
     function _bytesToAddress(bytes memory bys) private pure returns (address addr) {
         assembly {
           addr := mload(add(bys,20))

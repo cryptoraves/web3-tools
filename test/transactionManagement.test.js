@@ -37,10 +37,10 @@ contract("TransactionManagement", async accounts => {
     it("Test username-as-ticker lookup", async () => {
       let TransactionManagementInstance = await TransactionManagement.deployed()
       let userManagementInstance = await UserManagement.at(
-        await TransactionManagementInstance.getUserManagementAddress()
+        await TransactionManagementInstance.userManagementContractAddress()
       )
       let tokenManagementInstance = await TokenManagement.at(
-        await TransactionManagementInstance.getTokenManagementAddress()
+        await TransactionManagementInstance.tokenManagementContractAddress()
       )
       let userId = await userManagementInstance.getUserIdByPlatformHandle('fakeHandleA')
       let account = await userManagementInstance.getUserAccount(userId)
@@ -100,8 +100,8 @@ contract("TransactionManagement", async accounts => {
       }
     })
     it("verify cryptoraves token address is valid", async () => {
-      let instance = await TransactionManagement.deployed()
-      let tokenContractAddr = await instance.getCryptoravesTokenAddress.call()
+      let instance = await TokenManagement.deployed()
+      let tokenContractAddr = await instance.cryptoravesTokenAddr()
 
       assert.notEqual('0x0000000000000000000000000000000000000000', tokenContractAddr, "Token Manager Address is zero address")
       assert.lengthOf(
@@ -112,7 +112,7 @@ contract("TransactionManagement", async accounts => {
     })
     it("verify userManagement contract address is valid", async () => {
       let instance = await TransactionManagement.deployed()
-      let tokenContractAddr = await instance.getUserManagementAddress.call()
+      let tokenContractAddr = await instance.userManagementContractAddress.call()
 
       assert.notEqual('0x0000000000000000000000000000000000000000', tokenContractAddr, "User Manager Address is zero address")
       assert.lengthOf(
@@ -124,10 +124,10 @@ contract("TransactionManagement", async accounts => {
     it("test heresmyaddress functions", async () => {
       let TransactionManagementInstance = await TransactionManagement.deployed()
       let userManagementInstance = await UserManagement.at(
-        await TransactionManagementInstance.getUserManagementAddress()
+        await TransactionManagementInstance.userManagementContractAddress()
       )
       let cTkn = await TokenManagement.at(
-        await TransactionManagementInstance.getTokenManagementAddress()
+        await TransactionManagementInstance.tokenManagementContractAddress()
       )
 
       let res = await userManagementInstance.getUserStruct(1029384756);
@@ -180,10 +180,10 @@ contract("TransactionManagement", async accounts => {
 
       //get original tokenID
       let instanceTokenManagement = await TokenManagement.at(
-          await TransactionManagementInstance.getTokenManagementAddress()
+          await TransactionManagementInstance.tokenManagementContractAddress()
       )
       let userManagementInstance = await UserManagement.at(
-        await TransactionManagementInstance.getUserManagementAddress()
+        await TransactionManagementInstance.userManagementContractAddress()
       )
       let user = await userManagementInstance.getUserStruct(fakeUserId)
       let tokenId1155_A = await instanceTokenManagement.cryptoravesIdByAddress(
@@ -245,7 +245,7 @@ contract("TransactionManagement", async accounts => {
       }
       await instance.setUserManagementAddress(secondUserManagerAddr)
       await instance.setTokenManagementAddress(secondTokenManagerAddr)
-      let userMgmtTokenAddress = await instance.getUserManagementAddress.call()
+      let userMgmtTokenAddress = await instance.userManagementContractAddress.call()
       assert.equal(
         userMgmtTokenAddress,
         secondUserManagerAddr,

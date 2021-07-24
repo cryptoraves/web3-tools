@@ -2,7 +2,7 @@
 pragma solidity 0.6.10;
 
 library AdminToolsLibrary {
-    
+
     //for checking if address is a contract or not
     function _isContract(address _addr) internal view returns (bool){
       uint32 size;
@@ -14,13 +14,23 @@ library AdminToolsLibrary {
     function _stringsMatch (string memory a, string memory b) internal pure returns (bool) {
         return (keccak256(abi.encodePacked((a))) == keccak256(abi.encodePacked((b))) );
     }
-    
+
     //conversion functions
     function stringToBytes( string memory s) public pure returns (bytes memory){
         bytes memory b3 = bytes(s);
         return b3;
     }
-    
+    function bytesToUint256(bytes memory _bytes) internal pure returns (uint256) {
+        require(_bytes.length >= 32, "toUint256_outOfBounds");
+        uint256 tempUint;
+
+        assembly {
+            tempUint := mload(add(add(_bytes, 0x20), 0))
+        }
+
+        return tempUint;
+    }
+
     function parseAddr(string memory _a) public pure returns (address _parsedAddress) {
         bytes memory tmp = bytes(_a);
         uint160 iaddr = 0;

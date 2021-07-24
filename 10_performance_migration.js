@@ -86,7 +86,7 @@ module.exports = function (deployer, network, accounts) {
 		  )
 		  // Launch an ERC20 and deposit some to instantiate onto Cryptoraves. Then send some to Twitter user L1
 		  instanceTokenManagement = await TokenManagement.at(
-		    await instanceTransactionManagement.getTokenManagementAddress()
+		    await instanceTransactionManagement.tokenManagementContractAddress()
 		  )
 
 		  instanceCryptoravesToken = await CryptoravesToken.at(
@@ -94,7 +94,7 @@ module.exports = function (deployer, network, accounts) {
 		  )
 
 		  instanceUserManagement = await UserManagement.at(
-		  	await instanceTransactionManagement.getUserManagementAddress()
+		  	await instanceTransactionManagement.userManagementContractAddress()
 		  )
 
 		  res = await validatorInstance.validateCommand(
