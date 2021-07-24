@@ -65,7 +65,7 @@ contract Ravepool is AdministrationContract {
 
         require(_amountOfPersonalToken > 0, 'Amount must be greater than zero');
 
-        address _cryptoravesTokenAddress = ITokenManager(_tokenManager).cryptoravesTokenAddr();
+        address _cryptoravesTokenAddress = ITokenManager(_tokenManager).cryptoravesTokenAddress();
 
         //get personal token Id
         uint256 _1155tokenId  = CryptoravesTokenManager(_cryptoravesTokenAddress).cryptoravesIdByAddress(address(this));

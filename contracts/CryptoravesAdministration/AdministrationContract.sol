@@ -21,7 +21,7 @@ interface ITransactionManager {
 
 interface ITokenManager {
     function standardMintAmount() external view returns(uint);
-    function cryptoravesTokenAddr() external view returns(address);
+    function cryptoravesTokenAddress() external view returns(address);
     function getAddressBySymbol(string memory) external view returns(address);
     function cryptoravesIdByAddress(address) external view returns(uint256);
     function dropCrypto(string memory, address, uint256, bytes memory) external returns(uint256);

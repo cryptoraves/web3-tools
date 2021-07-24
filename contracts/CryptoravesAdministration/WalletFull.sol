@@ -28,7 +28,7 @@ contract WalletFull is ERC1155Receiver {
 
 
         address _tokenManagerAddress = ITransactionManager(_txnManagerAddress).tokenManagementContractAddress();
-        address _cryptoravesTokenAddress = ITokenManager(_tokenManagerAddress).cryptoravesTokenAddr();
+        address _cryptoravesTokenAddress = ITokenManager(_tokenManagerAddress).cryptoravesTokenAddress();
         //setManager
         IERC1155(_cryptoravesTokenAddress).setApprovalForAll(_tokenManagerAddress, true);
         _transactionManagerAddress = _txnManagerAddress;
@@ -44,22 +44,22 @@ contract WalletFull is ERC1155Receiver {
     }
 /*
     function managedTransfer(address _from, address _to, uint256 _id,  uint256 _val, bytes memory _data) public onlyAdmin {
-        address _cryptoravesTokenAddress = ITokenManager(_transactionManagerAddress).cryptoravesTokenAddr();
+        address _cryptoravesTokenAddress = ITokenManager(_transactionManagerAddress).cryptoravesTokenAddress();
         IERC1155(_cryptoravesTokenAddress).safeTransferFrom(_from, _to, _id, _val, _data);
     }
 
     function managedBatchTransfer(address _from, address _to, uint256[] memory _ids,  uint256[] memory _vals, bytes memory _data) public onlyAdmin {
-        address _cryptoravesTokenAddress = ITokenManager(_transactionManagerAddress).cryptoravesTokenAddr();
+        address _cryptoravesTokenAddress = ITokenManager(_transactionManagerAddress).cryptoravesTokenAddress();
         IERC1155(_cryptoravesTokenAddress).safeBatchTransferFrom(_from, _to, _ids, _vals, _data);
     }
 
     function managedBurn(address account, uint256 id, uint256 amount) public onlyAdmin {
-        address _cryptoravesTokenAddress = ITokenManager(_transactionManagerAddress).cryptoravesTokenAddr();
+        address _cryptoravesTokenAddress = ITokenManager(_transactionManagerAddress).cryptoravesTokenAddress();
         ERC1155Burnable(_cryptoravesTokenAddress).burn(account, id, amount);
     }
 
     function managedBurnBatch(address account, uint256[] memory ids, uint256[] memory amounts) public onlyAdmin {
-        address _cryptoravesTokenAddress = ITokenManager(_transactionManagerAddress).cryptoravesTokenAddr();
+        address _cryptoravesTokenAddress = ITokenManager(_transactionManagerAddress).cryptoravesTokenAddress();
         ERC1155Burnable(_cryptoravesTokenAddress).burnBatch(account, ids, amounts);
     }
 */

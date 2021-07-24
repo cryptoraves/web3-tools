@@ -293,7 +293,7 @@ contract("ValidatorInterfaceContract", async accounts => {
       }
       let primaryUserAccount = await instanceUserManagement.getUserAccount(primaryUserId)
       let instanceCryptoravesToken = await CryptoravesToken.at(
-        await instanceTokenManagement.cryptoravesTokenAddr()
+        await instanceTokenManagement.cryptoravesTokenAddress()
       )
       let heldIds = await instanceCryptoravesToken.getHeldTokenIds(
         primaryUserAccount

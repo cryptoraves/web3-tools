@@ -74,16 +74,6 @@ contract("TransactionManagement", async accounts => {
       )
       assert.isOk(res.receipt['status'], 'Transfer to rando3 failed')
     });
-    it("get token from twitter id", async () => {
-      let instance = await TransactionManagement.deployed()
-      let tokenId = await instance.getTokenIdFromPlatformId.call(1029388888)
-  //WARNING Zero is returned if no tokenId exists. Must fix??
-      assert.isAbove(
-        tokenId.toString().length,
-        1,
-        "Token ID not valid: "+tokenId.toString()
-      )
-    })
 
     	/*
   	* Begin UserManager Portion
@@ -101,7 +91,7 @@ contract("TransactionManagement", async accounts => {
     })
     it("verify cryptoraves token address is valid", async () => {
       let instance = await TokenManagement.deployed()
-      let tokenContractAddr = await instance.cryptoravesTokenAddr()
+      let tokenContractAddr = await instance.cryptoravesTokenAddress()
 
       assert.notEqual('0x0000000000000000000000000000000000000000', tokenContractAddr, "Token Manager Address is zero address")
       assert.lengthOf(
@@ -206,7 +196,7 @@ contract("TransactionManagement", async accounts => {
       )
       //6. check new balance.
       let instanceCryptoravesToken = await CryptoravesToken.at(
-        await instanceTokenManagement.cryptoravesTokenAddr()
+        await instanceTokenManagement.cryptoravesTokenAddress()
       )
 
       let tokenId1155_B = await instanceTokenManagement.cryptoravesIdByAddress(

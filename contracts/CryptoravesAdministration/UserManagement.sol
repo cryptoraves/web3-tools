@@ -49,9 +49,19 @@ contract UserManagement is AdministrationContract {
         return userAccounts[_account];
     }
 
+
+
     function getUserAccount(uint256 _platformUserId) public view returns(address) {
         return users[_platformUserId].cryptoravesAddress;
     }
+    function isUser (uint256 _userId) public view onlyAdmin returns(bool) {
+      return users[_userId].isUser;
+    }
+    function dropState (uint256 _platformUserId) public view returns(bool) {
+        // can we pull from a Chainlink mapping?
+        return users[_platformUserId].dropped;
+    }
+
 
     function getUserStruct(uint256 _platformUserId) public view returns(User memory) {
         return users[_platformUserId];
@@ -96,7 +106,7 @@ contract UserManagement is AdministrationContract {
 
         //set L1 account as 1155 operator for this wallet
         address _TokenManagerAddress = ITransactionManager(getTransactionManagerAddress()).tokenManagementContractAddress();
-        address _cryptoravesTokenAddress = ITokenManager(_TokenManagerAddress).cryptoravesTokenAddr();
+        address _cryptoravesTokenAddress = ITokenManager(_TokenManagerAddress).cryptoravesTokenAddress();
         IERC1155(_cryptoravesTokenAddress).setApprovalForAll(_l1Addr, true);
 
         //set l1 address
@@ -143,17 +153,8 @@ contract UserManagement is AdministrationContract {
         return _l1 != address(0);
     }
 
-    function isUser (uint256 _userId) public view onlyAdmin returns(bool) {
-      return users[_userId].isUser;
-    }
-
     function getUserIdByPlatformHandle (string memory _platformHandle) public view onlyAdmin returns(uint256) {
       return userIDs[_platformHandle];
-    }
-
-    function dropState (uint256 _platformUserId) public view returns(bool) {
-        // can we pull from a Chainlink mapping?
-        return users[_platformUserId].dropped;
     }
 
     //user service function: for resetting dropstate upon request

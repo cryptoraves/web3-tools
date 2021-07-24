@@ -39,7 +39,7 @@ contract TokenManagement is ERCDepositable, ERC1155NonFungibleIdManager {
     using SafeMath for uint256;
     using Address for address;
 
-    address public cryptoravesTokenAddr;
+    address public cryptoravesTokenAddress;
 
     mapping(uint256 =>address) public tokenAddressByFullBytesId;
     mapping(address =>uint256) public cryptoravesIdByAddress;
@@ -59,25 +59,22 @@ contract TokenManagement is ERCDepositable, ERC1155NonFungibleIdManager {
     event CryptoravesTransfer(address _from, address _to, uint256 _value, uint256 _cryptoravesTokenId, uint256 _tweetId);
 
     constructor(string memory _uri) public {
-
         setAdministrator(msg.sender);
         CryptoravesToken newCryptoravesToken = new CryptoravesToken(_uri);
-        cryptoravesTokenAddr = address(newCryptoravesToken);
+        cryptoravesTokenAddress = address(newCryptoravesToken);
 
         //must add fake token to zero spot
         tokenAddressByFullBytesId[createNewFullBytesId(0)] = address(this);
     }
 
     function setCryptoravesTokenAddress(address newAddr) public onlyAdmin {
-        cryptoravesTokenAddr = newAddr;
+        cryptoravesTokenAddress = newAddr;
     }
 
     /*
         Soleley for DropMyCrypto function. As it designates each new token as non-3rd party
-
         Turn this public and make it free if through social media.   Charge fee if not.
         This will reduce false account creation attacks, while allowing dapp-only launches
-
     */
     function dropCrypto(string memory _twitterHandleFrom, address account, uint256 amount, bytes memory data) public virtual onlyAdmin returns(uint256) {
 
@@ -104,7 +101,6 @@ contract TokenManagement is ERCDepositable, ERC1155NonFungibleIdManager {
         emit CryptoravesTransfer(address(0), account, amount, _1155tokenId, AdminToolsLibrary.bytesToUint256(data));
 
         return _1155tokenId;
-
     }
 
     function _checkSymbolAddress(string memory _sym, uint256 _tokenBaseBytesId) internal {
@@ -113,6 +109,7 @@ contract TokenManagement is ERCDepositable, ERC1155NonFungibleIdManager {
             symbolAndEmojiLookupTable[_sym] = _tokenBaseBytesId;
         }
     }
+
     function getL2AddressForManagedDeposit() private view returns(address){
         //check if existing user:
         ITransactionManager iTxnMgmt = ITransactionManager(getTransactionManagerAddress());
@@ -125,7 +122,6 @@ contract TokenManagement is ERCDepositable, ERC1155NonFungibleIdManager {
     }
 
     function deposit(uint128 _amountOrId, address _tokenAddr, uint _ercType, bool _managedTransfer) public payable returns(uint256){
-
       address _mintTo = _managedTransfer ? getL2AddressForManagedDeposit() : msg.sender;
       uint256 _1155tokenId;
       uint256 _amount;
@@ -147,12 +143,10 @@ contract TokenManagement is ERCDepositable, ERC1155NonFungibleIdManager {
 
       _mint(_mintTo, _1155tokenId, _amount, '');
       emit Deposit(_mintTo, _amountOrId, _tokenAddr, _1155tokenId, _ercType);
-
       emit CryptoravesTransfer(address(0), _mintTo, _amountOrId, _1155tokenId, 0);
 
       return _1155tokenId;
     }
-
 
     function withdrawERC20(uint256 _amount, address _tokenAddr, bool _isManagedWithdraw) public payable returns(uint256){
         _withdrawERC20(_amount, _tokenAddr);
@@ -167,7 +161,6 @@ contract TokenManagement is ERCDepositable, ERC1155NonFungibleIdManager {
 
         _burn(_burnAddr, _1155tokenId, _amount);
         emit Withdraw(_burnAddr, _amount, _tokenAddr, _1155tokenId, 20);
-
         emit CryptoravesTransfer(_burnAddr, address(0), _amount, _1155tokenId, 0);
 
         return _1155tokenId;
@@ -187,40 +180,44 @@ contract TokenManagement is ERCDepositable, ERC1155NonFungibleIdManager {
 
         _burn(_burnFromAddr, _1155tokenId, 1);
         emit Withdraw(_burnFromAddr, _tokenERC721Id, _tokenAddr, _1155tokenId, 721);
-
         emit CryptoravesTransfer(_burnFromAddr, address(0), _tokenERC721Id, _1155tokenId, 0);
 
         return _1155tokenId;
 
     }
-    /*
-    * executes deposit and withdraw functions via proxy. Thus eliminating Wallet Software adjustments for L2. See  https://github.com/uport-project/uport-identity/blob/develop/contracts/Proxy.sol
-    * @param destination = Cryptoraves User Account Address
-    * @param value = Ether value of transaction. Should be zero?
-    * @param data = Data payload of transaction
-    */
-    function proxyDepositWithdraw(address destination, uint value, bytes memory data) public onlyAdmin returns (bool success){
-        uint txGas = 0;
-        assembly {
-            success := call(txGas, destination, value, add(data, 0x20), mload(data), 0, 0)
-        }
-    }
+
     function getCryptoravesNFTIDbyTickerAndIndex(string memory _ticker, uint128 index) public view returns (uint256){
       uint256 _fullId = symbolAndEmojiLookupTable[_ticker] + index;
       require(managedTokenByFullBytesId[_fullId].isManagedToken, 'No result for given cryptoraves ID');
       return _fullId;
     }
+
     function getAddressBySymbol(string memory _symbol) public view returns (address) {
         uint256 _1155tokenBaseBytesId = symbolAndEmojiLookupTable[_symbol];
         return tokenAddressByFullBytesId[_1155tokenBaseBytesId];
     }
+
+
+
     function getTotalSupply(uint256 _1155tokenId) public view  returns(uint256){
         return managedTokenByFullBytesId[_1155tokenId].totalSupply;
     }
-
     function getSymbol(uint256 _1155tokenId) public view  returns(string memory){
         return managedTokenByFullBytesId[_1155tokenId].symbol;
     }
+    function getEmoji(uint256 _1155tokenId) public view  returns(string memory){
+        return managedTokenByFullBytesId[_1155tokenId].emoji;
+    }
+    function getERCtype(uint256 _1155tokenId) public view  returns(uint){
+        return managedTokenByFullBytesId[_1155tokenId].ercType;
+    }
+    function isManagedToken(address _tokenAddr) public view returns(bool) {
+        return managedTokenByFullBytesId[cryptoravesIdByAddress[_tokenAddr]].isManagedToken;
+    }
+
+
+
+
     function setSymbol(uint256 _1155tokenId, string memory _symbol) public onlyAdmin {
         managedTokenByFullBytesId[_1155tokenId].symbol = _symbol;
         if(managedTokenByFullBytesId[_1155tokenId].ercType == 721){
@@ -228,9 +225,7 @@ contract TokenManagement is ERCDepositable, ERC1155NonFungibleIdManager {
         }
         symbolAndEmojiLookupTable[_symbol] = _1155tokenId;
     }
-    function getEmoji(uint256 _1155tokenId) public view  returns(string memory){
-        return managedTokenByFullBytesId[_1155tokenId].emoji;
-    }
+
     function setEmoji(uint256 _1155tokenId, string memory _emoji) public onlyAdmin {
         require(managedTokenByFullBytesId[_1155tokenId].ercType != 721, "Cannot set emoji for NFTs");
         managedTokenByFullBytesId[_1155tokenId].emoji = _emoji;
@@ -238,13 +233,10 @@ contract TokenManagement is ERCDepositable, ERC1155NonFungibleIdManager {
         emit Emoji(_1155tokenId, _emoji);
     }
 
-    function getERCtype(uint256 _1155tokenId) public view  returns(uint){
-        return managedTokenByFullBytesId[_1155tokenId].ercType;
-    }
-
     function getNextBaseId(uint256 _1155tokenId) public pure returns(uint256){
         return ((_1155tokenId >> 128) + 1) << 128;
     }
+
     //for adjusting incoming human-typed values to smart contract uint values
     function adjustValueByUnits(uint256 _1155tokenId, uint256 _value, uint256 _decimalPlace) public view onlyAdmin returns(uint256){
         address _tokenAddr = tokenAddressByFullBytesId[_1155tokenId];
@@ -256,9 +248,7 @@ contract TokenManagement is ERCDepositable, ERC1155NonFungibleIdManager {
         if(_tknData.ercType == 20){
             //check decimals value
             IERCuni _token = IERCuni(_tokenAddr);
-
             uint256 decimals = _token.decimals() - _decimalPlace;
-
             return _value * 10**decimals;
         }
 
@@ -267,10 +257,6 @@ contract TokenManagement is ERCDepositable, ERC1155NonFungibleIdManager {
 
     function subtractFromTotalSupply(uint256 _1155tokenId, uint256 _amount) public onlyAdmin {
         managedTokenByFullBytesId[_1155tokenId].totalSupply = managedTokenByFullBytesId[_1155tokenId].totalSupply - _amount;
-    }
-
-    function isManagedToken(address _tokenAddr) public view returns(bool) {
-        return managedTokenByFullBytesId[cryptoravesIdByAddress[_tokenAddr]].isManagedToken;
     }
 
     function setIsManagedToken(address _tokenAddr, bool _state) public onlyAdmin {
@@ -282,6 +268,7 @@ contract TokenManagement is ERCDepositable, ERC1155NonFungibleIdManager {
         managedTokenByFullBytesId[_1155tokenId].tokenBrandImageUrl = _url;
         emit ImgUrlChange(_1155tokenId, _url);
     }
+
     function setTokenDescription(uint256 _1155tokenId, string memory _description) public onlyAdmin {
         require(managedTokenByFullBytesId[_1155tokenId].isManagedToken, 'Cannot set description url for non managed token');
         managedTokenByFullBytesId[_1155tokenId].tokenDescription = _description;
@@ -347,30 +334,23 @@ contract TokenManagement is ERCDepositable, ERC1155NonFungibleIdManager {
     }
 
     function _mint( address account, uint256 _1155tokenId, uint256 amount, bytes memory data) private {
-        CryptoravesToken instanceCryptoravesToken = CryptoravesToken(cryptoravesTokenAddr);
+        CryptoravesToken instanceCryptoravesToken = CryptoravesToken(cryptoravesTokenAddress);
         instanceCryptoravesToken.mint(account, _1155tokenId, amount, data);
     }
 
     function _burn( address account, uint256 _1155tokenId, uint256 amount) private {
-        CryptoravesToken instanceCryptoravesToken = CryptoravesToken(cryptoravesTokenAddr);
+        CryptoravesToken instanceCryptoravesToken = CryptoravesToken(cryptoravesTokenAddress);
         instanceCryptoravesToken.burn(account, _1155tokenId, amount);
     }
 
-    /*****************************tokenId mgmt*************************
-     *
-     *
-     *
-     */
-
     function managedTransfer(address _from, address _to, uint256 _1155tokenId,  uint256 _val, bytes memory _data)  public onlyAdmin {
-        CryptoravesToken instanceCryptoravesToken = CryptoravesToken(cryptoravesTokenAddr);
+        CryptoravesToken instanceCryptoravesToken = CryptoravesToken(cryptoravesTokenAddress);
         instanceCryptoravesToken.safeTransferFrom(_from, _to, _1155tokenId, _val, _data);
         emit CryptoravesTransfer(_from, _to, _val, _1155tokenId, AdminToolsLibrary.bytesToUint256(_data));
     }
 
-
     function testDownstreamAdminConfiguration() public view onlyAdmin returns(bool){
-        IDownStream _downstream = IDownStream(cryptoravesTokenAddr);
+        IDownStream _downstream = IDownStream(cryptoravesTokenAddress);
         return _downstream.testDownstreamAdminConfiguration();
     }
 }

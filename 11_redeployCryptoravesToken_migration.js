@@ -47,7 +47,7 @@ module.exports = function (deployer, network, accounts) {
 		  )
 
 		  instanceCryptoravesToken = await CryptoravesToken.at(
-		  	await instanceTokenManagement.cryptoravesTokenAddr()
+		  	await instanceTokenManagement.cryptoravesTokenAddress()
 		  )
 
 		  instanceUserManagement = await UserManagement.at(

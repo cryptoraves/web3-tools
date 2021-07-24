@@ -37,7 +37,7 @@ contract("TokenManagement", async accounts => {
   it("Drop 1 billion to admin", async () => {
     let instanceTokenManagement = await TokenManagement.deployed()
     let instanceCryptoravesToken = await CryptoravesToken.at(
-      await instanceTokenManagement.cryptoravesTokenAddr()
+      await instanceTokenManagement.cryptoravesTokenAddress()
     )
 
     let amount = ethers.utils.parseUnits('1000000000',18).toString()
@@ -84,7 +84,7 @@ contract("TokenManagement", async accounts => {
     let gasUsed = res.receipt.cumulativeGasUsed
     let tokenId1155 = await instanceTokenManagement.cryptoravesIdByAddress(zeroAddr)
     let instanceCryptoravesToken = await CryptoravesToken.at(
-      await instanceTokenManagement.cryptoravesTokenAddr()
+      await instanceTokenManagement.cryptoravesTokenAddress()
     )
     let balance = await instanceCryptoravesToken.balanceOf(accounts[0], tokenId1155)
     let finalEthBalance = await web3.eth.getBalance(accounts[0]);
@@ -128,7 +128,7 @@ contract("TokenManagement", async accounts => {
 
     let tokenId1155 = await instanceTokenManagement.cryptoravesIdByAddress(zeroAddr)
     let instanceCryptoravesToken = await CryptoravesToken.at(
-      await instanceTokenManagement.cryptoravesTokenAddr()
+      await instanceTokenManagement.cryptoravesTokenAddress()
     )
     let balance = await instanceCryptoravesToken.balanceOf(accounts[0], tokenId1155)
 
@@ -157,7 +157,7 @@ contract("TokenManagement", async accounts => {
     )
     let tokenId1155 = await instanceTokenManagement.cryptoravesIdByAddress(erc20Instance.address)
     let instanceCryptoravesToken = await CryptoravesToken.at(
-      await instanceTokenManagement.cryptoravesTokenAddr()
+      await instanceTokenManagement.cryptoravesTokenAddress()
     )
     let balance = await instanceCryptoravesToken.balanceOf(accounts[0], tokenId1155)
     assert.equal(
@@ -229,7 +229,7 @@ contract("TokenManagement", async accounts => {
     )
     let tokenId1155 = await instanceTokenManagement.cryptoravesIdByAddress(erc20Instance.address)
     let instanceCryptoravesToken = await CryptoravesToken.at(
-      await instanceTokenManagement.cryptoravesTokenAddr()
+      await instanceTokenManagement.cryptoravesTokenAddress()
     )
     let balance = await instanceCryptoravesToken.balanceOf(accounts[0], tokenId1155)
     assert.equal(
@@ -260,7 +260,7 @@ contract("TokenManagement", async accounts => {
     let tokenId1155 = await instanceTokenManagement.cryptoravesIdByAddress(erc721Instance.address)
 
     let instanceCryptoravesToken = await CryptoravesToken.at(
-      await instanceTokenManagement.cryptoravesTokenAddr()
+      await instanceTokenManagement.cryptoravesTokenAddress()
     )
 
     let balance = await instanceCryptoravesToken.balanceOf(accounts[0], tokenId1155)
@@ -290,7 +290,7 @@ contract("TokenManagement", async accounts => {
     let erc721Instance = await ERC721Full.deployed()
     let tokenId1155 = await instanceTokenManagement.cryptoravesIdByAddress(erc721Instance.address)
     let instanceCryptoravesToken = await CryptoravesToken.at(
-      await instanceTokenManagement.cryptoravesTokenAddr()
+      await instanceTokenManagement.cryptoravesTokenAddress()
     )
     let balance1 = await instanceCryptoravesToken.balanceOf(accounts[0], tokenId1155)
 
@@ -352,7 +352,7 @@ contract("TokenManagement", async accounts => {
   it("set new uri", async () => {
     let tokenManagementInstance = await TokenManagement.deployed()
     let instanceCryptoravesToken = await CryptoravesToken.at(
-      await tokenManagementInstance.cryptoravesTokenAddr()
+      await tokenManagementInstance.cryptoravesTokenAddress()
     )
 
     let newUri = 'data:application/json;charset=utf-8;base64,ew0KCSJuYW1lIjogIkFzc2V0IE5hbWUiLA0KCSJkZXNjcmlwdGlvbiI6ICJMb3JlbSBpcHN1bS4uLiIsDQoJImltYWdlIjogImh0dHBzOi8vczMuYW1hem9uYXdzLmNvbS95b3VyLWJ1Y2tldC9pbWFnZXMve2lkfS5wbmciLA0KCSJwcm9wZXJ0aWVzIjogew0KCQkic2ltcGxlX3Byb3BlcnR5IjogImV4YW1wbGUgdmFsdWUiLA0KCQkicmljaF9wcm9wZXJ0eSI6IHsNCgkJCSJuYW1lIjogIk5hbWUiLA0KCQkJInZhbHVlIjogIjEyMyIsDQoJCQkiZGlzcGxheV92YWx1ZSI6ICIxMjMgRXhhbXBsZSBWYWx1ZSIsDQoJCQkiY2xhc3MiOiAiZW1waGFzaXMiLA0KCQkJImNzcyI6IHsNCgkJCQkiY29sb3IiOiAiI2ZmZmZmZiIsDQoJCQkJImZvbnQtd2VpZ2h0IjogImJvbGQiLA0KCQkJCSJ0ZXh0LWRlY29yYXRpb24iOiAidW5kZXJsaW5lIg0KCQkJfQ0KCQl9LA0KCQkiYXJyYXlfcHJvcGVydHkiOiB7DQoJCQkibmFtZSI6ICJOYW1lIiwNCgkJCSJ2YWx1ZSI6IFsxLDIsMyw0XSwNCgkJCSJjbGFzcyI6ICJlbXBoYXNpcyINCgkJfQ0KCX0NCn0='

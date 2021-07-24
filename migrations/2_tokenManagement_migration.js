@@ -11,7 +11,7 @@ module.exports = function (deployer) {
     await deployer.deploy(TokenManagement, imgUrl)
     const instance = await TokenManagement.deployed()
 
-    CryptoravesTokenAddress = await instance.cryptoravesTokenAddr()
+    CryptoravesTokenAddress = await instance.cryptoravesTokenAddress()
 
     console.log('\n*************************************************************************\n')
     console.log('CryptoravesToken Contract Address: '+CryptoravesTokenAddress)
