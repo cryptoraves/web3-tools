@@ -6,30 +6,30 @@ import "./WalletFull.sol";
 
 contract UserManagement is AdministrationContract {
 
-    using SafeMath for uint256;
+    using SafeMath for uint;
     using Address for address;
 
     struct User {
-        uint256 twitterUserId;
+        uint twitterUserId;
         address cryptoravesAddress;
         string twitterHandle;
         string imageUrl;
         bool isManaged;
         bool isUser;
         bool dropped;
-        uint256 tokenId;
+        uint tokenId;
     }
 
     event UserData(User);
     event UsernameChange(address _cryptoravesAddress, string _handle);
     event ImageChange(address _cryptoravesAddress, string imageUrl);
-    event HeresMyAddress(address _layer1Address, address _cryptoravesAddress, uint256 _tweetId);
+    event HeresMyAddress(address _layer1Address, address _cryptoravesAddress, uint _tweetId);
 
     //maps platform user id to User object
-    mapping(uint256 => User) public users;
+    mapping(uint => User) public users;
 
     //for looking up user from account address
-    mapping(address => uint256) public userAccounts;
+    mapping(address => uint) public userAccounts;
 
     //for getting users' Layer 1 accounts. L2 => L1
     mapping(address => address) public layerOneAccounts;
@@ -38,36 +38,36 @@ contract UserManagement is AdministrationContract {
     mapping(address => address) public layerTwoAccounts;
 
     //for looking up platform ID from handle
-    mapping(string => uint256) public userIDs;
+    mapping(string => uint) public userIDs;
 
     constructor() public {
         //default administrator
         setAdministrator(msg.sender);
     }
 
-    function getUserId(address _account) public view returns(uint256) {
+    function getUserId(address _account) public view returns(uint) {
         return userAccounts[_account];
     }
 
 
 
-    function getUserAccount(uint256 _platformUserId) public view returns(address) {
+    function getUserAccount(uint _platformUserId) public view returns(address) {
         return users[_platformUserId].cryptoravesAddress;
     }
-    function isUser (uint256 _userId) public view onlyAdmin returns(bool) {
+    function isUser (uint _userId) public view onlyAdmin returns(bool) {
       return users[_userId].isUser;
     }
-    function dropState (uint256 _platformUserId) public view returns(bool) {
+    function dropState (uint _platformUserId) public view returns(bool) {
         // can we pull from a Chainlink mapping?
         return users[_platformUserId].dropped;
     }
 
 
-    function getUserStruct(uint256 _platformUserId) public view returns(User memory) {
+    function getUserStruct(uint _platformUserId) public view returns(User memory) {
         return users[_platformUserId];
     }
 
-    function launchL2Account(uint256 _userId, string memory _twitterHandleFrom, string memory _imageUrl) public onlyAdmin returns (User memory) {
+    function launchL2Account(uint _userId, string memory _twitterHandleFrom, string memory _imageUrl) public onlyAdmin returns (User memory) {
         //launch a managed wallet
         WalletFull receiver;
         address receiverAddress;
@@ -97,7 +97,7 @@ contract UserManagement is AdministrationContract {
         return user;
     }
 
-    function mapLayerOneAccount(address _l2Addr, address _l1Addr, uint256 _tweetId) public onlyAdmin {
+    function mapLayerOneAccount(address _l2Addr, address _l1Addr, uint _tweetId) public onlyAdmin {
 
         require(layerOneAccounts[_l2Addr] == address(0), "User already mapped an L1 account");
 
@@ -124,7 +124,7 @@ contract UserManagement is AdministrationContract {
         return layerTwoAccounts[_l1Addr];
     }
 
-    function userAccountCheck(uint256 _platformUserId, string memory _twitterHandle, string memory _imageUrl) public onlyAdmin returns (User memory) {
+    function userAccountCheck(uint _platformUserId, string memory _twitterHandle, string memory _imageUrl) public onlyAdmin returns (User memory) {
         //create a new user
         if (isUser(_platformUserId)){
             //check if handle has changed
@@ -153,12 +153,12 @@ contract UserManagement is AdministrationContract {
         return _l1 != address(0);
     }
 
-    function getUserIdByPlatformHandle (string memory _platformHandle) public view onlyAdmin returns(uint256) {
+    function getUserIdByPlatformHandle (string memory _platformHandle) public view onlyAdmin returns(uint) {
       return userIDs[_platformHandle];
     }
 
     //user service function: for resetting dropstate upon request
-    function setDropState(uint256 _platformUserId, bool _state) public onlyAdmin returns (address) {
+    function setDropState(uint _platformUserId, bool _state) public onlyAdmin returns (address) {
         users[_platformUserId].dropped = _state;
     }
 

@@ -14,7 +14,7 @@ contract EIP20Factory {
         createEIP20(10000, "Verify Token", 3, "VTX");
     }
 
-    function createEIP20(uint256 _initialAmount, string memory _name, uint8 _decimals, string memory _symbol)
+    function createEIP20(uint _initialAmount, string memory _name, uint8 _decimals, string memory _symbol)
         public
     returns (address) {
 

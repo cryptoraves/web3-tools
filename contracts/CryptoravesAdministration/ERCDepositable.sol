@@ -9,14 +9,14 @@ contract ERCDepositable is IERC721Receiver {
 
     //mapping for token ids and their origin addresses
     struct ManagedToken {
-        uint256 cryptoravesTokenId;
+        uint cryptoravesTokenId;
         bool isManagedToken;
         uint ercType;
         uint nftIndex;
-        uint256 totalSupply;
+        uint totalSupply;
         string name;
         string symbol;
-        uint256 decimals;
+        uint decimals;
         string emoji;
         string tokenBrandImageUrl;
         string tokenDescription;
@@ -45,7 +45,7 @@ contract ERCDepositable is IERC721Receiver {
     * @param _amount The amount to deposit.
     * @param _tokenAddr The token to deposit.
     */
-    function _depositERC20(uint256 _amount, address _tokenAddr) internal {
+    function _depositERC20(uint _amount, address _tokenAddr) internal {
         if(_tokenAddr == address(0)) {
           require(msg.value == _amount, 'incorrect amount');
         } else {
@@ -61,7 +61,7 @@ contract ERCDepositable is IERC721Receiver {
     * @param _amount The amount to withdraw.
     * @param _tokenAddr The token to withdraw.
     */
-    function _withdrawERC20(uint256 _amount, address _tokenAddr) internal {
+    function _withdrawERC20(uint _amount, address _tokenAddr) internal {
         if(_tokenAddr == address(0)) {
             (bool success, ) = msg.sender.call{value: _amount}("");
             require(success, "Transfer failed.");
@@ -71,29 +71,29 @@ contract ERCDepositable is IERC721Receiver {
         }
     }
 
-    function _depositERC721(uint256 _tokenId, address _tokenAddr) internal {
+    function _depositERC721(uint _tokenId, address _tokenAddr) internal {
         IERCuni token = IERCuni(_tokenAddr); //you can use ABI for ERC20 as IERC721.sol conflicts with IERC1155
         token.safeTransferFrom(msg.sender, address(this), _tokenId);
 
     }
-    function _withdrawERC721(uint256 _tokenId, address _tokenAddr) internal {
+    function _withdrawERC721(uint _tokenId, address _tokenAddr) internal {
         IERCuni token = IERCuni(_tokenAddr);
         token.safeTransferFrom(address(this), msg.sender, _tokenId);
 
     }
 
     //required for use with safeTransfer in ERC721
-    function onERC721Received(address, address, uint256, bytes memory) public virtual override returns (bytes4) {
+    function onERC721Received(address, address, uint, bytes memory) public virtual override returns (bytes4) {
         return this.onERC721Received.selector;
     }
 }
 
 interface IERCuni is IERC20 {
     //adding erc721 function for reducing inhereitances
-    function safeTransferFrom(address from, address to, uint256 tokenId) external;
+    function safeTransferFrom(address from, address to, uint tokenId) external;
     function name() external view returns(string memory);
     function symbol() external view returns(string memory);
-    function tokenURI(uint256) external view returns(string memory);
-    function totalSupply() external view override returns (uint256);
+    function tokenURI(uint) external view returns(string memory);
+    function totalSupply() external view override returns (uint);
     function decimals() external view returns (uint8);
 }

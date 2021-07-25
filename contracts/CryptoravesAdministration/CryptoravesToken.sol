@@ -6,11 +6,11 @@ import "/home/cartosys/openzeppelin-contracts/contracts/token/ERC1155/ERC1155.so
 
 contract CryptoravesToken is ERC1155, AdministrationContract {
     
-    using SafeMath for uint256;
+    using SafeMath for uint;
     using Address for address;
     
     //list of held 1155 token ids
-    mapping(address => uint256[]) public heldTokenIds;
+    mapping(address => uint[]) public heldTokenIds;
     
     constructor(string memory _uri) ERC1155(_uri) public {
         //default managers include parent contract and ValidatorInterfaceContract Owner
@@ -18,7 +18,7 @@ contract CryptoravesToken is ERC1155, AdministrationContract {
         setAdministrator(msg.sender);
     }
     
-    function _findHeldToken(address _addr, uint256 _tokenId) internal view returns(bool){
+    function _findHeldToken(address _addr, uint _tokenId) internal view returns(bool){
         for(uint i=0; i < heldTokenIds[_addr].length; i++){
             if (heldTokenIds[_addr][i] == _tokenId){
                 return true;
@@ -27,7 +27,7 @@ contract CryptoravesToken is ERC1155, AdministrationContract {
         return false;
     }
     
-    function checkHeldToken(address _addr, uint256 _tokenId) public {
+    function checkHeldToken(address _addr, uint _tokenId) public {
         if(!_findHeldToken(_addr, _tokenId)){
             heldTokenIds[_addr].push(_tokenId);
         }
@@ -36,7 +36,7 @@ contract CryptoravesToken is ERC1155, AdministrationContract {
     /*
     *  For after each transfer or burn. Remove held token id from account portfolio after checking balance == 0
     */
-    function pruneHeldToken(address _addr, uint256 _1155tokenId) private onlyAdmin {
+    function pruneHeldToken(address _addr, uint _1155tokenId) private onlyAdmin {
         
         for(uint i=0; i < heldTokenIds[_addr].length; i++){
             if(_1155tokenId == heldTokenIds[_addr][i]){
@@ -45,11 +45,11 @@ contract CryptoravesToken is ERC1155, AdministrationContract {
         }
     }
     
-    function getHeldTokenIds(address _addr) public view returns(uint256[] memory){
+    function getHeldTokenIds(address _addr) public view returns(uint[] memory){
         return heldTokenIds[_addr];
     }
     
-    function getHeldTokenBalances(address _addr) public view returns(uint256[] memory){
+    function getHeldTokenBalances(address _addr) public view returns(uint[] memory){
         address[] memory _accounts = new address[](heldTokenIds[_addr].length);
 
         for(uint i=0; i < heldTokenIds[_addr].length; i++){
@@ -63,7 +63,7 @@ contract CryptoravesToken is ERC1155, AdministrationContract {
     }
     
     //override function
-    function _beforeTokenTransfer(address operator, address from, address to, uint256[] memory ids, uint256[] memory amounts, bytes memory data) internal override{ 
+    function _beforeTokenTransfer(address operator, address from, address to, uint[] memory ids, uint[] memory amounts, bytes memory data) internal override{ 
         if(to != address(0)){
             //this is a burn or transfer to
             for(uint i=0; i < ids.length; i++){
@@ -84,19 +84,19 @@ contract CryptoravesToken is ERC1155, AdministrationContract {
     }
     
     // General mint function
-    function mint(address account, uint256 id, uint256 amount, bytes memory data) public virtual onlyAdmin {
+    function mint(address account, uint id, uint amount, bytes memory data) public virtual onlyAdmin {
         _mint(account, id, amount, data);
     }
     
-    function mintBatch(address account, uint256[] memory ids, uint256[] memory amounts, bytes memory data) public virtual onlyAdmin {
+    function mintBatch(address account, uint[] memory ids, uint[] memory amounts, bytes memory data) public virtual onlyAdmin {
         _mintBatch(account, ids, amounts, data);
     }
     
-    function burn(address account, uint256 id, uint256 value) public virtual {
+    function burn(address account, uint id, uint value) public virtual {
         _burn(account, id, value);
     }
 
-    function burnBatch(address account, uint256[] memory ids, uint256[] memory values) public virtual {
+    function burnBatch(address account, uint[] memory ids, uint[] memory values) public virtual {
         _burnBatch(account, ids, values);
     }
     

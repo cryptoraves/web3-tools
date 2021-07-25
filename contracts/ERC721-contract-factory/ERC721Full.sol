@@ -10,12 +10,12 @@ contract ERC721Full is IERC721Metadata, IERC721Enumerable,  ERC721 {
 
     constructor(address userAddress, string memory name, string memory symbol, string memory _baseUri) ERC721(name, symbol) public {
       _setBaseURI(_baseUri);
-      uint256 newItemId = _tokenIds.current();
+      uint newItemId = _tokenIds.current();
       _safeMint(userAddress, newItemId);
     }
-    function mint(address to) public returns (uint256) {
+    function mint(address to) public returns (uint) {
       _tokenIds.increment();
-      uint256 newItemId = _tokenIds.current();
+      uint newItemId = _tokenIds.current();
       _safeMint(to, newItemId);
       _setTokenURI(newItemId, newItemId.toString());
       return newItemId;

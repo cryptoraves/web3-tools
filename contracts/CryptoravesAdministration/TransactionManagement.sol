@@ -8,12 +8,12 @@ import "./AdministrationContract.sol";
 contract TransactionManagement is AdministrationContract {
 
     struct TwitterInts {
-        uint256 twitterIdFrom;
-        uint256 twitterIdTo;
-        uint256 twitterIdThirdParty;
-        uint256 amountOrId;             //amount or original id of token to transfer -- integers of any decimal value. eg 1.31 = 131, 12321.989293 = 12321989293, 1000 = 1000 etc
-        uint256 decimalPlaceLocation;   //where the decimal place lies: 1.31 = 2, 12321.989293 = 6, 1000 = 0 etc
-        uint256 tweetId;                //tweet ID from twitter
+        uint twitterIdFrom;
+        uint twitterIdTo;
+        uint twitterIdThirdParty;
+        uint amountOrId;             //amount or original id of token to transfer -- integers of any decimal value. eg 1.31 = 131, 12321.989293 = 12321989293, 1000 = 1000 etc
+        uint decimalPlaceLocation;   //where the decimal place lies: 1.31 = 2, 12321.989293 = 6, 1000 = 0 etc
+        uint tweetId;                //tweet ID from twitter
     }
 
     address public tokenManagementContractAddress;
@@ -130,8 +130,8 @@ contract TransactionManagement is AdministrationContract {
             }
 
             require(_addr != address(0), 'Attempt to send a token not deposited into Cryptoraves');
-            uint256 _cryptoravesTokenId = _tokenManagement.cryptoravesIdByAddress(_addr);
-            uint256 _adjustedValue;
+            uint _cryptoravesTokenId = _tokenManagement.cryptoravesIdByAddress(_addr);
+            uint _adjustedValue;
 
             //nft id adjustment
             if(_tokenManagement.getTokenStruct(_cryptoravesTokenId).ercType == 721){
@@ -139,8 +139,8 @@ contract TransactionManagement is AdministrationContract {
                 _adjustedValue = 1;
             }else{
 
-                uint256 _dec = _twitterInts.decimalPlaceLocation;
-                uint256 _amt = _twitterInts.amountOrId;
+                uint _dec = _twitterInts.decimalPlaceLocation;
+                uint _amt = _twitterInts.amountOrId;
                 _adjustedValue = _tokenManagement.adjustValueByUnits(_cryptoravesTokenId, _amt, _dec );
             }
             bytes memory bytesTweetId = abi.encodePacked(_twitterInts.tweetId);
@@ -151,7 +151,7 @@ contract TransactionManagement is AdministrationContract {
         }
     }
 
-    function _initCryptoDrop(uint256 _platformUserId, string memory _twitterHandleFrom, string memory _imageUrl, uint256 _tweetId) internal returns(address) {
+    function _initCryptoDrop(uint _platformUserId, string memory _twitterHandleFrom, string memory _imageUrl, uint _tweetId) internal returns(address) {
 
         IUserManager _userManagement = IUserManager(userManagementContractAddress);
 
@@ -181,7 +181,7 @@ contract TransactionManagement is AdministrationContract {
     }
 
     //End user support features
-    function resetTokenDrop(uint256 _platformUserId) public onlyAdmin {
+    function resetTokenDrop(uint _platformUserId) public onlyAdmin {
         //reset user's dropState
         IUserManager _userManagement = IUserManager(userManagementContractAddress);
         _userManagement.setDropState(_platformUserId, false);

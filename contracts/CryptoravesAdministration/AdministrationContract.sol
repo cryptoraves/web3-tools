@@ -6,12 +6,12 @@ import "./AdminToolsLibrary.sol";
 
 interface ITransactionManager {
     struct TwitterInts {
-        uint256 twitterIdFrom;
-        uint256 twitterIdTo;
-        uint256 twitterIdThirdParty;
-        uint256 amountOrId;
-        uint256 decimalPlaceLocation;
-        uint256 tweetId;
+        uint twitterIdFrom;
+        uint twitterIdTo;
+        uint twitterIdThirdParty;
+        uint amountOrId;
+        uint decimalPlaceLocation;
+        uint tweetId;
     }
     function initCommand(TwitterInts memory, string[] memory) external returns(bool);
     function testFortransactionManagerAddressUniquely() external pure returns(bool);
@@ -21,14 +21,14 @@ interface ITransactionManager {
 
 interface ITokenManager {
     struct ManagedToken {
-        uint256 cryptoravesTokenId;
+        uint cryptoravesTokenId;
         bool isManagedToken;
         uint ercType;
         uint nftIndex;
-        uint256 totalSupply;
+        uint totalSupply;
         string name;
         string symbol;
-        uint256 decimals;
+        uint decimals;
         string emoji;
         string tokenBrandImageUrl;
         string tokenDescription;
@@ -37,35 +37,35 @@ interface ITokenManager {
     function getTokenStruct(uint) external view returns(ManagedToken memory); //required as solidity not yet allowing above getter function call from another contract
     function cryptoravesTokenAddress() external view returns(address);
     function getAddressBySymbol(string memory) external view returns(address);
-    function cryptoravesIdByAddress(address) external view returns(uint256);
-    function dropCrypto(string memory, address, uint256, bytes memory) external returns(uint256);
-    function managedTransfer(address, address, uint256, uint256, bytes memory) external;
+    function cryptoravesIdByAddress(address) external view returns(uint);
+    function dropCrypto(string memory, address, uint, bytes memory) external returns(uint);
+    function managedTransfer(address, address, uint, uint, bytes memory) external;
     function setIsManagedToken(address, bool) external;
-    function adjustValueByUnits(uint256, uint256, uint256) external view returns(uint256);
+    function adjustValueByUnits(uint, uint, uint) external view returns(uint);
 }
 
 interface IUserManager {
     struct User {
-        uint256 twitterUserId;
+        uint twitterUserId;
         address cryptoravesAddress;
         string twitterHandle;
         string imageUrl;
         bool isManaged;
         bool isUser;
         bool dropped;
-        uint256 tokenId;
+        uint tokenId;
     }
     function getLayerOneAccount(address) external view returns(address);
     function getLayerTwoAccount(address) external view returns(address);
     function userHasL1AddressMapped(address) external view returns(bool);
-    function getUserId(address) external view returns(uint256);
-    function dropState (uint256) external view returns(bool);
-    function userAccountCheck(uint256, string memory, string memory) external returns(User memory);
-    function mapLayerOneAccount(address, address, uint256) external;
-    function getUserAccount(uint256) external view returns(address);
-    function getUserStruct(uint256) external view returns(User memory);
-    function isUser (uint256) external view  returns(bool);
-    function setDropState(uint256, bool) external returns (address);
+    function getUserId(address) external view returns(uint);
+    function dropState (uint) external view returns(bool);
+    function userAccountCheck(uint, string memory, string memory) external returns(User memory);
+    function mapLayerOneAccount(address, address, uint) external;
+    function getUserAccount(uint) external view returns(address);
+    function getUserStruct(uint) external view returns(User memory);
+    function isUser (uint) external view  returns(bool);
+    function setDropState(uint, bool) external returns (address);
 }
 
 interface IDownStream {

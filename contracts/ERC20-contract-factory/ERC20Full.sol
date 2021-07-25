@@ -12,7 +12,7 @@ contract ERC20Full is ERC20, ERC20Burnable {
         string memory _name,
         string memory _symbol,
         uint8 _decimals,
-        uint256 _initialAmount
+        uint _initialAmount
     ) ERC20(_name, _symbol) public {
 	    _mint(userAddress, _initialAmount);
 	    _setupDecimals(_decimals);

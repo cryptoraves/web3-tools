@@ -20,9 +20,9 @@ library AdminToolsLibrary {
         bytes memory b3 = bytes(s);
         return b3;
     }
-    function bytesToUint256(bytes memory _bytes) internal pure returns (uint256) {
-        require(_bytes.length >= 32, "toUint256_outOfBounds");
-        uint256 tempUint;
+    function bytesTouint(bytes memory _bytes) internal pure returns (uint) {
+        require(_bytes.length >= 32, "touint_outOfBounds");
+        uint tempUint;
 
         assembly {
             tempUint := mload(add(add(_bytes, 0x20), 0))
