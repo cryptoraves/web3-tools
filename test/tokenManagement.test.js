@@ -435,7 +435,7 @@ contract("TokenManagement", async accounts => {
   })
   it("token list length ok", async () => {
   	let instanceTokenManagement = await TokenManagement.deployed()
-  	let count = await instanceTokenManagement.getTokenListCount()
+  	let count = await instanceTokenManagement.numberOfTokens()
   	assert.isNumber(
   		count.toNumber(),
   		"Managed token count failed isNumber test"

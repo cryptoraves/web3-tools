@@ -4,6 +4,7 @@ pragma experimental ABIEncoderV2;
 
 import "./ERCDepositable.sol";
 import "./CryptoravesToken.sol";
+import "./AdministrationContract.sol";
 
 contract ERC1155NonFungibleIdManager {
   // Uses a split bit implementation.
@@ -14,7 +15,7 @@ contract ERC1155NonFungibleIdManager {
   uint256 constant NF_INDEX_MASK = uint128(~0);
 
   //Bytes-based token ID scheme
-  uint256 numberOfTokens = 0;
+  uint256 public numberOfTokens = 0;
   uint256 public standardMintAmount = 1000000000000000000000000000; //18-decimal adjusted standard amount (1 billion)
 
   mapping (uint128 => address) ERC721AddressByBaseId;
@@ -34,7 +35,7 @@ contract ERC1155NonFungibleIdManager {
   }
 }
 
-contract TokenManagement is ERCDepositable, ERC1155NonFungibleIdManager {
+contract TokenManagement is AdministrationContract, ERCDepositable, ERC1155NonFungibleIdManager {
 
     using SafeMath for uint256;
     using Address for address;
@@ -257,10 +258,6 @@ contract TokenManagement is ERCDepositable, ERC1155NonFungibleIdManager {
         require(managedTokenByFullBytesId[_1155tokenId].isManagedToken, 'Cannot set description url for non managed token');
         managedTokenByFullBytesId[_1155tokenId].tokenDescription = _description;
         emit DescriptionChange(_1155tokenId, _description);
-    }
-
-    function getTokenListCount() public view returns(uint count) {
-        return numberOfTokens;
     }
 
     function _addTokenToManagedTokenList(address _tokenAddr, uint ercType, uint128 _nftIndex) private onlyAdmin returns(uint256){

@@ -3,10 +3,9 @@ pragma solidity 0.6.10;
 pragma experimental ABIEncoderV2;
 
 import "/home/cartosys/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
-import "./AdministrationContract.sol";
 import "/home/cartosys/openzeppelin-contracts/contracts/token/ERC721/IERC721Receiver.sol";
 
-contract ERCDepositable is IERC721Receiver, AdministrationContract {
+contract ERCDepositable is IERC721Receiver {
 
     //mapping for token ids and their origin addresses
     struct ManagedToken {
@@ -23,6 +22,7 @@ contract ERCDepositable is IERC721Receiver, AdministrationContract {
         string tokenDescription;
     }
 
+    //retrieves ERC specs from original ERC20 contract
     function getERCspecs(address _tknAddr, uint _ercType)  public view returns (ManagedToken memory){
         IERCuni token = IERCuni(_tknAddr);
 

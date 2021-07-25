@@ -35,7 +35,6 @@ interface ITokenManager {
     }
     function managedTokenByFullBytesId(uint) external view returns(ManagedToken memory);
     function getTokenStruct(uint) external view returns(ManagedToken memory); //required as solidity not yet allowing above getter function call from another contract
-    function standardMintAmount() external view returns(uint);
     function cryptoravesTokenAddress() external view returns(address);
     function getAddressBySymbol(string memory) external view returns(address);
     function cryptoravesIdByAddress(address) external view returns(uint256);
@@ -43,7 +42,6 @@ interface ITokenManager {
     function managedTransfer(address, address, uint256, uint256, bytes memory) external;
     function setIsManagedToken(address, bool) external;
     function adjustValueByUnits(uint256, uint256, uint256) external view returns(uint256);
-    function getNextBaseId(uint256) external view returns(uint256);
 }
 
 interface IUserManager {
@@ -124,13 +122,6 @@ contract AdministrationContract {
     function unsetAdministrator(address _oldAdmin) public onlyAdmin {
         _administrators[_oldAdmin] = false;
         //emit RemovedAdministrator(_oldAdmin, address(this));
-    }
-
-    /*
-    * For checking if contract is launched
-    */
-    function isAvailable() public pure returns(bool) {
-        return true;
     }
 
     /*
