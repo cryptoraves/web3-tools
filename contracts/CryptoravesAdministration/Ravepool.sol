@@ -1,17 +1,17 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.6.10;
+pragma experimental ABIEncoderV2;
 
 import "/home/cartosys/openzeppelin-contracts/contracts/token/ERC1155/ERC1155Burnable.sol";
 import "./AdministrationContract.sol";
 
-interface CryptoravesTokenManager {
+interface CryptoravesTokenContract {
     function cryptoravesIdByAddress(address _account) external view returns(uint256);
     function getHeldTokenIds(address _addr) external view returns(uint256[] memory);
     function getHeldTokenBalances(address _addr) external view returns(uint256[] memory);
     function safeTransferFrom(address from, address to, uint256 id, uint256 amount, bytes memory data) external;
     function safeBatchTransferFrom(address from, address to, uint256[] memory ids, uint256[] memory amounts, bytes memory data) external;
     function burn(address, uint256, uint256) external;
-    function getTotalSupply(uint256) external view returns(uint256);
     function subtractFromTotalSupply(uint256 _tokenId, uint256 _amount) external;
 }
 
@@ -68,17 +68,17 @@ contract Ravepool is AdministrationContract {
         address _cryptoravesTokenAddress = ITokenManager(_tokenManager).cryptoravesTokenAddress();
 
         //get personal token Id
-        uint256 _1155tokenId  = CryptoravesTokenManager(_cryptoravesTokenAddress).cryptoravesIdByAddress(address(this));
+        uint256 _1155tokenId  = CryptoravesTokenContract(_cryptoravesTokenAddress).cryptoravesIdByAddress(address(this));
 
         //require sent token to be the designated personal token
         require(_sentTokenId == _1155tokenId, 'Token ID sent to redeemAndBurnViaRavepool doesn\'t match designated burn token ID');
 
         //gather list of all held tokens in Ravepool
-        uint256[] memory _heldTokenIds = CryptoravesTokenManager(_cryptoravesTokenAddress).getHeldTokenIds(address(this));
-        uint256[] memory _heldTokenbalances = CryptoravesTokenManager(_cryptoravesTokenAddress).getHeldTokenBalances(address(this));
+        uint256[] memory _heldTokenIds = CryptoravesTokenContract(_cryptoravesTokenAddress).getHeldTokenIds(address(this));
+        uint256[] memory _heldTokenbalances = CryptoravesTokenContract(_cryptoravesTokenAddress).getHeldTokenBalances(address(this));
 
         //total supply used to calculate final share percentaghe
-        uint256 _totalSupplyOfPersonalToken = CryptoravesTokenManager(_cryptoravesTokenAddress).getTotalSupply(_sentTokenId);
+        uint256 _totalSupplyOfPersonalToken = ITokenManager(_tokenManager).managedTokenByFullBytesId(_sentTokenId).totalSupply;
 
         //calculate percentage of each token to be distributed back to msg sender
         uint256[] memory _distributionAmounts;
@@ -89,16 +89,16 @@ contract Ravepool is AdministrationContract {
         }
 
         //send tokens for redemption
-        CryptoravesTokenManager(_cryptoravesTokenAddress).safeTransferFrom(msg.sender, address(this), _sentTokenId, _amountOfPersonalToken, _data);
+        CryptoravesTokenContract(_cryptoravesTokenAddress).safeTransferFrom(msg.sender, address(this), _sentTokenId, _amountOfPersonalToken, _data);
 
         //distribute held tokens
-        CryptoravesTokenManager(_cryptoravesTokenAddress).safeBatchTransferFrom(address(this), msg.sender, _heldTokenIds, _distributionAmounts, _data);
+        CryptoravesTokenContract(_cryptoravesTokenAddress).safeBatchTransferFrom(address(this), msg.sender, _heldTokenIds, _distributionAmounts, _data);
 
         //burn spent tokens
-        CryptoravesTokenManager(_cryptoravesTokenAddress).burn(address(this), _sentTokenId, _amountOfPersonalToken);
+        CryptoravesTokenContract(_cryptoravesTokenAddress).burn(address(this), _sentTokenId, _amountOfPersonalToken);
 
         //adjust totalSupply
-        CryptoravesTokenManager(_cryptoravesTokenAddress).subtractFromTotalSupply(_sentTokenId, _amountOfPersonalToken);
+        CryptoravesTokenContract(_cryptoravesTokenAddress).subtractFromTotalSupply(_sentTokenId, _amountOfPersonalToken);
 
         emit BurnAndRedeem(_sentTokenId, _amountOfPersonalToken);
     }

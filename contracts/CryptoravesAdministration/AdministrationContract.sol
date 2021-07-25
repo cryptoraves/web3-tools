@@ -20,6 +20,21 @@ interface ITransactionManager {
 }
 
 interface ITokenManager {
+    struct ManagedToken {
+        uint256 cryptoravesTokenId;
+        bool isManagedToken;
+        uint ercType;
+        uint nftIndex;
+        uint256 totalSupply;
+        string name;
+        string symbol;
+        uint256 decimals;
+        string emoji;
+        string tokenBrandImageUrl;
+        string tokenDescription;
+    }
+    function managedTokenByFullBytesId(uint) external view returns(ManagedToken memory);
+    function getTokenStruct(uint) external view returns(ManagedToken memory); //required as solidity not yet allowing above getter function call from another contract
     function standardMintAmount() external view returns(uint);
     function cryptoravesTokenAddress() external view returns(address);
     function getAddressBySymbol(string memory) external view returns(address);
@@ -28,7 +43,6 @@ interface ITokenManager {
     function managedTransfer(address, address, uint256, uint256, bytes memory) external;
     function setIsManagedToken(address, bool) external;
     function adjustValueByUnits(uint256, uint256, uint256) external view returns(uint256);
-    function getERCtype(uint256) external view returns(uint256);
     function getNextBaseId(uint256) external view returns(uint256);
 }
 

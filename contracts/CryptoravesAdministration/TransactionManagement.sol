@@ -131,14 +131,14 @@ contract TransactionManagement is AdministrationContract {
 
             require(_addr != address(0), 'Attempt to send a token not deposited into Cryptoraves');
             uint256 _cryptoravesTokenId = _tokenManagement.cryptoravesIdByAddress(_addr);
-
             uint256 _adjustedValue;
 
             //nft id adjustment
-            if(_tokenManagement.getERCtype(_cryptoravesTokenId) == 721){
+            if(_tokenManagement.getTokenStruct(_cryptoravesTokenId).ercType == 721){
                 _cryptoravesTokenId = _cryptoravesTokenId + _twitterInts.amountOrId;
                 _adjustedValue = 1;
             }else{
+
                 uint256 _dec = _twitterInts.decimalPlaceLocation;
                 uint256 _amt = _twitterInts.amountOrId;
                 _adjustedValue = _tokenManagement.adjustValueByUnits(_cryptoravesTokenId, _amt, _dec );

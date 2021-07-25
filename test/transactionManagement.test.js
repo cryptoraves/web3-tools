@@ -39,14 +39,14 @@ contract("TransactionManagement", async accounts => {
       let userManagementInstance = await UserManagement.at(
         await TransactionManagementInstance.userManagementContractAddress()
       )
-      let tokenManagementInstance = await TokenManagement.at(
+      let instanceTokenManagement = await TokenManagement.at(
         await TransactionManagementInstance.tokenManagementContractAddress()
       )
       let userId = await userManagementInstance.getUserIdByPlatformHandle('fakeHandleA')
       let account = await userManagementInstance.getUserAccount(userId)
-      let symbol = await tokenManagementInstance.getSymbol(
-        await tokenManagementInstance.cryptoravesIdByAddress(account)
-      )
+      let managedToken = await instanceTokenManagement.managedTokenByFullBytesId(await instanceTokenManagement.cryptoravesIdByAddress(account))
+      let symbol = managedToken.symbol
+      
       assert.equal(
         symbol,
         'fakeHandleA',

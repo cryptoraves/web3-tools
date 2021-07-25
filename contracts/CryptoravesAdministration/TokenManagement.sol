@@ -71,6 +71,11 @@ contract TokenManagement is ERCDepositable, ERC1155NonFungibleIdManager {
         cryptoravesTokenAddress = newAddr;
     }
 
+    //required for calls from within the smart contracts as solidity will revert when automattic getter function called
+    function getTokenStruct(uint _cryptoravesTokenId) public view returns(ManagedToken memory) {
+      return managedTokenByFullBytesId[_cryptoravesTokenId];
+    }
+
     /*
         Soleley for DropMyCrypto function. As it designates each new token as non-3rd party
         Turn this public and make it free if through social media.   Charge fee if not.
@@ -196,27 +201,6 @@ contract TokenManagement is ERCDepositable, ERC1155NonFungibleIdManager {
         uint256 _1155tokenBaseBytesId = symbolAndEmojiLookupTable[_symbol];
         return tokenAddressByFullBytesId[_1155tokenBaseBytesId];
     }
-
-
-
-    function getTotalSupply(uint256 _1155tokenId) public view  returns(uint256){
-        return managedTokenByFullBytesId[_1155tokenId].totalSupply;
-    }
-    function getSymbol(uint256 _1155tokenId) public view  returns(string memory){
-        return managedTokenByFullBytesId[_1155tokenId].symbol;
-    }
-    function getEmoji(uint256 _1155tokenId) public view  returns(string memory){
-        return managedTokenByFullBytesId[_1155tokenId].emoji;
-    }
-    function getERCtype(uint256 _1155tokenId) public view  returns(uint){
-        return managedTokenByFullBytesId[_1155tokenId].ercType;
-    }
-    function isManagedToken(address _tokenAddr) public view returns(bool) {
-        return managedTokenByFullBytesId[cryptoravesIdByAddress[_tokenAddr]].isManagedToken;
-    }
-
-
-
 
     function setSymbol(uint256 _1155tokenId, string memory _symbol) public onlyAdmin {
         managedTokenByFullBytesId[_1155tokenId].symbol = _symbol;
