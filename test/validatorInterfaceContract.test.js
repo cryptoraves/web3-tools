@@ -98,8 +98,10 @@ contract("ValidatorInterfaceContract", async accounts => {
         await instanceTransactionManagement.userManagementContractAddress()
       )
 
-      let l2Address = await instanceUserManagement.getLayerTwoAccount(additionalAccount)
-      let user = await instanceUserManagement.getUserAccount(primaryUserId)
+      let l2Address = await instanceUserManagement.layerTwoAccounts(additionalAccount)
+      let userStruct = await instanceUserManagement.getUserStruct(primaryUserId)
+  		let user = userStruct.cryptoravesAddress
+
       assert.equal(l2Address, user, 'L1 address mapped to non-matching l2 address');
     });
     it("inits and sends erc20", async () => {
@@ -291,7 +293,8 @@ contract("ValidatorInterfaceContract", async accounts => {
         await instance.validateCommand([ids[i],0,0,0,0, 1234567895], ['rando'+ids[i].toString(), '', '', 'twitter','launch',uri])
         await instance.validateCommand([ids[i],primaryUserId,0, amounts[i],18, 1234567896], ['rando'+ids[i].toString(), 'fakeHandle', '','twitter','transfer',uri])
       }
-      let primaryUserAccount = await instanceUserManagement.getUserAccount(primaryUserId)
+      let userStruct = await instanceUserManagement.getUserStruct(primaryUserId)
+  		let primaryUserAccount = userStruct.cryptoravesAddress
       let instanceCryptoravesToken = await CryptoravesToken.at(
         await instanceTokenManagement.cryptoravesTokenAddress()
       )
@@ -301,7 +304,8 @@ contract("ValidatorInterfaceContract", async accounts => {
       assert.isAbove(heldIds.length, 0, 'No held token ids returned.')
       let tokenId, userAddr;
       for(i=0; i < 5; i++){
-        userAddr = await instanceUserManagement.getUserAccount(ids[i])
+        let userStruct = await instanceUserManagement.getUserStruct(ids[i])
+    		userAddr = userStruct.cryptoravesAddress
         tokenId = await instanceTokenManagement.cryptoravesIdByAddress(userAddr)
         switch(i){
           case 0: assert.equal(tokenId.toString(), heldIds[i+1].toString(), 'heldid corresponding to id0 does not match'); break;

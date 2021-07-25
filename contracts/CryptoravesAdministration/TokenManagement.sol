@@ -121,7 +121,7 @@ contract TokenManagement is AdministrationContract, ERCDepositable, ERC1155NonFu
         ITransactionManager iTxnMgmt = ITransactionManager(getTransactionManagerAddress());
         IUserManager iUserMgmt = IUserManager(iTxnMgmt.userManagementContractAddress());
         //1. lookup msg.sender's L2 account
-        address _l2Addr = iUserMgmt.getLayerTwoAccount(msg.sender);
+        address _l2Addr = iUserMgmt.layerTwoAccounts(msg.sender);
         //2. require they are mapped to an L2 account
         require(_l2Addr != address(0), 'Depositor/Withdrawer\'s L1 account not mapped to cryptoraves (L2) account');
         return _l2Addr;
@@ -291,7 +291,7 @@ contract TokenManagement is AdministrationContract, ERCDepositable, ERC1155NonFu
 
               ITransactionManager iTxnMgmt = ITransactionManager(getTransactionManagerAddress());
               IUserManager iUserMgmt = IUserManager(iTxnMgmt.userManagementContractAddress());
-              IUserManager.User memory _userStruct = iUserMgmt.getUserStruct(iUserMgmt.getUserId(_tokenAddr));
+              IUserManager.User memory _userStruct = iUserMgmt.getUserStruct(iUserMgmt.userAccounts(_tokenAddr));
               _mngTkn.name = _userStruct.twitterHandle;
               _mngTkn.symbol = _userStruct.twitterHandle;
               _mngTkn.decimals = 18;

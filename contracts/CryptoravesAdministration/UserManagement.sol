@@ -45,24 +45,6 @@ contract UserManagement is AdministrationContract {
         setAdministrator(msg.sender);
     }
 
-    function getUserId(address _account) public view returns(uint) {
-        return userAccounts[_account];
-    }
-
-
-
-    function getUserAccount(uint _platformUserId) public view returns(address) {
-        return users[_platformUserId].cryptoravesAddress;
-    }
-    function isUser (uint _userId) public view onlyAdmin returns(bool) {
-      return users[_userId].isUser;
-    }
-    function dropState (uint _platformUserId) public view returns(bool) {
-        // can we pull from a Chainlink mapping?
-        return users[_platformUserId].dropped;
-    }
-
-
     function getUserStruct(uint _platformUserId) public view returns(User memory) {
         return users[_platformUserId];
     }
@@ -116,17 +98,9 @@ contract UserManagement is AdministrationContract {
         emit HeresMyAddress(_l1Addr, _l2Addr, _tweetId);
     }
 
-    function getLayerOneAccount(address _l2Addr) public view returns(address){
-        return layerOneAccounts[_l2Addr];
-    }
-
-    function getLayerTwoAccount(address _l1Addr) public view returns(address){
-        return layerTwoAccounts[_l1Addr];
-    }
-
     function userAccountCheck(uint _platformUserId, string memory _twitterHandle, string memory _imageUrl) public onlyAdmin returns (User memory) {
         //create a new user
-        if (isUser(_platformUserId)){
+        if (users[_platformUserId].isUser){
             //check if handle has changed
             if(!AdminToolsLibrary._stringsMatch(_twitterHandle, users[_platformUserId].twitterHandle)){
                 //update user handle if no match
@@ -146,15 +120,6 @@ contract UserManagement is AdministrationContract {
         } else {
             return launchL2Account(_platformUserId, _twitterHandle, _imageUrl);
         }
-    }
-
-    function userHasL1AddressMapped(address _userCryptoravesAddr) public view returns(bool){
-        address _l1 = layerOneAccounts[_userCryptoravesAddr];
-        return _l1 != address(0);
-    }
-
-    function getUserIdByPlatformHandle (string memory _platformHandle) public view onlyAdmin returns(uint) {
-      return userIDs[_platformHandle];
     }
 
     //user service function: for resetting dropstate upon request

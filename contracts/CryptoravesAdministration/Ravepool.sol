@@ -42,15 +42,16 @@ contract Ravepool is AdministrationContract {
         address _userTokenManager = ITransactionManager(getTransactionManagerAddress()).userManagementContractAddress();
 
         //require crypto already dropped by user
-        uint _userIdToCheck = IUserManager(_userTokenManager).getUserId(address(this));
+        uint _userIdToCheck = IUserManager(_userTokenManager).userAccounts(address(this));
         require(
-            IUserManager(_userTokenManager).dropState(_userIdToCheck),
+            IUserManager(_userTokenManager).getUserStruct(_userIdToCheck).dropped,
             'User has not yet dropped their cryptoraves personal token.'
         );
 
         //require layer 1 address be mapped by user
+        address _addr = IUserManager(_userTokenManager).layerOneAccounts(address(this));
         require(
-            IUserManager(_userTokenManager).userHasL1AddressMapped(address(this)),
+            _addr != address(0),
             'User has not yet Mapped an L1 address to their cryptoraves address.'
         );
 

@@ -42,11 +42,12 @@ contract("TransactionManagement", async accounts => {
       let instanceTokenManagement = await TokenManagement.at(
         await TransactionManagementInstance.tokenManagementContractAddress()
       )
-      let userId = await userManagementInstance.getUserIdByPlatformHandle('fakeHandleA')
-      let account = await userManagementInstance.getUserAccount(userId)
+      let userId = await userManagementInstance.userIDs('fakeHandleA')
+      let userStruct = await userManagementInstance.getUserStruct(userId)
+      let account = userStruct.cryptoravesAddress
       let managedToken = await instanceTokenManagement.managedTokenByFullBytesId(await instanceTokenManagement.cryptoravesIdByAddress(account))
       let symbol = managedToken.symbol
-      
+
       assert.equal(
         symbol,
         'fakeHandleA',
@@ -122,7 +123,7 @@ contract("TransactionManagement", async accounts => {
 
       let res = await userManagementInstance.getUserStruct(1029384756);
       let addr = res['cryptoravesAddress']
-      res = await userManagementInstance.userHasL1AddressMapped(addr)
+      res = await userManagementInstance.layerOneAccounts(addr)
       assert.isOk(
         res,
         "L1 Mapped address should exist"
@@ -131,9 +132,9 @@ contract("TransactionManagement", async accounts => {
       res = await userManagementInstance.getUserStruct(99434443434);
       addr = res['cryptoravesAddress']
       let randoAddr = ethers.Wallet.createRandom().address
-      res = await userManagementInstance.userHasL1AddressMapped(addr)
+      res = await userManagementInstance.layerOneAccounts(addr)
       assert.isFalse(
-        res,
+        parseInt(res) != 0,
         "Issue checking L1 Mapped address. Should not exist."
       );
       res = await TransactionManagementInstance.initCommand(
@@ -141,12 +142,12 @@ contract("TransactionManagement", async accounts => {
         ['rando2', '', '','twitter','mapaccount','https://i.picsum.photos/id/111/200/200.jpg',randoAddr]
       )
       res = await userManagementInstance.getUserStruct(99434443434);
-      res = await userManagementInstance.userHasL1AddressMapped(addr)
+      res = await userManagementInstance.layerOneAccounts(addr)
       assert.isOk(
         res,
         "Issue checking L1 Mapped address. Random address should now be assigned but isn't."
       );
-      res = await userManagementInstance.getLayerOneAccount(addr)
+      res = await userManagementInstance.layerOneAccounts(addr)
       assert.equal(
         res,
         randoAddr,
@@ -267,7 +268,7 @@ contract("TransactionManagement", async accounts => {
     //get WalletFull (Ravepool) contract
     res = await userManagementInstance.getUserStruct(9929387656);
     let walletFullAddr = res['account']
-    res = await userManagementInstance.userHasL1AddressMapped(walletFullAddr)
+    res = await userManagementInstance.layerOneAccounts(walletFullAddr)
     assert.isOk(res, "could not map address for new user")
 
     walletFullInstance = await WalletFull.at(walletFullAddr)

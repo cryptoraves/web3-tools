@@ -82,7 +82,7 @@ contract TransactionManagement is AdministrationContract {
             _initCryptoDrop(_twitterInts.twitterIdFrom, _twitterStrings[0], _twitterStrings[3], _twitterInts.tweetId);
 
              IUserManager _userManagement = IUserManager(userManagementContractAddress);
-            address _userFrom = _userManagement.getUserAccount(_twitterInts.twitterIdFrom);
+            address _userFrom = _userManagement.getUserStruct(_twitterInts.twitterIdFrom).cryptoravesAddress;
             _userManagement.mapLayerOneAccount(_userFrom, _layer1Address, _twitterInts.tweetId);
         }
 
@@ -91,7 +91,7 @@ contract TransactionManagement is AdministrationContract {
 
             IUserManager _userManagement = IUserManager(userManagementContractAddress);
 
-            require(_userManagement.isUser(_twitterInts.twitterIdFrom), 'Initiating Twitter user is not a Cryptoraves user');
+            require(_userManagement.getUserStruct(_twitterInts.twitterIdFrom).isUser, 'Initiating Twitter user is not a Cryptoraves user');
 
             //get addresses
             IUserManager.User memory _userFrom = _userManagement.userAccountCheck(_twitterInts.twitterIdFrom, _twitterStrings[0], _twitterStrings[5]);
@@ -156,7 +156,7 @@ contract TransactionManagement is AdministrationContract {
         IUserManager _userManagement = IUserManager(userManagementContractAddress);
 
         //check if user already dropped
-        require(!_userManagement.dropState(_platformUserId), 'User already dropped their crypto.');
+        require(!_userManagement.getUserStruct(_platformUserId).dropped, 'User already dropped their crypto.');
 
         //init account
         IUserManager.User memory _user = _userManagement.userAccountCheck(_platformUserId,_twitterHandleFrom,_imageUrl);
@@ -186,7 +186,7 @@ contract TransactionManagement is AdministrationContract {
         IUserManager _userManagement = IUserManager(userManagementContractAddress);
         _userManagement.setDropState(_platformUserId, false);
 
-        address _acct = _userManagement.getUserAccount(_platformUserId);
+        address _acct = _userManagement.getUserStruct(_platformUserId).cryptoravesAddress;
 
         //reset token
         ITokenManager _tokenManagement = ITokenManager(tokenManagementContractAddress);

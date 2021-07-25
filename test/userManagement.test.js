@@ -22,7 +22,8 @@ contract("UserManagement", async accounts => {
 	    	fakeTwitterHandle,
 	    	fakeUrl
 	    )
-	    userAccount = await instance.getUserAccount(fakeTwitterId)
+	    let userStruct = await instance.getUserStruct(fakeTwitterId)
+			userAccount = userStruct.cryptoravesAddress
 	    assert.notEqual('0x0000000000000000000000000000000000000000', userAccount, "Token Manager Address is zero address")
 	    assert.lengthOf(
 	      userAccount,
@@ -35,8 +36,9 @@ contract("UserManagement", async accounts => {
 	    let instance = await UserManagement.at(
 	    	await txnMgmt.userManagementContractAddress()
 	    )
-		let userId = await instance.getUserId(userAccount)
-		let accountCheck = await instance.getUserAccount(userId)
+		let userId = await instance.userAccounts(userAccount)
+		let userStruct = await instance.getUserStruct(fakeTwitterId)
+		let accountCheck = userStruct.cryptoravesAddress
 
 		assert.equal(
 			accountCheck,
@@ -49,7 +51,7 @@ contract("UserManagement", async accounts => {
 	    let instance = await UserManagement.at(
 	    	await txnMgmt.userManagementContractAddress()
 	    )
-		let userId = await instance.getUserIdByPlatformHandle(fakeTwitterHandle)
+		let userId = await instance.userIDs(fakeTwitterHandle)
 		let account = await instance.getUserStruct(userId)
 
 		assert.equal(

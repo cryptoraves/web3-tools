@@ -55,16 +55,12 @@ interface IUserManager {
         bool dropped;
         uint tokenId;
     }
-    function getLayerOneAccount(address) external view returns(address);
-    function getLayerTwoAccount(address) external view returns(address);
-    function userHasL1AddressMapped(address) external view returns(bool);
-    function getUserId(address) external view returns(uint);
-    function dropState (uint) external view returns(bool);
+    function layerTwoAccounts(address) external view returns(address);
+    function layerOneAccounts(address) external view returns(address);
+    function userAccounts(address) external view returns(uint);
     function userAccountCheck(uint, string memory, string memory) external returns(User memory);
     function mapLayerOneAccount(address, address, uint) external;
-    function getUserAccount(uint) external view returns(address);
     function getUserStruct(uint) external view returns(User memory);
-    function isUser (uint) external view  returns(bool);
     function setDropState(uint, bool) external returns (address);
 }
 
