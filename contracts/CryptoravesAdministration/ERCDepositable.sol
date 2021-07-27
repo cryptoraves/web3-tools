@@ -2,8 +2,8 @@
 pragma solidity 0.6.10;
 pragma experimental ABIEncoderV2;
 
-import "/home/cartosys/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
-import "/home/cartosys/openzeppelin-contracts/contracts/token/ERC721/IERC721Receiver.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 
 contract ERCDepositable is IERC721Receiver {
 

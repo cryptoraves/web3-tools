@@ -2,7 +2,7 @@
 pragma solidity 0.6.10;
 pragma experimental ABIEncoderV2;
 
-import "/home/cartosys/openzeppelin-contracts/contracts/token/ERC1155/ERC1155Burnable.sol";
+import "@openzeppelin/contracts/token/ERC1155/ERC1155Burnable.sol";
 import "./AdministrationContract.sol";
 
 interface CryptoravesTokenContract {

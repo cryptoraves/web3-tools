@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.6.10;
 
-import "/home/cartosys/openzeppelin-contracts/contracts/token/ERC1155/ERC1155Burnable.sol";
+import "@openzeppelin/contracts/token/ERC1155/ERC1155Burnable.sol";
 import "./AdministrationContract.sol";
 
 abstract contract ERC1155Receiver is ERC165, IERC1155Receiver, AdministrationContract {
