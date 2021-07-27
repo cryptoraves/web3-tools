@@ -55,3 +55,42 @@ echo ']' >> /tmp/realUserData.json
 
 
 mysqldump --column-statistics=0  --host=token-game-db-t2-small-v1.cjgcqwhurzri.us-east-1.rds.amazonaws.com -u colinTradolf2 --ssl-mode=DISABLED -p token_game_plasma > ~/Downloads/dbexport.sql
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--balances only
+SELECT CONCAT(
+    '[',
+    GROUP_CONCAT(CONCAT(
+    	'{"twitterIdFrom":"1054910011795824640"',
+    	',"twitterIdTo":"', users.platform_id, '"',
+    	',"twitterIdThirdParty":"1054910011795824640"',
+    	',"amountOrId":"', balance, '"',
+    	',"decimalPlaceLocation":"', 0, '"',
+    --	',"tweetId":"', IFNULL((SELECT platform_content_id FROM requests where requests.id = request_id),''), '"',
+    	',"twitterHandleFrom":"',IFNULL(user_from,''), '"',
+    	',"twitterHandleTo":"', IFNULL(user_to,''), '"',
+    	',"ticker":""',
+    	',"_platformName":"', 'twitter', '"',
+    	',"_txnType":"', IFNULL(IF(user_from='LAUNCH', 'launch', 'transfer'),''), '"',
+    	',"_fromImgUrl":"',IFNULL(IF(user_from='LAUNCH', (select image_url FROM users where users.id=user_to_id), null),(select image_url FROM users where users.id=user_from_id),''), '"',
+    	',"L1Address":"', IFNULL((select eth_address FROM users where users.id=user_from_id),''), '"}'
+    )),
+    ']'
+)
+FROM balances
+left join users on balances.platform_handle_id=users.id
+WHERE users.
+;

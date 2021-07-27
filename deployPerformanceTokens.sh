@@ -26,6 +26,14 @@ while [ "$1" != "" ]; do
             ;;
 
     esac
+    case $1 in
+        -r | --redeploymentMigrationCryptoravesOnly )
+			shift
+            MIGRATIONFILE=12_redeployCryptoravesTokenCryptoravesOnly_migration.js
+            MIGRATIONFILENUMBER=12
+            ;;
+
+    esac
     shift
 done
 
