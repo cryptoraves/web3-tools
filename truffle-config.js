@@ -103,6 +103,11 @@ module.exports = {
         confirmations: 2,
         timeoutBlocks: 400
       },
+      arbitrumTest: {
+        provider: () => new HDWalletProvider(privateKey, `https://rinkeby.arbitrum.io/rpc`),
+        network_id: 421611,
+        gasPrice: 0
+      },
     // Useful for private networks
     // private: {
       // provider: () => new HDWalletProvider(mnemonic, `https://network.io`),
