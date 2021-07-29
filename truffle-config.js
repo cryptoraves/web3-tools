@@ -84,7 +84,7 @@ module.exports = {
         gasPrice: 0,
         gas: 40000000,
         network_id: "*",
-        timeout: 100000,
+        timeout: 1000000,
         ChainID: 344435,
         skipDryRun: true
       },
