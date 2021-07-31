@@ -25,7 +25,7 @@ const infuraKey = fs.readFileSync(".infuraKey").toString().trim();
 //const fs = require('fs');
 //const mnemonic = fs.readFileSync(".secret").toString().trim();
 //const infuraKey = fs.readFileSync(".infuraKey").toString().trim();
-
+process.env.UV_THREADPOOL_SIZE = 128;
 module.exports = {
   /**
    * Networks define how you connect to your ethereum client and let you set the
@@ -86,7 +86,9 @@ module.exports = {
         network_id: "*",
         timeout: 1000000,
         ChainID: 344435,
-        skipDryRun: true
+        skipDryRun: true,
+        networkCheckTimeout: 1000000,
+        timeoutBlocks: 400
       },
       skaleTestBob: {
         provider: () => new HDWalletProvider(privateKey, 'https://dev-testnet-v1-1.skalelabs.com'),
