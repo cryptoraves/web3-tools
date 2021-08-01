@@ -14,7 +14,7 @@
   "dependencies": {
     "3box": "^1.20.3",
     "@openzeppelin/contracts": "3.3",
-    "@truffle/hdwallet-provider": "^1.0.39",
+    "@truffle/hdwallet-provider": "^1.4",
     "add": "^2.0.6",
     "assemblyscript": "0.10.0",
     "ethers": "^5.0.0",

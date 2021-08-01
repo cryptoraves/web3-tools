@@ -97,8 +97,8 @@ module.exports = {
         skipDryRun: true
       },
       maticTest: {
-        provider: () => new HDWalletProvider(privateKey, `https://matic-mainnet.chainstacklabs.com`),
-        network_id: 137,
+        provider: () => new HDWalletProvider(privateKey, `https://matic-mumbai.chainstacklabs.com`),
+        network_id: 80001,
         confirmations: 2,
         timeoutBlocks: 400
       },
