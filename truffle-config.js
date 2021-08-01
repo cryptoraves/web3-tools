@@ -84,11 +84,8 @@ module.exports = {
         gasPrice: 0,
         gas: 40000000,
         network_id: "*",
-        timeout: 1000000,
         ChainID: 344435,
-        skipDryRun: true,
-        networkCheckTimeout: 1000000,
-        timeoutBlocks: 400
+        skipDryRun: true
       },
       skaleTestBob: {
         provider: () => new HDWalletProvider(privateKey, 'https://dev-testnet-v1-1.skalelabs.com'),
@@ -100,8 +97,8 @@ module.exports = {
         skipDryRun: true
       },
       maticTest: {
-        provider: () => new HDWalletProvider(privateKey, `https://rpc-mumbai.matic.today`),
-        network_id: 80001,
+        provider: () => new HDWalletProvider(privateKey, `https://matic-mainnet.chainstacklabs.com`),
+        network_id: 137,
         confirmations: 2,
         timeoutBlocks: 400
       },
@@ -109,6 +106,10 @@ module.exports = {
         provider: () => new HDWalletProvider(privateKey, `https://rinkeby.arbitrum.io/rpc`),
         network_id: 421611,
         gasPrice: 0
+      },
+      arbitrumTest2: {
+        provider: () => new HDWalletProvider(privateKey, `https://kovan5.arbitrum.io/rpc`),
+        network_id: "*"
       },
     // Useful for private networks
     // private: {
