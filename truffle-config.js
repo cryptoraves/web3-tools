@@ -105,7 +105,7 @@ module.exports = {
       arbitrumTest: {
         provider: () => new HDWalletProvider(privateKey, `https://rinkeby.arbitrum.io/rpc`),
         network_id: 421611,
-        gasPrice: 0
+        gas: 40000000
       },
       arbitrumTest2: {
         provider: () => new HDWalletProvider(privateKey, `https://kovan5.arbitrum.io/rpc`),
