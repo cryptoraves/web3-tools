@@ -99,6 +99,11 @@ module.exports = {
       maticTest: {
         provider: () => new HDWalletProvider(privateKey, `https://matic-mumbai.chainstacklabs.com`),
         network_id: 80001,
+        skipDryRun: true
+      },
+      matic: {
+        provider: () => new HDWalletProvider(privateKey, `https://matic-mainnet.chainstacklabs.com`),
+        network_id: 137,
         confirmations: 2,
         timeoutBlocks: 400
       },
