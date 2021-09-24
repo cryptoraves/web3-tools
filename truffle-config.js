@@ -118,6 +118,19 @@ module.exports = {
         provider: () => new HDWalletProvider(privateKey, `https://kovan5.arbitrum.io/rpc`),
         network_id: "*"
       },
+
+
+      devSkaleLocalMainnet: {
+        provider: () => new HDWalletProvider('0x7ec3bb27ea4718da58251e7f5c2edda830de602ecc30c57efe74fe5c1d798a5b', 'http://127.0.0.1:8545'),
+        network_id: "*",
+        gas: 40000000
+      },
+      devSkaleLocalSideChain: {
+        provider: () => new HDWalletProvider('0x7ec3bb27ea4718da58251e7f5c2edda830de602ecc30c57efe74fe5c1d798a5b', 'http://127.0.0.1:15000'),
+        gasPrice: 0,
+        gas: 40000000,
+        network_id: "*"
+      },
     // Useful for private networks
     // private: {
       // provider: () => new HDWalletProvider(mnemonic, `https://network.io`),

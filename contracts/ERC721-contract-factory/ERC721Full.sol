@@ -13,11 +13,11 @@ contract ERC721Full is IERC721Metadata, IERC721Enumerable,  ERC721 {
       uint newItemId = _tokenIds.current();
       _safeMint(userAddress, newItemId);
     }
-    function mint(address to) public returns (uint) {
+    /*function mint(address to) public returns (uint) {
       _tokenIds.increment();
       uint newItemId = _tokenIds.current();
       _safeMint(to, newItemId);
       _setTokenURI(newItemId, newItemId.toString());
       return newItemId;
-    }
+    }*/
 }
