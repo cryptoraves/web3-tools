@@ -1,12 +1,16 @@
 const TransactionManagement = artifacts.require("TransactionManagement")
 const WalletFull = artifacts.require("WalletFull")
-const ethers = require('ethers')
+
 
 const UserManagement = artifacts.require("UserManagement")
 const CryptoravesToken = artifacts.require("CryptoravesToken")
+const TokenManagement = artifacts.require("TokenManagement")
+
+const ethers = require('ethers')
+
 let secondUserManagerAddr = ''
 let secondTokenManagerAddr = ''
-const TokenManagement = artifacts.require("TokenManagement")
+
 
 //reserve objects
 let usrMgmt2
