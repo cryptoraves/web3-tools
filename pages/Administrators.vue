@@ -346,7 +346,7 @@ export default {
       let tx = await contract.deployed()
 
       this.TokenManagementContractAddress = localStorage.TokenManagementContractAddress = contract.address
-      this.CryptoravesTokenContractAddress = localStorage.CryptoravesTokenContractAddress = await contract.cryptoravesTokenAddr()
+      this.CryptoravesTokenContractAddress = localStorage.CryptoravesTokenContractAddress = await contract.cryptoravesTokenAddress()
 
       //set admin for cryptoraves token (to allow minting rights)
       let cryptoravesTokenContract = new this.ethers.Contract(
@@ -620,7 +620,7 @@ export default {
       cumulativeBool = cumulativeBool && res
       console.log('Is ValidatorInterfaceContract an Administrator: ', res)
 
-      let tokenMgmtContractAddress = await transactionManagerContract.getTokenManagementAddress()
+      let tokenMgmtContractAddress = await transactionManagerContract.tokenManagementContractAddress()
       res = tokenMgmtContractAddress==this.TokenManagementContractAddress
       cumulativeBool = cumulativeBool && res
       console.log('TokenManager Address Matches: ', res)
@@ -651,7 +651,7 @@ export default {
         await this.sleep(1000)
       }
 
-      let cryptoravesTokenAddress = await transactionManagerContract.getCryptoravesTokenAddress()
+      let cryptoravesTokenAddress = await tokenManagerContract.cryptoravesTokenAddress()
       res = cryptoravesTokenAddress==this.CryptoravesTokenContractAddress
       cumulativeBool = cumulativeBool && res
       console.log('CryptoravesToken Address Matches: ', res)
@@ -670,7 +670,7 @@ export default {
       cumulativeBool = cumulativeBool && res
       console.log('CryptoravesToken URI Matches: ',res)
 
-      let userContractAddress = await transactionManagerContract.getUserManagementAddress()
+      let userContractAddress = await transactionManagerContract.userManagementContractAddress()
       res = userContractAddress==this.UserManagementContractAddress
       cumulativeBool = cumulativeBool && res
       console.log('UserManager Address Matches: ', res)
