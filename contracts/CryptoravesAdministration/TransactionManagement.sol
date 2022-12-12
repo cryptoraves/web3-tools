@@ -19,10 +19,9 @@ contract TransactionManagement is AdministrationContract {
     address public tokenManagementContractAddress;
     address public userManagementContractAddress;
 
-    constructor(address _tokenManagementAddr, address _userManagementAddr) public {
+    //event GetsHere(bool a);
 
-        //default administrator
-        setAdministrator(msg.sender);
+    constructor(address _tokenManagementAddr, address _userManagementAddr) public {
 
         setTokenManagementAddress(_tokenManagementAddr);
         setUserManagementAddress(_userManagementAddr);
@@ -67,6 +66,7 @@ contract TransactionManagement is AdministrationContract {
 
         //map layer 1 account
         else if(keccak256(bytes(_twitterStrings[4])) == keccak256(bytes("mapaccount"))){
+
             IUserManager _userManagement = IUserManager(userManagementContractAddress);
             IUserManager.User memory _userFrom = _userManagement.userAccountCheck(_twitterInts.twitterIdFrom, _twitterStrings[0], _twitterStrings[5]);
             address _layer1Address = AdminToolsLibrary.parseAddr(_twitterStrings[6]);

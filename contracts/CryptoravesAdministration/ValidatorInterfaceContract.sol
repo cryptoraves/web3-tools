@@ -15,11 +15,9 @@ contract ValidatorInterfaceContract is AdministrationContract {
     //owner is administrator ("validator") by default. Can later revoke self by unsetValidator()
     constructor(address _txnManager) public {
 
-        //asssign sender as admin
-        setAdministrator(msg.sender);
-
         //set default token manager address
         settransactionManagerAddress(_txnManager);
+        
     }
 
     /*

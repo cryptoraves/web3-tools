@@ -20,6 +20,8 @@ contract UserManagement is AdministrationContract {
         uint tokenId;
     }
 
+    //event GetsHere(bool a);  debugging event
+
     event UserData(User);
     event UsernameChange(address _cryptoravesAddress, string _handle);
     event ImageChange(address _cryptoravesAddress, string imageUrl);
@@ -41,8 +43,6 @@ contract UserManagement is AdministrationContract {
     mapping(string => uint) public userIDs;
 
     constructor() public {
-        //default administrator
-        setAdministrator(msg.sender);
     }
 
     function getUserStruct(uint _platformUserId) public view returns(User memory) {

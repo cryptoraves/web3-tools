@@ -60,7 +60,6 @@ contract TokenManagement is AdministrationContract, ERCDepositable, ERC1155NonFu
     event CryptoravesTransfer(address _from, address _to, uint _value, uint _cryptoravesTokenId, uint _tweetId);
 
     constructor(string memory _uri) public {
-        setAdministrator(msg.sender);
         CryptoravesToken newCryptoravesToken = new CryptoravesToken(_uri);
         cryptoravesTokenAddress = address(newCryptoravesToken);
 

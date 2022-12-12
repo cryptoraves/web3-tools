@@ -38,7 +38,7 @@ while [ "$1" != "" ]; do
 done
 
 if [[ -z ${NETWORK} ]]; then
-  NETWORK="development"
+  NETWORK="homestead"
 fi
 
 DATAJSONPATH="/tmp/${NETWORK}-contractAddresses.json"
