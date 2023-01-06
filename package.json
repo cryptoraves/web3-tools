@@ -18,7 +18,7 @@
     "add": "^2.0.6",
     "assemblyscript": "0.10.0",
     "fs": "0.0.1-security",
-    "nuxt": "2.12.1",
+    "nuxt": "2.15.8",
     "solc": "^0.6.10",
     "solhint": "2.3.0",
     "truffle": "^5.1.60",
@@ -32,7 +32,7 @@
     "@nomiclabs/hardhat-waffle": "^2.0.1",
     "@openzeppelin/contracts": "^3.4.0",
     "chai": "^4.3.4",
-    "ethereum-waffle": "^3.4.0",
+    "ethereum-waffle": "^4.0.7",
     "ethers": "^5.5.1",
     "hardhat": "^2.6.7"
   }
